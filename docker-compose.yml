@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  rink-tech:
+    build:
+      context: .
+    container_name: rink-tech-prod
+    ports:
+      - "127.0.0.1:8302:3000"
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
