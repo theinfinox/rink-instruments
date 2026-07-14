@@ -12,7 +12,7 @@ interface Props {
     q?: string;
     sector?: string;
     institution?: string;
-    trl?: string;
+    district?: string;
     patent?: string;
     potential?: string;
     page?: string;
@@ -74,21 +74,24 @@ export default async function TechnologiesPage({ searchParams }: Props) {
     );
   }
   if (params.sector) {
+    const sectorQuery = params.sector;
     filtered = filtered.filter(i => {
       const tags = Array.isArray(i.tag) ? i.tag : (i.tag ? i.tag.split(',') : []);
-      return tags.some(t => t.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-') === params.sector);
+      return tags.some(t => t.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-') === sectorQuery);
     });
   }
   if (params.institution) {
-    filtered = filtered.filter(i => i.institution_name && i.institution_name.toLowerCase().replace(/[^a-z0-9]+/g, '-') === params.institution);
+    const institutionQuery = params.institution;
+    filtered = filtered.filter(i => i.institution_name && i.institution_name.toLowerCase().replace(/[^a-z0-9]+/g, '-') === institutionQuery);
   }
-  if (params.trl) {
-    // using 'trl' query param for district
-    filtered = filtered.filter(i => i.standardized_district === params.trl);
+  if (params.district) {
+    const districtQuery = params.district.toLowerCase();
+    filtered = filtered.filter(i => i.standardized_district && i.standardized_district.toLowerCase() === districtQuery);
   }
   if (params.patent) {
     // using 'patent' query param for verification status
-    filtered = filtered.filter(i => i.warnings === params.patent);
+    const patentQuery = params.patent;
+    filtered = filtered.filter(i => i.warnings === patentQuery);
   }
 
   const perPage = 12;
@@ -113,7 +116,7 @@ export default async function TechnologiesPage({ searchParams }: Props) {
         q: params.q ?? '',
         sector: params.sector ?? '',
         institution: params.institution ?? '',
-        trl: params.trl ?? '',
+        district: params.district ?? '',
         patent: params.patent ?? '',
         potential: params.potential ?? '',
       }}

@@ -8,7 +8,7 @@ interface Props {
 
 export default function BrowseByInstitution({ institutions }: Props) {
   return (
-    <section id="institutions" className="relative scroll-mt-20 py-20 bg-white border-b border-slate-100">
+    <section id="institutions" className="relative py-20 bg-white border-b border-slate-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="mb-8">
           <div className="text-xs font-bold text-[#1B4D9B] uppercase tracking-widest mb-3">Browse by Institution</div>

@@ -3,14 +3,14 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
-import { House, Building2, LayoutGrid, Phone } from 'lucide-react';
+import { House, Building2, MapPin, Phone } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
 
 const NAV_LINKS = [
   { label: 'Home',          href: '/',               icon: House },
   { label: 'Institutions',  href: '/#institutions',  icon: Building2 },
-  { label: 'Sectors',       href: '/#sectors',       icon: LayoutGrid },
+  { label: 'Districts',     href: '/#districts',     icon: MapPin },
   { label: 'Contact',       href: '/contact',        icon: Phone },
 ];
 
@@ -71,7 +71,7 @@ export default function Navbar() {
                 href="/technologies"
                 className="ml-1 px-4 py-2 text-sm font-semibold rounded-lg bg-[#0A2164] text-white hover:bg-[#081A52] transition-colors duration-150 font-heading"
               >
-                Browse Technologies
+                Browse Instruments
               </Link>
               
             </div>
@@ -132,10 +132,10 @@ export default function Navbar() {
             );
           })}
 
-          {/* Technologies shortcut */}
+          {/* Instruments shortcut */}
           <Link
             href="/technologies"
-            aria-label="Browse Technologies"
+            aria-label="Browse Instruments"
             className={clsx(
               'flex flex-col items-center justify-center flex-1 gap-1 py-3 min-h-[64px] transition-all duration-200 select-none relative',
               pathname.startsWith('/technologies')
@@ -163,7 +163,7 @@ export default function Navbar() {
               'text-[11px] font-bold tracking-wide',
               pathname.startsWith('/technologies') ? 'text-[#0A2164]' : 'text-gray-500'
             )}>
-              Technologies
+              Instruments
             </span>
           </Link>
         </div>

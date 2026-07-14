@@ -197,7 +197,7 @@ export default async function HomePage() {
       {/* ══════════════════════════════════════════════════════════
           BROWSE BY DISTRICT
       ══════════════════════════════════════════════════════════ */}
-      <section id="districts" className="relative scroll-mt-20 py-20 bg-[#F6F8FC] overflow-hidden border-b border-slate-100">
+      <section id="districts" className="relative py-20 bg-[#F6F8FC] overflow-hidden border-b border-slate-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="max-w-xl mb-12">
             <div className="text-xs font-bold text-[#1B4D9B] uppercase tracking-widest mb-3">Explore by District</div>

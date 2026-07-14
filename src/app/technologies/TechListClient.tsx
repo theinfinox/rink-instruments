@@ -23,7 +23,7 @@ interface InitialFilters {
   q: string;
   sector: string;
   institution: string;
-  trl: string;
+  district: string;
   patent: string;
   potential: string;
 }
@@ -85,7 +85,7 @@ export default function TechListClient({
     if (merged.q) params.set('q', merged.q);
     if (merged.sector) params.set('sector', merged.sector);
     if (merged.institution) params.set('institution', merged.institution);
-    if (merged.trl) params.set('trl', merged.trl);
+    if (merged.district) params.set('district', merged.district);
     if (merged.patent) params.set('patent', merged.patent);
     if (merged.potential) params.set('potential', merged.potential);
     const p = (overrides as { page?: string }).page;
@@ -102,7 +102,7 @@ export default function TechListClient({
   }
 
   function clearFilters() {
-    const empty: InitialFilters = { q: '', sector: '', institution: '', trl: '', patent: '', potential: '' };
+    const empty: InitialFilters = { q: '', sector: '', institution: '', district: '', patent: '', potential: '' };
     setFilters(empty);
     startTransition(() => router.push(pathname));
   }
@@ -241,13 +241,13 @@ export default function TechListClient({
                 </div>
 
                 <div className="filter-group">
-                  <label htmlFor="filter-trl" className="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2">
+                  <label htmlFor="filter-district" className="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2">
                     District
                   </label>
                   <select
-                    id="filter-trl"
-                    value={filters.trl}
-                    onChange={e => applyFilter('trl', e.target.value)}
+                    id="filter-district"
+                    value={filters.district}
+                    onChange={e => applyFilter('district', e.target.value)}
                     className="w-full text-sm border border-border rounded-lg px-3 py-2 text-text-primary bg-card focus:outline-none focus:border-accent-secondary focus:ring-1 focus:ring-accent-secondary/20"
                   >
                     <option value="">All Districts</option>
