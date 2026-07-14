@@ -10,9 +10,9 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 
 export const metadata = {
-  title: 'RINK Technology Transfer Portal — Kerala Startup Mission',
+  title: 'RINK Instrumentation Portal — Kerala Startup Mission',
   description:
-    "Explore commercializable technologies developed by Kerala's leading research institutions under the Research Innovation Network Kerala (RINK).",
+    "Explore research instruments and testing facilities available at Kerala's leading research institutions under the Research Innovation Network Kerala (RINK).",
 };
 
 export default async function HomePage() {
@@ -156,7 +156,7 @@ export default async function HomePage() {
             className="text-[11px] sm:text-xs md:text-sm font-bold uppercase tracking-[0.25em] mb-8"
             style={{ color: 'rgba(255,255,255,0.75)' }}
           >
-            RESEARCH INNOVATION NETWORK KERALA . TECHNOLOGY TRANSFER PORTAL
+            RESEARCH INNOVATION NETWORK KERALA . INSTRUMENTATION PORTAL
           </div>
 
           {/* Heading */}
@@ -164,7 +164,7 @@ export default async function HomePage() {
             className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-[1.12] tracking-tight max-w-5xl mb-10"
             style={{ color: '#FFFFFF', textShadow: '0 2px 12px rgba(0,0,0,0.35)' }}
           >
-            Discover Technologies from Kerala&apos;s Leading Research Institutions
+            Discover Research Instruments from Kerala&apos;s Leading Institutions
           </h1>
 
           {/* Search — the centerpiece */}
