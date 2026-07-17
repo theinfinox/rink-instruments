@@ -10,6 +10,9 @@ interface Props {
   size?: 'lg' | 'md';
   defaultValue?: string;
   autoFocus?: boolean;
+  searchRoute?: string;
+  placeholder?: string;
+  ariaLabel?: string;
 }
 
 function highlight(text: string, query: string) {
@@ -27,7 +30,14 @@ function highlight(text: string, query: string) {
   );
 }
 
-export default function SearchBar({ size = 'md', defaultValue = '', autoFocus = false }: Props) {
+export default function SearchBar({ 
+  size = 'md', 
+  defaultValue = '', 
+  autoFocus = false, 
+  searchRoute = '/technologies',
+  placeholder = 'Search technologies, sectors, institutions, applications...',
+  ariaLabel = 'Search technologies'
+}: Props) {
   const router = useRouter();
   const [query, setQuery] = useState(defaultValue);
   const [suggestions, setSuggestions] = useState<SearchIndexItem[]>([]);
@@ -87,13 +97,13 @@ export default function SearchBar({ size = 'md', defaultValue = '', autoFocus = 
     e.preventDefault();
     if (query.trim()) {
       setOpen(false);
-      router.push(`/technologies?q=${encodeURIComponent(query.trim())}`);
+      router.push(`${searchRoute}?q=${encodeURIComponent(query.trim())}`);
     }
   }
 
   function handleSelect(item: SearchIndexItem) {
     setOpen(false);
-    router.push(`/technologies/${item.id}`);
+    router.push(`${searchRoute}/${item.id}`);
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
@@ -132,11 +142,11 @@ export default function SearchBar({ size = 'md', defaultValue = '', autoFocus = 
           onChange={e => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
           onFocus={() => { if (suggestions.length > 0) setOpen(true); }}
-          placeholder="Search technologies, sectors, institutions, applications..."
+          placeholder={placeholder}
           autoFocus={autoFocus}
           className={`search-input ${inputPadding} pr-24`}
           autoComplete="off"
-          aria-label="Search technologies"
+          aria-label={ariaLabel}
           aria-expanded={open}
           aria-autocomplete="list"
         />
@@ -196,7 +206,7 @@ export default function SearchBar({ size = 'md', defaultValue = '', autoFocus = 
               type="button"
               onClick={() => {
                 setOpen(false);
-                router.push(`/technologies?q=${encodeURIComponent(query)}`);
+                router.push(`${searchRoute}?q=${encodeURIComponent(query)}`);
               }}
               className="text-xs text-accent-secondary font-semibold hover:underline"
             >

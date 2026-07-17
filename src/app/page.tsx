@@ -1,5 +1,7 @@
 import { CDN_HOST } from '@/lib/utils';
 import { Instrument } from '@/types/instrument';
+import { fetchDataset } from '@/lib/dataFetcher';
+import TechnologyCard from '@/components/ui/TechnologyCard';
 import DistrictCard, { District } from '@/components/ui/DistrictCard';
 import FeaturedCarousel from '@/components/ui/FeaturedCarousel';
 import HeroSearch from '@/components/ui/HeroSearch';
@@ -17,9 +19,7 @@ export const metadata = {
 
 export default async function HomePage() {
   // Fetch Instrumentation Data
-  const res = await fetch(`${CDN_HOST}/instrument.json`);
-  const data = await res.json();
-  const instruments: Instrument[] = data.main_data || [];
+  const instruments: Instrument[] = await fetchDataset('instruments');
   
   // Take top 20 instruments for the featured carousel, ensuring they have an image
   const featuredTechs = instruments
@@ -167,6 +167,18 @@ export default async function HomePage() {
             Discover Research Instruments from Kerala&apos;s Leading Institutions
           </h1>
 
+          {/* Dataset Selector */}
+          <div className="flex items-center justify-center gap-6 mb-8 mt-4">
+            <Link href="/" className="flex items-center gap-2 text-white font-semibold hover:opacity-100 transition-opacity" style={{ opacity: 1 }}>
+              <div className="w-3 h-3 rounded-full bg-[#3b82f6] shadow-[0_0_12px_#3b82f6]" />
+              Instruments
+            </Link>
+            <Link href="/services" className="flex items-center gap-2 text-white font-medium hover:opacity-100 transition-opacity" style={{ opacity: 0.6 }}>
+              <div className="w-3 h-3 rounded-full border border-white/60" />
+              Services
+            </Link>
+          </div>
+
           {/* Search — the centerpiece */}
           <div className="w-full hero-search-breathe">
             <HeroSearch />
@@ -187,7 +199,10 @@ export default async function HomePage() {
           FEATURED TECHNOLOGIES
           (section background, curves, and CTA live inside FeaturedCarousel)
       ══════════════════════════════════════════════════════════ */}
-      <FeaturedCarousel technologies={featuredTechs} />
+      <FeaturedCarousel 
+        items={featuredTechs} 
+        itemType="instrument"
+      />
 
       {/* ══════════════════════════════════════════════════════════
           BROWSE BY INSTITUTION

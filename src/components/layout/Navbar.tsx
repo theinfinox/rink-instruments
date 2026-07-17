@@ -17,6 +17,7 @@ const NAV_LINKS = [
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
+  const isServicesContext = pathname.startsWith('/services');
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 10);
@@ -68,10 +69,10 @@ export default function Navbar() {
                 ))}
               </div>
               <Link
-                href="/technologies"
+                href={isServicesContext ? "/services/list" : "/technologies"}
                 className="ml-1 px-4 py-2 text-sm font-semibold rounded-lg bg-[#0A2164] text-white hover:bg-[#081A52] transition-colors duration-150 font-heading"
               >
-                Browse Instruments
+                {isServicesContext ? 'Browse Services' : 'Browse Instruments'}
               </Link>
               
             </div>
@@ -80,7 +81,7 @@ export default function Navbar() {
             <div className="flex items-center gap-2 md:hidden">
               
               <Link
-                href="/technologies"
+                href={isServicesContext ? "/services/list" : "/technologies"}
                 className="px-3 py-2 text-xs font-bold rounded-lg bg-[#0A2164] text-white hover:bg-[#081A52] transition-colors font-heading"
               >
                 Browse
@@ -132,38 +133,38 @@ export default function Navbar() {
             );
           })}
 
-          {/* Instruments shortcut */}
+          {/* Instruments / Services shortcut */}
           <Link
-            href="/technologies"
-            aria-label="Browse Instruments"
+            href={isServicesContext ? "/services/list" : "/technologies"}
+            aria-label={isServicesContext ? "Browse Services" : "Browse Instruments"}
             className={clsx(
               'flex flex-col items-center justify-center flex-1 gap-1 py-3 min-h-[64px] transition-all duration-200 select-none relative',
-              pathname.startsWith('/technologies')
+              (pathname.startsWith('/technologies') || pathname.startsWith('/services/list'))
                 ? 'text-[#0A2164]'
                 : 'text-gray-500 hover:text-[#0A2164]'
             )}
           >
-            {pathname.startsWith('/technologies') && (
+            {(pathname.startsWith('/technologies') || pathname.startsWith('/services/list')) && (
               <span className="absolute top-0 inset-x-4 h-1 bg-[#0A2164] rounded-b-md shadow-[0_2px_8px_rgba(10,33,100,0.4)]" />
             )}
             <svg
               className={clsx(
                 'w-6 h-6 mt-1 transition-all duration-200',
-                pathname.startsWith('/technologies') && 'scale-110'
+                (pathname.startsWith('/technologies') || pathname.startsWith('/services/list')) && 'scale-110'
               )}
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              strokeWidth={pathname.startsWith('/technologies') ? 2.5 : 2}
+              strokeWidth={(pathname.startsWith('/technologies') || pathname.startsWith('/services/list')) ? 2.5 : 2}
             >
               <rect x="3" y="3" width="18" height="18" rx="2" />
               <path d="M9 9h6M9 13h6M9 17h4" />
             </svg>
             <span className={clsx(
               'text-[11px] font-bold tracking-wide',
-              pathname.startsWith('/technologies') ? 'text-[#0A2164]' : 'text-gray-500'
+              (pathname.startsWith('/technologies') || pathname.startsWith('/services/list')) ? 'text-[#0A2164]' : 'text-gray-500'
             )}>
-              Instruments
+              {isServicesContext ? 'Services' : 'Instruments'}
             </span>
           </Link>
         </div>

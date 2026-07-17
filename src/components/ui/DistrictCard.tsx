@@ -13,15 +13,17 @@ export interface District {
 
 interface Props {
   district: District;
+  linkPrefix?: string;
+  itemName?: string;
 }
 
-export default function DistrictCard({ district }: Props) {
+export default function DistrictCard({ district, linkPrefix = '/technologies?district=', itemName = 'Instrument' }: Props) {
   const [imgFailed, setImgFailed] = useState(false);
   const accentColor = '#1B4D9B'; // Consistent brand blue for districts
 
   return (
     <Link
-      href={`/technologies?district=${district.slug}`}
+      href={`${linkPrefix}${district.slug}`}
       id={`district-card-${district.slug}`}
       className="block group"
     >
@@ -70,7 +72,7 @@ export default function DistrictCard({ district }: Props) {
             {district.tech_count}
           </span>
           <span className="text-white/70 text-xs leading-none font-medium">
-            {district.tech_count === 1 ? 'Instrument' : 'Instruments'}
+            {district.tech_count === 1 ? itemName : `${itemName}s`}
           </span>
         </div>
 

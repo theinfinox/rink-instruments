@@ -9,13 +9,26 @@ import { precisionSearch, type ScoredItem } from '@/lib/searchEngine';
 /* ─────────────────────────────────────────────────────────────────
    Constants
 ───────────────────────────────────────────────────────────────── */
-const PLACEHOLDERS = [
-  'Search Instruments, Facilities, Institutions, Categories or Instrument ID…',
-  'Try "mass spectrometer" or "electron microscope"…',
-  'Search by Instrument ID e.g. RINK-8DA73B…',
-  'Explore testing facilities…',
-  'Find agri-tech or biomedical equipment…',
-];
+export interface SearchConfig {
+  placeholders: string[];
+  searchRoute: string;
+  detailRoute: string;
+  indexUrl: string;
+  ariaLabel?: string;
+}
+
+const DEFAULT_CONFIG: SearchConfig = {
+  placeholders: [
+    'Search Instruments, Facilities, Institutions, Categories or Instrument ID…',
+    'Try "mass spectrometer" or "electron microscope"…',
+    'Search by Instrument ID e.g. RINK-8DA73B…',
+    'Explore testing facilities…',
+    'Find agri-tech or biomedical equipment…',
+  ],
+  searchRoute: '/technologies',
+  detailRoute: '/technologies',
+  indexUrl: '/api/search-index',
+};
 
 /* ─────────────────────────────────────────────────────────────────
    Highlight helper — unchanged
@@ -74,15 +87,17 @@ function SuggestionCard({
   query,
   isActive,
   onHover,
+  config,
 }: {
   item: ScoredItem;
   query: string;
   isActive: boolean;
   onHover: () => void;
+  config: SearchConfig;
 }) {
   return (
     <Link
-      href={`/technologies/${item.id}`}
+      href={`${config.detailRoute}/${item.id}`}
       role="option"
       aria-selected={isActive}
       onMouseEnter={onHover}
@@ -142,7 +157,7 @@ function SuggestionCard({
 /* ─────────────────────────────────────────────────────────────────
    Main component
 ───────────────────────────────────────────────────────────────── */
-export default function HeroSearch() {
+export default function HeroSearch({ config = DEFAULT_CONFIG }: { config?: SearchConfig }) {
   const [query, setQuery]               = useState('');
   const [placeholderIdx, setPlaceholderIdx] = useState(0);
   const [focused, setFocused]           = useState(false);
@@ -164,19 +179,19 @@ export default function HeroSearch() {
 
   /* ── Load index once — unchanged ── */
   useEffect(() => {
-    fetch('/api/search-index')
+    fetch(config.indexUrl)
       .then(r => r.json())
       .then((data: SearchIndexItem[]) => setIndex(data))
       .catch(() => {})
       .finally(() => setIndexLoading(false));
-  }, []);
+  }, [config.indexUrl]);
 
   /* ── Rotate placeholder — unchanged ── */
   useEffect(() => {
     if (focused || query) return;
-    const id = setInterval(() => setPlaceholderIdx(i => (i + 1) % PLACEHOLDERS.length), 4200);
+    const id = setInterval(() => setPlaceholderIdx(i => (i + 1) % config.placeholders.length), 4200);
     return () => clearInterval(id);
-  }, [focused, query]);
+  }, [focused, query, config.placeholders]);
 
   /* ── Live search with 200ms debounce — unchanged ── */
   const runSearch = useCallback(async (q: string) => {
@@ -221,7 +236,7 @@ export default function HeroSearch() {
   function handleKeyDown(e: React.KeyboardEvent) {
     if (!showDrop) {
       if (e.key === 'Enter' && query.trim()) {
-        window.location.href = `/technologies?q=${encodeURIComponent(query.trim())}`;
+        window.location.href = `${config.searchRoute}?q=${encodeURIComponent(query.trim())}`;
       }
       return;
     }
@@ -402,8 +417,8 @@ export default function HeroSearch() {
                 if (query.trim() && suggestions.length > 0) setShowDrop(true);
               }}
               onKeyDown={handleKeyDown}
-              placeholder={PLACEHOLDERS[placeholderIdx]}
-              aria-label="Search instruments, facilities, institutions, categories or instrument ID"
+              placeholder={config.placeholders[placeholderIdx]}
+              aria-label={config.ariaLabel}
               aria-autocomplete="list"
               aria-expanded={dropVisible}
               role="combobox"
@@ -435,12 +450,12 @@ export default function HeroSearch() {
             <button
               type="button"
               onClick={() => {
-                if (query.trim()) window.location.href = `/technologies?q=${encodeURIComponent(query.trim())}`;
+                if (query.trim()) window.location.href = `${config.searchRoute}?q=${encodeURIComponent(query.trim())}`;
               }}
               onMouseEnter={() => setBtnHovered(true)}
               onMouseLeave={() => setBtnHovered(false)}
               disabled={!query.trim()}
-              aria-label="Search instruments"
+              aria-label="Search"
               className="vision-btn flex-shrink-0 flex items-center justify-center gap-2.5 mx-2 sm:mx-[10px] px-4 sm:px-6 min-w-[50px] sm:min-w-[120px]"
               style={{
                 height: 50,
@@ -475,13 +490,14 @@ export default function HeroSearch() {
               {isLoading && [1, 2, 3].map(i => <SkeletonRow key={i} />)}
 
               {/* Results */}
-              {!isLoading && suggestions.map((item, idx) => (
+              {!isLoading && suggestions.map((item, i) => (
                 <SuggestionCard
                   key={item.id}
                   item={item}
                   query={query}
-                  isActive={idx === activeIdx}
-                  onHover={() => setActiveIdx(idx)}
+                  isActive={i === activeIdx}
+                  onHover={() => setActiveIdx(i)}
+                  config={config}
                 />
               ))}
 
@@ -489,14 +505,14 @@ export default function HeroSearch() {
               {noResults && (
                 <div className="flex flex-col items-center gap-3 py-8 px-5 text-center">
                   <p className="text-sm text-slate-500">
-                    No matching instruments found for{' '}
+                    No matching results found for{' '}
                     <span className="text-slate-800 font-semibold">&ldquo;{query}&rdquo;</span>.
                   </p>
                   <Link
-                    href="/technologies"
+                    href={config.searchRoute}
                     className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#2563EB] transition-opacity hover:opacity-75"
                   >
-                    Browse All Instruments <ArrowRight style={{ width: 14, height: 14 }} />
+                    Browse All <ArrowRight style={{ width: 14, height: 14 }} />
                   </Link>
                 </div>
               )}
@@ -511,7 +527,7 @@ export default function HeroSearch() {
                     {suggestions.length} result{suggestions.length !== 1 ? 's' : ''} &nbsp;·&nbsp; ↑↓ navigate &nbsp;·&nbsp; ↵ open
                   </span>
                   <Link
-                    href={`/technologies?q=${encodeURIComponent(query.trim())}`}
+                    href={`${config.searchRoute}?q=${encodeURIComponent(query.trim())}`}
                     className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#F4B400] transition-opacity hover:opacity-80"
                   >
                     See all results <ArrowRight style={{ width: 11, height: 11 }} />

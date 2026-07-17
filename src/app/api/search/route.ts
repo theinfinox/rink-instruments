@@ -32,18 +32,22 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    const dataset = body.dataset || 'instruments';
+
     // Perform Orama search
-    const searchResult = await oramaSearch(query, body.filters, 12);
+    const searchResult = await oramaSearch(dataset, query, body.filters, 12);
 
     // Build response message
     const count = searchResult.totalFound;
+    const itemLabel = dataset === 'services' ? 'service' : 'technology';
+    const itemLabelPlural = dataset === 'services' ? 'services' : 'technologies';
     const responseMessage = count === 0
-      ? `No technologies found matching **"${query}"**. Try a different keyword or browse by sector.`
-      : `Found **${count} ${count === 1 ? 'technology' : 'technologies'}** matching **"${query}"**:`;
+      ? `No ${itemLabelPlural} found matching **"${query}"**. Try a different keyword or browse by sector.`
+      : `Found **${count} ${count === 1 ? itemLabel : itemLabelPlural}** matching **"${query}"**:`;
 
     return NextResponse.json({
       results: searchResult.results.map(r => ({
-        instrument: r.instrument,
+        instrument: r.item, // kept as instrument for legacy chat UI support
         score: r.score,
         matchedOn: [],
       })),

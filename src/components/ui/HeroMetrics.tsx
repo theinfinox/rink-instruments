@@ -12,15 +12,18 @@ export default function HeroMetrics({
   totalInstruments,
   totalCategories,
   totalInstitutions,
+  context,
 }: {
   totalInstruments: number;
   totalCategories: number;
   totalInstitutions: number;
+  context?: 'instruments' | 'services';
 }) {
+  const isServices = context === 'services';
   const metrics: Metric[] = [
-    { target: totalInstruments, suffix: '+', label: 'Available Instruments' },
-    { target: totalCategories, suffix: '+', label: 'Equipment Categories' },
-    { target: totalInstitutions, suffix: '+', label: 'Research Facilities' },
+    { target: totalInstruments, suffix: '+', label: isServices ? 'Available Services' : 'Available Instruments' },
+    { target: totalCategories, suffix: '+', label: isServices ? 'Service Categories' : 'Equipment Categories' },
+    { target: totalInstitutions, suffix: '+', label: isServices ? 'Startups & Providers' : 'Research Facilities' },
   ];
 
 

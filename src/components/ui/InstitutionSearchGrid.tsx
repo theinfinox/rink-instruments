@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Building2, Search, X } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import type { Institution } from '@/types';
 
 // ── Helpers ─────────────────────────────────────────────────────
@@ -33,12 +34,15 @@ function SuggestionItem({
   isActive,
   onHover,
   onSelect,
+  context,
 }: {
   inst: Institution;
   isActive: boolean;
   onHover: () => void;
   onSelect: () => void;
+  context?: 'instruments' | 'services';
 }) {
+  const isServices = context === 'services';
   const logo = getLogo(inst);
   return (
     <button
@@ -68,7 +72,7 @@ function SuggestionItem({
           {inst.name}
         </div>
         <div className="text-[11px] text-slate-400 mt-0.5">
-          {inst.tech_count} {inst.tech_count === 1 ? 'technology' : 'technologies'}
+          {inst.tech_count} {inst.tech_count === 1 ? (isServices ? 'service' : 'technology') : (isServices ? 'services' : 'technologies')}
         </div>
       </div>
     </button>
@@ -76,12 +80,16 @@ function SuggestionItem({
 }
 
 // ── Institution Grid Card (unchanged card design) ────────────────
-function InstitutionGridCard({ inst }: { inst: Institution }) {
+function InstitutionGridCard({ inst, context }: { inst: Institution, context?: 'instruments' | 'services' }) {
+  const isServices = context === 'services';
   const logo = getLogo(inst);
+  const linkHref = isServices 
+    ? `/services/list?startup=${encodeURIComponent(inst.slug)}` 
+    : `/technologies?institution=${encodeURIComponent(inst.slug)}`;
   return (
     <Link
       key={inst.slug}
-      href={`/technologies?institution=${encodeURIComponent(inst.slug)}`}
+      href={linkHref}
       className="group flex items-center gap-[18px] bg-white border border-[rgba(15,23,42,0.08)] rounded-md p-4 transition-all duration-250 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(15,23,42,0.10)] hover:border-[#1B4D9B]/25"
       id={`browse-inst-${inst.slug}`}
       style={{
@@ -138,56 +146,80 @@ function InstitutionGridCard({ inst }: { inst: Institution }) {
 // ── Main Component ───────────────────────────────────────────────
 interface Props {
   institutions: Institution[];
+  context?: 'instruments' | 'services';
 }
 
-export default function InstitutionSearchGrid({ institutions }: Props) {
+export default function InstitutionSearchGrid({ institutions, context }: Props) {
+  const router = useRouter();
+  const isServices = context === 'services';
   const sorted = [...institutions].sort((a, b) => b.tech_count - a.tech_count);
   const total = sorted.length;
 
   const [query, setQuery] = useState('');
-  const [focused, setFocused] = useState(false);
-  const [activeIdx, setActiveIdx] = useState(-1);
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [suggestions, setSuggestions] = useState<Institution[]>([]);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Filtered cards
-  const filtered = query.trim()
+  const filteredInstitutions = query.trim()
     ? sorted.filter(inst => matches(inst.name, query))
     : sorted;
 
-  // Autocomplete suggestions (max 6, only when input focused)
-  const suggestions = query.trim()
-    ? sorted.filter(inst => matches(inst.name, query)).slice(0, 6)
-    : [];
-
-  const showDrop = focused && query.trim() !== '' && suggestions.length > 0;
-
   const clearSearch = useCallback(() => {
     setQuery('');
-    setActiveIdx(-1);
+    setSuggestions([]);
+    setIsOpen(false);
+    setSelectedIndex(-1);
     inputRef.current?.focus();
   }, []);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setQuery(val);
+    if (!val.trim()) {
+      setSuggestions([]);
+      setIsOpen(false);
+      return;
+    }
+    const matchesList = institutions
+      .filter((inst) => matches(inst.name, val))
+      .slice(0, 6);
+    setSuggestions(matchesList);
+    setIsOpen(matchesList.length > 0);
+    setSelectedIndex(-1);
+  };
+
+  const handleSelect = useCallback((inst: Institution) => {
+    setQuery(inst.name);
+    setIsOpen(false);
+    
+    // Redirect
+    if (isServices) {
+      router.push(`/services/list?startup=${encodeURIComponent(inst.slug)}`);
+    } else {
+      router.push(`/technologies?institution=${encodeURIComponent(inst.slug)}`);
+    }
+  }, [router, isServices]);
 
   // Keyboard navigation
   function handleKeyDown(e: React.KeyboardEvent) {
     if (e.key === 'Escape') {
       clearSearch();
-      setFocused(false);
-      inputRef.current?.blur();
       return;
     }
-    if (!showDrop) return;
+    if (!isOpen) return;
     if (e.key === 'ArrowDown') {
       e.preventDefault();
-      setActiveIdx(i => Math.min(i + 1, suggestions.length - 1));
+      setSelectedIndex(i => Math.min(i + 1, suggestions.length - 1));
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
-      setActiveIdx(i => Math.max(i - 1, -1));
-    } else if (e.key === 'Enter' && activeIdx >= 0 && suggestions[activeIdx]) {
+      setSelectedIndex(i => Math.max(i - 1, -1));
+    } else if (e.key === 'Enter' && selectedIndex >= 0 && suggestions[selectedIndex]) {
       e.preventDefault();
-      setQuery(suggestions[activeIdx].name);
-      setFocused(false);
+      handleSelect(suggestions[selectedIndex]);
     }
   }
 
@@ -195,21 +227,16 @@ export default function InstitutionSearchGrid({ institutions }: Props) {
   useEffect(() => {
     function onClickOutside(e: MouseEvent) {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setFocused(false);
+        setIsOpen(false);
       }
     }
     document.addEventListener('mousedown', onClickOutside);
     return () => document.removeEventListener('mousedown', onClickOutside);
   }, []);
 
-  // Reset activeIdx when suggestions change
-  useEffect(() => {
-    setActiveIdx(-1);
-  }, [query]);
-
   const countLabel = query.trim()
-    ? `Showing ${filtered.length} of ${total} Institutions`
-    : `Showing All ${total} Institutions`;
+    ? `Showing ${filteredInstitutions.length} of ${total} ${isServices ? 'Startups' : 'Institutions'}`
+    : `Showing All ${total} ${isServices ? 'Startups' : 'Institutions'}`;
 
   return (
     <>
@@ -230,10 +257,10 @@ export default function InstitutionSearchGrid({ institutions }: Props) {
             style={{
               height: 52,
               borderRadius: 16,
-              border: focused
+              border: isOpen
                 ? '1px solid #2563EB'
                 : '1px solid #E5E7EB',
-              boxShadow: focused
+              boxShadow: isOpen
                 ? '0 0 0 4px rgba(37,99,235,.12), 0 4px 18px rgba(0,0,0,0.06)'
                 : '0 4px 18px rgba(0,0,0,0.06)',
               padding: '0 14px',
@@ -241,20 +268,20 @@ export default function InstitutionSearchGrid({ institutions }: Props) {
           >
             <Search
               className="flex-shrink-0 mr-3"
-              style={{ width: 18, height: 18, color: focused ? '#2563EB' : '#9CA3AF' }}
+              style={{ width: 18, height: 18, color: isOpen ? '#2563EB' : '#9CA3AF' }}
               aria-hidden="true"
             />
             <input
               ref={inputRef}
               type="text"
               value={query}
-              onChange={e => setQuery(e.target.value)}
-              onFocus={() => setFocused(true)}
+              onChange={handleInputChange}
+              onFocus={() => { if(query.trim()) setIsOpen(true); }}
               onKeyDown={handleKeyDown}
-              placeholder="Find an Institution..."
-              aria-label="Search institutions by name"
+              placeholder={isServices ? "Find a Startup..." : "Find an Institution..."}
+              aria-label={isServices ? "Search by startup" : "Search by institution"}
               aria-autocomplete="list"
-              aria-expanded={showDrop}
+              aria-expanded={isOpen}
               autoComplete="off"
               spellCheck={false}
               className="flex-1 bg-transparent outline-none border-0 text-sm"
@@ -276,26 +303,24 @@ export default function InstitutionSearchGrid({ institutions }: Props) {
           </div>
 
           {/* Autocomplete Dropdown */}
-          {showDrop && (
+          {isOpen && (
             <div
               role="listbox"
-              aria-label="Institution suggestions"
+              aria-label="Suggestions"
               className="absolute left-0 right-0 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 overflow-hidden"
               style={{
                 top: 'calc(100% + 8px)',
                 boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
               }}
             >
-              {suggestions.map((inst, i) => (
+              {suggestions.map((inst, index) => (
                 <SuggestionItem
                   key={inst.slug}
                   inst={inst}
-                  isActive={i === activeIdx}
-                  onHover={() => setActiveIdx(i)}
-                  onSelect={() => {
-                    setQuery(inst.name);
-                    setFocused(false);
-                  }}
+                  isActive={index === selectedIndex}
+                  onHover={() => setSelectedIndex(index)}
+                  onSelect={() => handleSelect(inst)}
+                  context={context}
                 />
               ))}
             </div>
@@ -309,10 +334,10 @@ export default function InstitutionSearchGrid({ institutions }: Props) {
       </div>
 
       {/* ── Institution Grid ── */}
-      {filtered.length > 0 ? (
+      {filteredInstitutions.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filtered.map(inst => (
-            <InstitutionGridCard key={inst.slug} inst={inst} />
+          {filteredInstitutions.slice(0, 16).map(inst => (
+            <InstitutionGridCard key={inst.slug} inst={inst} context={context} />
           ))}
         </div>
       ) : (

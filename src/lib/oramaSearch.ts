@@ -6,7 +6,8 @@
 
 import { create, insert, search } from '@orama/orama';
 import { Instrument } from '@/types/instrument';
-import { CDN_HOST } from '@/lib/utils';
+import { Service } from '@/types/service';
+import { fetchDataset, DatasetType } from '@/lib/dataFetcher';
 
 // ── Orama schema ─────────────────────────────────────────────
 const SCHEMA = {
@@ -22,15 +23,10 @@ const SCHEMA = {
 // ── Normalization ────────────────────────────────────────────
 function normalizeText(text: string): string {
   if (!text) return '';
-  // 1 & 2. Lowercase / ignore capitalization
   let normalized = text.toLowerCase();
-  // 3 & 4. Ignore punctuation & hyphens (replace with space)
   normalized = normalized.replace(/[^\w\s]/g, ' ');
-  // 5. Ignore multiple spaces
   normalized = normalized.replace(/\s+/g, ' ').trim();
 
-  // 6. Treat compound words and spaced words as equivalent
-  // Append joined variations directly to the index text
   const words = normalized.split(' ');
   const joinedPairs = [];
   for (let i = 0; i < words.length - 1; i++) {
@@ -38,66 +34,84 @@ function normalizeText(text: string): string {
   }
   const fullyJoined = words.join('');
 
-  // Example: "waste water management" -> "waste water management wastewater watermanagement wastewatermanagement"
   return `${normalized} ${joinedPairs.join(' ')} ${fullyJoined}`.trim();
 }
 
-// ── Singleton index ──────────────────────────────────────────
-let _oramaDB: Awaited<ReturnType<typeof create>> | null = null;
-let _indexedTechs: Instrument[] = [];
-let _indexTs = 0;
+// ── Multi-dataset Cache ──────────────────────────────────────────
+type OramaDB = Awaited<ReturnType<typeof create>>;
+
+const _oramaDBs: Partial<Record<DatasetType, OramaDB>> = {};
+const _indexedData: Partial<Record<DatasetType, any[]>> = {};
+const _indexTs: Partial<Record<DatasetType, number>> = {};
 const INDEX_TTL = 60 * 1000; // Rebuild every 60s (matches ISR)
 
-async function getIndex() {
-  if (_oramaDB && Date.now() - _indexTs < INDEX_TTL) {
-    return { db: _oramaDB, techs: _indexedTechs };
+async function getIndex(dataset: DatasetType) {
+  const ts = _indexTs[dataset] || 0;
+  if (_oramaDBs[dataset] && Date.now() - ts < INDEX_TTL) {
+    return { db: _oramaDBs[dataset]!, data: _indexedData[dataset]! };
   }
 
-  const res = await fetch(`${CDN_HOST}/instrument.json`);
-  const data = await res.json();
-  const techs: Instrument[] = data.main_data || [];
+  const items = await fetchDataset(dataset);
 
   const db = await create({
     schema: SCHEMA,
   });
 
-  for (const tech of techs) {
-    const tags = Array.isArray(tech.tag) ? tech.tag : (tech.tag ? tech.tag.split(',') : []);
-    await insert(db, {
-      id: tech.id,
-      name: normalizeText(tech.instruments || ''),
-      institution: normalizeText(tech.institution_name || ''),
-      category: normalizeText(tags.join(' ')),
-      problem_solved: normalizeText(tech.name_of_facility || ''),
-      description: normalizeText(tech.address || ''),
-      keywords: normalizeText(tags.join(', ')),
-    });
+  if (dataset === 'instruments') {
+    const techs = items as Instrument[];
+    for (const tech of techs) {
+      const tags = Array.isArray(tech.tag) ? tech.tag : (tech.tag ? tech.tag.split(',') : []);
+      await insert(db, {
+        id: tech.id,
+        name: normalizeText(tech.instruments || ''),
+        institution: normalizeText(tech.institution_name || ''),
+        category: normalizeText(tags.join(' ')),
+        problem_solved: normalizeText(tech.name_of_facility || ''),
+        description: normalizeText(tech.address || ''),
+        keywords: normalizeText(tags.join(', ')),
+      });
+    }
+  } else if (dataset === 'services') {
+    const services = items as Service[];
+    for (const srv of services) {
+      const id = srv.id || srv.serviceName;
+      await insert(db, {
+        id,
+        name: normalizeText(srv.serviceName || ''),
+        institution: normalizeText(srv.startupName || ''),
+        category: normalizeText(srv.category || ''),
+        problem_solved: normalizeText(srv.sector || ''),
+        description: normalizeText(srv.description || ''),
+        keywords: normalizeText(srv.keywords?.join(', ') || ''),
+      });
+    }
   }
 
-  _oramaDB = db;
-  _indexedTechs = techs;
-  _indexTs = Date.now();
+  _oramaDBs[dataset] = db;
+  _indexedData[dataset] = items;
+  _indexTs[dataset] = Date.now();
 
-  console.log(`[RINK Orama] Indexed ${techs.length} technologies`);
-  return { db, techs };
+  console.log(`[RINK Orama] Indexed ${items.length} items for ${dataset}`);
+  return { db, data: items };
 }
 
 // ── Search interface ─────────────────────────────────────────
-export interface OramaSearchResult {
-  instrument: Instrument;
+export interface OramaSearchResult<T = Instrument | Service> {
+  item: T;
   score: number;
   highlight?: string;
 }
 
-export interface OramaSearchResponse {
-  results: OramaSearchResult[];
+export interface OramaSearchResponse<T = Instrument | Service> {
+  results: OramaSearchResult<T>[];
   query: string;
   totalFound: number;
   elapsed: number; // milliseconds
 }
 
 // ── Main search function ─────────────────────────────────────
-export async function oramaSearch(
+export async function oramaSearch<T = Instrument | Service>(
+  dataset: DatasetType,
   query: string,
   filters?: {
     sector?: string;
@@ -107,17 +121,17 @@ export async function oramaSearch(
     potential?: string;
   },
   limit = 20
-): Promise<OramaSearchResponse> {
+): Promise<OramaSearchResponse<T>> {
   const startTime = Date.now();
-  const { db, techs } = await getIndex();
+  const { db, data } = await getIndex(dataset);
   const q = query.trim();
 
-  if (!q) {
-    // No query — return all techs (optionally filtered)
-    let filtered = techs;
+  const getDocId = (item: any) => item.id || item.serviceName;
 
+  if (!q) {
+    let filtered = data;
     return {
-      results: filtered.slice(0, limit).map(t => ({ instrument: t, score: 1 })),
+      results: filtered.slice(0, limit).map(t => ({ item: t, score: 1 })),
       query: q,
       totalFound: filtered.length,
       elapsed: Date.now() - startTime,
@@ -126,18 +140,17 @@ export async function oramaSearch(
 
   // 1. Exact ID Match Override (Priority 1)
   const qLower = q.toLowerCase();
-  const exactIdMatch = techs.find(t => t.id?.toLowerCase() === qLower);
+  const exactIdMatch = data.find(t => getDocId(t)?.toLowerCase() === qLower);
   if (exactIdMatch) {
     return {
-      results: [{ instrument: exactIdMatch, score: 1000 }],
+      results: [{ item: exactIdMatch, score: 1000 }],
       query: q,
       totalFound: 1,
       elapsed: Date.now() - startTime,
     };
   }
 
-  // 2. Remove Stop Words and normalize query
-  const STOP_WORDS = new Set(['the', 'and', 'for', 'of', 'with', 'using', 'based', 'system', 'method', 'technology']);
+  const STOP_WORDS = new Set(['the', 'and', 'for', 'of', 'with', 'using', 'based', 'system', 'method', 'technology', 'service']);
   const cleanTokens = q.toLowerCase()
     .replace(/[^\w\s]/g, ' ')
     .replace(/\s+/g, ' ')
@@ -146,9 +159,8 @@ export async function oramaSearch(
     .filter(w => !STOP_WORDS.has(w));
 
   const cleanQuery = cleanTokens.join(' ');
-  const joinedQuery = cleanTokens.join(''); // e.g. "sea weed" -> "seaweed"
+  const joinedQuery = cleanTokens.join('');
 
-  // 3. Search Configuration with User-Defined Weights
   const searchConfig = {
     term: cleanQuery,
     boost: {
@@ -163,14 +175,10 @@ export async function oramaSearch(
     limit: 100,
   };
 
-  // 4. First Pass: Exact Matches Only (Tolerance: 0)
   let oramaResults = await search(db, { ...searchConfig, tolerance: 0 });
 
-  // 5. Concurrent Pass: if user typed multiple words, also search the joined version (e.g. "seaweed")
   if (cleanTokens.length > 1 && joinedQuery) {
     const joinedResults = await search(db, { ...searchConfig, term: joinedQuery, tolerance: 0 });
-    
-    // Merge hits safely (avoiding duplicates)
     const seen = new Set(oramaResults.hits.map(h => h.id));
     for (const hit of joinedResults.hits) {
       if (!seen.has(hit.id)) {
@@ -178,26 +186,21 @@ export async function oramaSearch(
         seen.add(hit.id);
       }
     }
-    // Sort combined hits by score descending
     oramaResults.hits.sort((a, b) => b.score - a.score);
   }
 
-  // 6. Fallback Pass: Fuzzy Matching (Tolerance: 1) only if exact matches yield nothing
   if (oramaResults.hits.length === 0) {
     oramaResults = await search(db, { ...searchConfig, tolerance: 1 });
   }
 
-  // Map Orama hits back to Technology objects
-  let results: OramaSearchResult[] = [];
+  let results: OramaSearchResult<T>[] = [];
   for (const hit of oramaResults.hits) {
-    const techId = (hit.document as { id: string }).id;
-    const tech = techs.find(t => t.id === techId);
-    if (tech) {
-      results.push({ instrument: tech, score: hit.score });
+    const hitId = (hit.document as { id: string }).id;
+    const item = data.find(t => getDocId(t) === hitId);
+    if (item) {
+      results.push({ item: item as T, score: hit.score });
     }
   }
-
-  // Apply filters on top of search results
 
   return {
     results: results.slice(0, limit),
@@ -207,33 +210,31 @@ export async function oramaSearch(
   };
 }
 
-// ── Conversational intent detection (preserved from old system) ──
-const GREETING_PATTERNS = [
-  /^hi+\s*[!?.]*$/i, /^hey+\s*[!?.]*$/i, /^hello+\s*[!?.]*$/i,
-  /^good\s*(morning|afternoon|evening|day)\s*[!?.]*$/i,
-  /^greetings\s*[!?.]*$/i, /^howdy\s*[!?.]*$/i,
-  /^how are you/i, /^how r u/i,
-  /^thanks?\s*[!?.]*$/i, /^thank you\s*[!?.]*$/i,
-  /^thx\s*[!?.]*$/i, /^cheers?\s*[!?.]*$/i,
-];
-
 export function isConversational(query: string): boolean {
+  const GREETING_PATTERNS = [
+    /^hi+\s*[!?.]*$/i, /^hey+\s*[!?.]*$/i, /^hello+\s*[!?.]*$/i,
+    /^good\s*(morning|afternoon|evening|day)\s*[!?.]*$/i,
+    /^greetings\s*[!?.]*$/i, /^howdy\s*[!?.]*$/i,
+    /^how are you/i, /^how r u/i,
+    /^thanks?\s*[!?.]*$/i, /^thank you\s*[!?.]*$/i,
+    /^thx\s*[!?.]*$/i, /^cheers?\s*[!?.]*$/i,
+  ];
   return GREETING_PATTERNS.some(p => p.test(query.trim()));
 }
 
 export function getConversationalReply(query: string): string {
   const q = query.trim().toLowerCase();
   if (/^(hi|hey|hello|greetings|howdy)/i.test(q)) {
-    return "Hello! I can help you discover technologies from Kerala's research institutions. Tell me about your idea, industry, challenge, or product concept.";
+    return "Hello! I can help you discover technologies and services from Kerala's research institutions and startups.";
   }
   if (/^good\s*(morning|afternoon|evening|day)/i.test(q)) {
-    return "Good day! What technology area would you like to explore? You can search by sector, institution, or describe your startup idea.";
+    return "Good day! What area would you like to explore? You can search by sector, institution, or startup.";
   }
   if (/how are you|how r u/i.test(q)) {
-    return "I'm doing well, thank you! I'm here to help you discover commercializable technologies. What area interests you?";
+    return "I'm doing well, thank you! I'm here to help you discover commercializable technologies and services. What area interests you?";
   }
   if (/thanks|thank you|thx|cheers/i.test(q)) {
-    return "You're welcome! Feel free to search for more technologies anytime.";
+    return "You're welcome! Feel free to search for more anytime.";
   }
-  return "I can help you discover technologies. Try searching by technology name, sector, institution, or describe what you're looking for.";
+  return "I can help you discover technologies and services. Try searching by name, sector, institution, or describe what you're looking for.";
 }
