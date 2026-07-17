@@ -85,7 +85,7 @@ function InstitutionGridCard({ inst, context }: { inst: Institution, context?: '
   const logo = getLogo(inst);
   const linkHref = isServices 
     ? `/services/list?startup=${encodeURIComponent(inst.slug)}` 
-    : `/technologies?institution=${encodeURIComponent(inst.slug)}`;
+    : `/instruments?institution=${encodeURIComponent(inst.slug)}`;
   return (
     <Link
       key={inst.slug}
@@ -133,7 +133,7 @@ function InstitutionGridCard({ inst, context }: { inst: Institution, context?: '
           {inst.name}
         </div>
         <div className="text-xs font-bold text-[#1B4D9B] mt-1.5">
-          {inst.tech_count} {inst.tech_count === 1 ? 'technology' : 'technologies'}
+          {inst.tech_count} {inst.tech_count === 1 ? (isServices ? 'service' : 'technology') : (isServices ? 'services' : 'technologies')}
         </div>
       </div>
 
@@ -200,7 +200,7 @@ export default function InstitutionSearchGrid({ institutions, context }: Props) 
     if (isServices) {
       router.push(`/services/list?startup=${encodeURIComponent(inst.slug)}`);
     } else {
-      router.push(`/technologies?institution=${encodeURIComponent(inst.slug)}`);
+      router.push(`/instruments?institution=${encodeURIComponent(inst.slug)}`);
     }
   }, [router, isServices]);
 

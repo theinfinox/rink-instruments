@@ -362,7 +362,7 @@ export default function SectorCard({ sector }: Props) {
 
   return (
     <Link
-      href={`/technologies?sector=${sector.slug}`}
+      href={`/instruments?sector=${sector.slug}`}
       id={`sector-card-${sector.slug}`}
       className="block group"
     >

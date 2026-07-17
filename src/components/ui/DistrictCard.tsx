@@ -17,7 +17,7 @@ interface Props {
   itemName?: string;
 }
 
-export default function DistrictCard({ district, linkPrefix = '/technologies?district=', itemName = 'Instrument' }: Props) {
+export default function DistrictCard({ district, linkPrefix = '/instruments?district=', itemName = 'Instrument' }: Props) {
   const [imgFailed, setImgFailed] = useState(false);
   const accentColor = '#1B4D9B'; // Consistent brand blue for districts
 

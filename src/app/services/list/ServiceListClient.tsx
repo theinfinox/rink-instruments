@@ -149,6 +149,7 @@ export default function ServiceListClient({
               searchRoute="/services/list" 
               placeholder="Search services, startups..."
               ariaLabel="Search services"
+              dataset="services"
             />
           </div>
         </div>

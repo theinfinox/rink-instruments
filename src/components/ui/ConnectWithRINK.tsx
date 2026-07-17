@@ -157,11 +157,11 @@ export default function ConnectWithRINK() {
         {/* Bottom CTA strip */}
         <div className="mt-12 pt-10 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
-            <div className="text-sm font-bold text-gray-900 font-heading mb-1">Ready to commercialize a technology?</div>
-            <div className="text-xs text-gray-500 font-sans">Browse all technologies and connect with the right institution.</div>
+            <div className="text-sm font-bold text-gray-900 font-heading mb-1">Ready to explore an instrument?</div>
+            <div className="text-xs text-gray-500 font-sans">Browse all instruments and connect with the right institution.</div>
           </div>
           <Link
-            href="/technologies"
+            href="/instruments"
             className="flex-shrink-0 inline-flex items-center gap-2 px-6 py-3 rounded-md bg-[#0A2164] text-white font-bold text-sm hover:bg-[#081A52] transition-colors font-heading shadow-sm"
             id="connect-browse-btn"
           >

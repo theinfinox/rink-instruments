@@ -181,7 +181,7 @@ export default async function HomePage() {
 
           {/* Search — the centerpiece */}
           <div className="w-full hero-search-breathe">
-            <HeroSearch />
+            <HeroSearch key="instruments-search" />
           </div>
         </div>
       </section>

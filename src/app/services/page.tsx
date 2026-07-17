@@ -160,7 +160,7 @@ export default async function ServicesHomePage() {
           </div>
 
           <div className="w-full hero-search-breathe">
-            <HeroSearch config={SERVICE_SEARCH_CONFIG} />
+            <HeroSearch key="services-search" config={SERVICE_SEARCH_CONFIG} />
           </div>
         </div>
       </section>

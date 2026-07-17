@@ -13,6 +13,7 @@ interface Props {
   searchRoute?: string;
   placeholder?: string;
   ariaLabel?: string;
+  dataset?: 'instruments' | 'services';
 }
 
 function highlight(text: string, query: string) {
@@ -34,9 +35,10 @@ export default function SearchBar({
   size = 'md', 
   defaultValue = '', 
   autoFocus = false, 
-  searchRoute = '/technologies',
-  placeholder = 'Search technologies, sectors, institutions, applications...',
-  ariaLabel = 'Search technologies'
+  searchRoute = '/instruments',
+  placeholder = 'Search instruments, sectors, institutions, applications...',
+  ariaLabel = 'Search instruments',
+  dataset = 'instruments'
 }: Props) {
   const router = useRouter();
   const [query, setQuery] = useState(defaultValue);
@@ -50,11 +52,11 @@ export default function SearchBar({
 
   // Fetch search index once
   useEffect(() => {
-    fetch('/api/search-index')
+    fetch(`/api/search-index?dataset=${dataset}`)
       .then(r => r.json())
       .then(data => setAllItems(data))
       .catch(() => {/* silent */});
-  }, []);
+  }, [dataset]);
 
   // Debounced search
   const doSearch = useCallback((q: string) => {

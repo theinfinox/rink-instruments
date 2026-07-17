@@ -42,7 +42,7 @@ export default function TechnologyCard({ instrument, compact = false, featured =
   // ── COMPACT variant (used in search results / lists) ──────────────────────
   if (compact) {
     return (
-      <Link href={`/technologies/${vm.id}`} className="block group" id={`tech-card-compact-${vm.id}`}>
+      <Link href={`/instruments/${vm.id}`} className="block group" id={`tech-card-compact-${vm.id}`}>
         <motion.div
           className="bg-[#FCFDFF] rounded-xl border border-blue-900/10 shadow-sm p-4 hover:shadow-md hover:border-blue-300/30 transition-all duration-300"
           {...cardMotion}
@@ -85,7 +85,7 @@ export default function TechnologyCard({ instrument, compact = false, featured =
   // ── FULL CARD variant ─────────────────────────────────────────────────────
   return (
     <Link
-      href={`/technologies/${vm.id}`}
+      href={`/instruments/${vm.id}`}
       className="block group h-full focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-2xl"
       id={`tech-card-${vm.id}`}
       aria-label={`View ${vm.title} by ${vm.institution}`}

@@ -133,7 +133,7 @@ export default async function TechnologyDetailPage({ params }: { params: Promise
             <nav className="flex items-center gap-1.5 text-xs text-slate-500 flex-wrap mb-8">
               <Link href="/" className="hover:text-[#0A2164] transition-colors">Home</Link>
               <ChevronRight className="w-3 h-3 text-slate-300" />
-              <Link href="/technologies" className="hover:text-[#0A2164] transition-colors">Technologies</Link>
+              <Link href="/instruments" className="hover:text-[#0A2164] transition-colors">Instruments</Link>
               <ChevronRight className="w-3 h-3 text-slate-300" />
               <Link href={`/sectors/${sectorSlug}`} className="hover:text-[#0A2164] transition-colors">{vm.location.district || 'General'}</Link>
               <ChevronRight className="w-3 h-3 text-slate-300" />
@@ -357,7 +357,7 @@ export default async function TechnologyDetailPage({ params }: { params: Promise
                 {related.map(rel => {
                   const relImg = rel.media.thumbnail;
                   return (
-                    <Link key={rel.id} href={`/technologies/${rel.id}`}
+                    <Link key={rel.id} href={`/instruments/${rel.id}`}
                       className="group bg-white rounded-md border border-gray-200 shadow-sm overflow-hidden hover:shadow-md hover:border-blue-300 transition-all">
                       <div className="aspect-[16/9] bg-gray-100 relative overflow-hidden">
                         {relImg ? (

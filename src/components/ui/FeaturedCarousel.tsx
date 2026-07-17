@@ -20,7 +20,7 @@ export default function FeaturedCarousel<T>({
   itemType, 
   title = "Featured Innovation Opportunities", 
   ctaText = "Browse All Instruments", 
-  ctaLink = "/technologies" 
+  ctaLink = "/instruments" 
 }: Props<T>) {
   const containerRef   = useRef<HTMLDivElement>(null);
   const isInteracting  = useRef(false);

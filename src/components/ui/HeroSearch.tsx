@@ -25,8 +25,8 @@ const DEFAULT_CONFIG: SearchConfig = {
     'Explore testing facilities…',
     'Find agri-tech or biomedical equipment…',
   ],
-  searchRoute: '/technologies',
-  detailRoute: '/technologies',
+  searchRoute: '/instruments',
+  detailRoute: '/instruments',
   indexUrl: '/api/search-index',
 };
 
@@ -249,9 +249,9 @@ export default function HeroSearch({ config = DEFAULT_CONFIG }: { config?: Searc
     } else if (e.key === 'Enter') {
       e.preventDefault();
       if (activeIdx >= 0 && suggestions[activeIdx]) {
-        window.location.href = `/technologies/${suggestions[activeIdx].id}`;
+        window.location.href = `/instruments/${suggestions[activeIdx].id}`;
       } else if (query.trim()) {
-        window.location.href = `/technologies?q=${encodeURIComponent(query.trim())}`;
+        window.location.href = `/instruments?q=${encodeURIComponent(query.trim())}`;
       }
     } else if (e.key === 'Escape') {
       setShowDrop(false);
