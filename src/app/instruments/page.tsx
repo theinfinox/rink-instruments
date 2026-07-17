@@ -3,8 +3,8 @@ import { Instrument } from '@/types/instrument';
 import TechListClient from './TechListClient';
 
 export const metadata = {
-  title: 'All Technologies — RINK Technology Transfer Portal',
-  description: 'Browse all commercializable technologies from Kerala research institutions. Filter by sector, institution, type, and more.',
+  title: 'All Instruments — RINK Technology Transfer Portal',
+  description: 'Browse all instruments from Kerala research institutions. Filter by sector, institution, type, and more.',
 };
 
 interface Props {
