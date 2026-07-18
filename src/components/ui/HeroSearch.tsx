@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
-import { Search, ArrowRight, Building2, Layers, Hash, X, Cpu } from 'lucide-react';
+import { Search, ArrowRight, Building2, Layers, Hash, X } from 'lucide-react';
 import type { SearchIndexItem } from '@/types';
 import { precisionSearch, type ScoredItem } from '@/lib/searchEngine';
 
@@ -35,26 +35,27 @@ const DEFAULT_CONFIG: SearchConfig = {
 ───────────────────────────────────────────────────────────────── */
 function Highlight({ text, query }: { text: string; query: string }) {
   if (!query.trim() || !text) return <>{text}</>;
+  let regex: RegExp;
   try {
     const escaped = query.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const regex = new RegExp(`(${escaped})`, 'gi');
-    const parts = text.split(regex);
-    return (
-      <>
-        {parts.map((part, i) =>
-          regex.test(part) ? (
-            <mark key={i} style={{ background: 'transparent', color: '#2563EB', fontWeight: 700 }}>
-              {part}
-            </mark>
-          ) : (
-            <span key={i}>{part}</span>
-          )
-        )}
-      </>
-    );
+    regex = new RegExp(`(${escaped})`, 'gi');
   } catch {
     return <>{text}</>;
   }
+  const parts = text.split(regex);
+  return (
+    <>
+      {parts.map((part, i) =>
+        regex.test(part) ? (
+          <mark key={i} style={{ background: 'transparent', color: '#2563EB', fontWeight: 700 }}>
+            {part}
+          </mark>
+        ) : (
+          <span key={i}>{part}</span>
+        )
+      )}
+    </>
+  );
 }
 
 /* ─────────────────────────────────────────────────────────────────
@@ -172,7 +173,7 @@ export default function HeroSearch({ config = DEFAULT_CONFIG }: { config?: Searc
   const [searching, setSearching]       = useState(false);
   const [showDrop, setShowDrop]         = useState(false);
 
-  const [btnHovered, setBtnHovered]     = useState(false);
+
   const inputRef    = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -210,12 +211,14 @@ export default function HeroSearch({ config = DEFAULT_CONFIG }: { config?: Searc
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     if (!query.trim()) {
-      setSuggestions([]);
-      setShowDrop(false);
-      setSearching(false);
+      setTimeout(() => {
+        setSuggestions([]);
+        setShowDrop(false);
+        setSearching(false);
+      }, 0);
       return;
     }
-    setSearching(true);
+    setTimeout(() => setSearching(true), 0);
     debounceRef.current = setTimeout(() => runSearch(query), 200);
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
   }, [query, runSearch]);
@@ -421,6 +424,7 @@ export default function HeroSearch({ config = DEFAULT_CONFIG }: { config?: Searc
               aria-label={config.ariaLabel}
               aria-autocomplete="list"
               aria-expanded={dropVisible}
+              aria-controls="hero-search-listbox"
               role="combobox"
               className="vision-input w-full h-full py-4 px-4 text-base md:text-[17px] min-w-0 font-sans bg-transparent"
             />
@@ -452,8 +456,6 @@ export default function HeroSearch({ config = DEFAULT_CONFIG }: { config?: Searc
               onClick={() => {
                 if (query.trim()) window.location.href = `${config.searchRoute}?q=${encodeURIComponent(query.trim())}`;
               }}
-              onMouseEnter={() => setBtnHovered(true)}
-              onMouseLeave={() => setBtnHovered(false)}
               disabled={!query.trim()}
               aria-label="Search"
               className="vision-btn flex-shrink-0 flex items-center justify-center gap-2.5 mx-2 sm:mx-[10px] px-4 sm:px-6 min-w-[50px] sm:min-w-[120px]"
@@ -474,6 +476,7 @@ export default function HeroSearch({ config = DEFAULT_CONFIG }: { config?: Searc
           {/* ── Suggestions Dropdown ── */}
           {dropVisible && (
             <div
+              id="hero-search-listbox"
               role="listbox"
               aria-label="Search suggestions"
               className="vision-drop absolute left-0 right-0 mt-3 overflow-y-auto"

@@ -70,7 +70,7 @@ export default function InstitutionFilterView({ initialInstruments }: Props) {
           <FlaskConical className="w-12 h-12 text-text-secondary/50 mx-auto mb-4 animate-pulse" />
           <h3 className="font-heading font-bold text-heading text-lg mb-1">No Instruments Found</h3>
           <p className="text-text-secondary text-sm">
-            We couldn't find any instruments matching the active category filter.
+            We couldn&apos;t find any instruments matching the active category filter.
           </p>
         </div>
       ) : (

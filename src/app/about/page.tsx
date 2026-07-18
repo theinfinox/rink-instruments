@@ -1,8 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { CDN_HOST } from '@/lib/utils';
-import { Instrument } from '@/types/instrument';
-import { Lightbulb, Target, Users, Building2, ArrowRight, CheckCircle, Globe, MapPin, Phone, Mail } from 'lucide-react';
+import { Target, Users, Building2, ArrowRight, Globe, MapPin, Phone, Mail, Lightbulb } from 'lucide-react';
 import PartnerLogoWall from '@/components/ui/PartnerLogoWall';
 
 export const metadata: Metadata = {
@@ -20,28 +18,6 @@ function LinkedInIcon({ className }: { className?: string }) {
 }
 
 export default async function AboutPage() {
-  let institutions = [];
-  try {
-    const res = await fetch(`${CDN_HOST}/instrument.json`, { next: { revalidate: 60 } });
-    if (res.ok) {
-      const data = await res.json();
-      const instruments: Instrument[] = data.main_data || [];
-      const institutionMap = new Map<string, any>();
-      instruments.forEach((inst) => {
-        const instName = inst.institution_name?.trim();
-        if (instName) {
-          const slug = instName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-          if (!institutionMap.has(slug)) {
-            institutionMap.set(slug, { slug, name: instName, tech_count: 0 });
-          }
-          institutionMap.get(slug).tech_count++;
-        }
-      });
-      institutions = Array.from(institutionMap.values()).sort((a, b) => b.tech_count - a.tech_count);
-    }
-  } catch (error) {
-    console.error('Failed to load institutions for about page', error);
-  }
 
   return (
     <div className="bg-white min-h-screen text-gray-900">
@@ -125,7 +101,7 @@ export default async function AboutPage() {
       </div>
 
       {/* ── Partner Institutions Logo Wall ───────────────────── */}
-      <PartnerLogoWall institutions={institutions} showMarquee={true} />
+      <PartnerLogoWall />
 
       {/* ── Connect With RINK ─────────────────────────────────── */}
       <section className="py-20 bg-white border-b border-gray-100">

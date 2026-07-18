@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { ChevronRight, ExternalLink, ArrowRight, FileText, Microscope, Lightbulb, Building2 } from 'lucide-react';
+import { ChevronRight, ArrowRight, FileText, Microscope, Building2 } from 'lucide-react';
 import TechImage from '@/components/ui/TechImage';
 import { CDN_HOST } from '@/lib/utils';
 import { Instrument } from '@/types/instrument';
@@ -10,27 +10,8 @@ const GOOGLE_FORM_URL =
 
 // ── Helpers ───────────────────────────────────────────────────
 
-function parseTechTypes(raw: string): string[] {
-  if (!raw || raw === 'Not Specified' || raw === 'NA') return [];
-  return raw.split(',').map(t => t.trim()).filter(t => t.length > 0 && t !== 'Not Specified');
-}
 
-function parseTRL(raw: string): number {
-  if (!raw || raw === 'Not Specified' || raw === 'NA') return 0;
-  const match = raw.match(/\d+/);
-  return match ? Math.min(Math.max(parseInt(match[0]), 0), 9) : 0;
-}
 
-function getTRLLabel(level: number): string {
-  if (level <= 0) return 'Not Specified';
-  if (level <= 2) return 'Basic Research';
-  if (level === 3) return 'Proof of Concept';
-  if (level <= 5) return 'Lab Validated';
-  if (level === 6) return 'Prototype Validated';
-  if (level === 7) return 'Demonstration Ready';
-  if (level === 8) return 'System Complete';
-  return 'Production Ready';
-}
 
 function clean(val: string | undefined | null): string {
   if (!val) return '';
@@ -92,8 +73,7 @@ export default async function TechnologyDetailPage({ params }: { params: Promise
   // Create a sector slug based on the district for routing, same as the mapper
   const sectorSlug = vm.location.district ? vm.location.district.toLowerCase().replace(/[^a-z0-9]+/g, '-') : 'general';
 
-  const trlLevel = 0;
-  const trlLabel = getTRLLabel(trlLevel);
+  const finalBookingLink = clean(rawTech.website_booking_link) || clean(rawTech.website_booking_link_fallback) || GOOGLE_FORM_URL;
 
   const displayImage = vm.media.thumbnail;
 
@@ -110,13 +90,13 @@ export default async function TechnologyDetailPage({ params }: { params: Promise
       <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden">
         <div className="bg-white border-t border-gray-200 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] px-4 pt-3 pb-5">
           <a
-            href={GOOGLE_FORM_URL}
+            href={finalBookingLink}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center justify-center gap-2 w-full py-3.5 rounded-md bg-[#0A2164] text-white font-semibold text-sm"
           >
             <FileText className="w-4 h-4" />
-            Submit Expression of Interest
+            Booking link
           </a>
         </div>
       </div>
@@ -265,36 +245,7 @@ export default async function TechnologyDetailPage({ params }: { params: Promise
                   {/* Sidebar Card */}
                   <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
 
-                    {/* TRL */}
-                    <div className="p-5 border-b border-slate-100">
-                      <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">
-                        Technology Readiness Level
-                      </div>
-                      {trlLevel > 0 ? (
-                        <div className="flex items-center gap-3">
-                          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-[#0A2164]/10 flex items-center justify-center">
-                            <span className="text-sm font-black text-[#0A2164]">{trlLevel}</span>
-                          </div>
-                          <div>
-                            <div className="text-sm font-bold text-slate-900">TRL {trlLevel}</div>
-                            <div className="text-xs text-slate-500">{trlLabel}</div>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="text-sm text-slate-500 font-sans italic">Will be updated soon</div>
-                      )}
-                    </div>
 
-                    {/* IP Status */}
-                    <div className="p-5 border-b border-slate-100">
-                      <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">
-                        IP / Patent Status
-                      </div>
-                      <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 flex-shrink-0" />
-                        {clean(rawTech.warnings) || 'Not Specified'}
-                      </span>
-                    </div>
 
                     {/* Partner Institution */}
                     <div className="p-5 border-b border-slate-100">
@@ -313,19 +264,19 @@ export default async function TechnologyDetailPage({ params }: { params: Promise
                     {/* ── CTA ── */}
                     <div className="p-5 bg-gradient-to-br from-[#0A2164] to-[#0d3285]">
                       <h3 className="font-serif text-base font-bold mb-2" style={{ color: '#FFFFFF' }}>
-                        Interested in this Technology?
+                        Interested in this Instrument?
                       </h3>
                       <p className="text-xs leading-relaxed font-sans mb-4" style={{ color: 'rgba(191,219,254,0.9)' }}>
-                        Submit an Expression of Interest (EOI) through RINK to explore technology transfer, licensing, startup creation, and commercialization opportunities related to this technology.
+                        Submit an enquiry to book this instrument or request analysis services for your research, development, and testing needs.
                       </p>
                       <a
-                        href={GOOGLE_FORM_URL}
+                        href={finalBookingLink}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center justify-center gap-2 w-full py-3 rounded-lg bg-[#F5B400] hover:bg-yellow-400 text-slate-900 font-bold text-sm transition-all duration-200 hover:shadow-lg hover:shadow-yellow-500/20 hover:-translate-y-0.5"
                       >
                         <FileText className="w-4 h-4 flex-shrink-0" />
-                        Submit Expression of Interest
+                        Booking link
                       </a>
                     </div>
 

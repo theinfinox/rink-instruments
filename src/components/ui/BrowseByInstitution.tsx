@@ -1,4 +1,4 @@
-import Link from 'next/link';
+
 import type { Institution } from '@/types';
 import InstitutionSearchGrid from './InstitutionSearchGrid';
 

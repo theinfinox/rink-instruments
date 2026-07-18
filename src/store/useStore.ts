@@ -34,6 +34,7 @@ export interface AppState {
   isLoading: boolean;
   error: string | null;
   hasLoadedOnce: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   oramaInstance: Orama<any> | null;
   
   searchQuery: string;
@@ -115,7 +116,7 @@ export const useStore = create<AppState>((set, get) => ({
             fetchedTaxonomy = rawTaxonomy;
             usingFallback = false;
           }
-        } catch (e) {
+        } catch {
           console.warn("Failed to parse filters.json, falling back to static constants.");
         }
       }

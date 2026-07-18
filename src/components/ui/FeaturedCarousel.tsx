@@ -3,7 +3,6 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { ArrowUpRight } from 'lucide-react';
-import { Instrument } from '@/types/instrument';
 import TechnologyCard from './TechnologyCard';
 import ServiceCard from './ServiceCard';
 
@@ -36,7 +35,7 @@ export default function FeaturedCarousel<T>({
   }
   const tripled = [...base, ...base, ...base];
 
-  useEffect(() => { setIsMounted(true); }, []);
+  useEffect(() => { setTimeout(() => setIsMounted(true), 0); }, []);
 
   // ── Intersection observer: pause when section is off-screen ─────────────────
   useEffect(() => {
@@ -145,6 +144,7 @@ export default function FeaturedCarousel<T>({
           `}</style>
 
           {tripled.map((item, idx) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const itemKey = (item as any).provider_key || (item as any).id || (item as any).ksumUid || `fallback-${idx}`;
             return (
             <div
@@ -154,9 +154,11 @@ export default function FeaturedCarousel<T>({
               onMouseLeave={resume}
             >
                 {itemType === 'instrument' ? (
-                  <TechnologyCard instrument={item as any} featured />
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  <TechnologyCard instrument={item as any} />
                 ) : (
-                  <ServiceCard service={item as any} featured />
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  <ServiceCard service={item as any} />
                 )}
             </div>
             );

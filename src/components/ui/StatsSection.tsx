@@ -25,22 +25,6 @@ export default function StatsSection({ totalCount = 160, sectorsCount = 11, inst
   const [hasAnimated, setHasAnimated] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && !hasAnimated) {
-          setHasAnimated(true);
-          animateCount(totalCount, setTechs);
-          animateCount(institutionsCount, setInsts);
-          animateCount(sectorsCount, setSectors);
-        }
-      },
-      { threshold: 0.1 }
-    );
-    if (sectionRef.current) observer.observe(sectionRef.current);
-    return () => observer.disconnect();
-  }, [hasAnimated, totalCount, sectorsCount, institutionsCount]);
-
   const animateCount = (target: number, setter: React.Dispatch<React.SetStateAction<number>>) => {
     let start = 0;
     const duration = 1200;
@@ -56,6 +40,22 @@ export default function StatsSection({ totalCount = 160, sectorsCount = 11, inst
     };
     requestAnimationFrame(step);
   };
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !hasAnimated) {
+          setHasAnimated(true);
+          animateCount(totalCount, setTechs);
+          animateCount(institutionsCount, setInsts);
+          animateCount(sectorsCount, setSectors);
+        }
+      },
+      { threshold: 0.1 }
+    );
+    if (sectionRef.current) observer.observe(sectionRef.current);
+    return () => observer.disconnect();
+  }, [hasAnimated, totalCount, sectorsCount, institutionsCount]);
 
   const floatingIcons: FloatingIcon[] = [
     {

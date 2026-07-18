@@ -10,10 +10,8 @@ import { motion, useReducedMotion } from 'framer-motion';
 interface Props {
   service: Service;
   compact?: boolean;
-  featured?: boolean;
 }
-
-export default function ServiceCard({ service, compact = false, featured = false }: Props) {
+export default function ServiceCard({ service, compact = false }: Props) {
   const [imageFailed, setImageFailed]   = useState(false);
   const [imageLoaded, setImageLoaded]   = useState(false);
   const prefersReduced = useReducedMotion();

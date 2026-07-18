@@ -1,5 +1,6 @@
 import { Service } from '@/types/service';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function mapService(raw: any): Service {
   return {
     id: undefined, // Backend does not provide stable IDs yet
@@ -24,6 +25,7 @@ export function mapService(raw: any): Service {
   };
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function mapServices(rawData: any[]): Service[] {
   if (!Array.isArray(rawData)) return [];
   return rawData.map(mapService);

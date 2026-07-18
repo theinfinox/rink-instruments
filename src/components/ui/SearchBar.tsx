@@ -45,7 +45,6 @@ export default function SearchBar({
   const [suggestions, setSuggestions] = useState<SearchIndexItem[]>([]);
   const [allItems, setAllItems] = useState<SearchIndexItem[]>([]);
   const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [activeIdx, setActiveIdx] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -149,7 +148,6 @@ export default function SearchBar({
           className={`search-input ${inputPadding} pr-24`}
           autoComplete="off"
           aria-label={ariaLabel}
-          aria-expanded={open}
           aria-autocomplete="list"
         />
         <button

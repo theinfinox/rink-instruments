@@ -180,7 +180,7 @@ export default function PortalManager({ instruments, services, initialView }: Po
         itemName: "Service",
       };
     }
-  }, [view, instruments, services]);
+  }, [activeDataView, instruments, services]);
 
   const getSpans = (total: number, cols: number) => {
     if (total === 0) return [];
@@ -279,6 +279,7 @@ export default function PortalManager({ instruments, services, initialView }: Po
         ctaText={data.featuredCtaText}
         ctaLink={data.featuredCtaLink}
         ctaMessage={data.featuredCtaMessage}
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         items={data.featured as any[]} 
         itemType={data.context === 'instruments' ? 'instrument' : 'service'}
       />

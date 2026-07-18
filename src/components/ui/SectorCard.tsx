@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Sector } from '@/types';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
-import { getSectorIcon } from './SectorIcons';
+
 
 interface Props {
   sector: Sector;
@@ -29,21 +29,6 @@ export const SECTOR_ACCENTS: Record<string, string> = {
   'infrastructure-construction-smart-cities': '#F97316', // Orange
 };
 
-// ── Map each sector slug → its dynamic sub-sectors ────
-const SECTOR_SUBSECTORS: Record<string, string[]> = {
-  'agriculture':                              ['Kerala farms', 'Smart irrigation', 'Agricultural drones'],
-  'food-technology':                          ['Processing line', 'Packaging', 'Food innovation lab'],
-  'water-environment-waste-management':       ['Rivers & treatment', 'Smart monitoring', 'Circular economy'],
-  'energy-climate-sustainability':            ['Solar & wind', 'Clean energy', 'Green tech'],
-  'digital-technologies-ai-software':        ['AI network', 'Smart computing', 'Cloud systems'],
-  'digital-technologies-al-software':        ['AI network', 'Smart computing', 'Cloud systems'],
-  'biotechnology-life-sciences':              ['DNA & Lab', 'Research labs', 'Biotech innovation'],
-  'biotechnology-life-sciences-1':            ['DNA & Lab', 'Research labs', 'Biotech innovation'],
-  'medtech-health-care':                      ['Medical devices', 'Diagnostics', 'Digital health'],
-  'robotics-automation-drones':               ['Industrial robots', 'UAVs', 'Smart automation'],
-  'manufacturing-industrial-technologies':    ['Industrial robots', 'UAVs', 'Smart automation'],
-  'default':                                  ['Kerala Innovation', 'Research', 'Tech Transfer'],
-};
 
 // ── Illustrated Custom Vector Artwork component (Colored pencil / soft vector editorial style) ────
 export function SectorIllustration({ slug, accentColor }: { slug: string; accentColor: string }) {
@@ -354,9 +339,7 @@ export function SectorIllustration({ slug, accentColor }: { slug: string; accent
 }
 
 export default function SectorCard({ sector }: Props) {
-  const tags = sector.top_tags && sector.top_tags.length > 0
-    ? sector.top_tags.slice(0, 2)
-    : (SECTOR_SUBSECTORS[sector.slug] || SECTOR_SUBSECTORS['default']).slice(0, 2);
+
   const accentColor = SECTOR_ACCENTS[sector.slug] || '#10B981';
   const [imgFailed, setImgFailed] = useState(false);
 

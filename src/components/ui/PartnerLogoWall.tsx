@@ -60,12 +60,7 @@ function LogoTile({ inst }: { inst: typeof ALL_23_INSTITUTIONS[0] }) {
 }
 
 // ── Main Component ───────────────────────────────────────────
-interface Props {
-  institutions?: any[];
-  showMarquee?: boolean;
-}
-
-export default function PartnerLogoWall({ institutions, showMarquee }: Props) {
+export default function PartnerLogoWall() {
   return (
     <section className="relative py-12 bg-[#F8FAFF] overflow-hidden border-b border-gray-100">
       {/* Dot pattern */}

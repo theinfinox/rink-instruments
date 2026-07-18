@@ -4,7 +4,7 @@ import { useState, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import {
   Search, ArrowRight, ExternalLink, Building2,
-  Layers, FlaskConical, Loader2, RotateCcw, Sparkles
+  Layers, Loader2, RotateCcw
 } from 'lucide-react';
 import type { AISearchResponse, AISearchResult } from '@/lib/aiSearch';
 
@@ -23,11 +23,7 @@ function Bold({ text }: { text: string }) {
   );
 }
 
-// Split comma-separated technology type string into individual tags
-function parseTechTypes(raw: string): string[] {
-  if (!raw || raw === 'Not Specified' || raw === 'NA' || raw === 'Information being updated') return [];
-  return raw.split(',').map(t => t.trim()).filter(t => t.length > 0 && t !== 'Not Specified' && t !== 'NA');
-}
+
 
 // ── Single result card ────────────────────────────────────────
 function ResultCard({ r }: { r: AISearchResult }) {

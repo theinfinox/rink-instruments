@@ -8,6 +8,7 @@ export type DatasetType = 'instruments' | 'services';
 export async function fetchDataset(type: 'instruments'): Promise<Instrument[]>;
 export async function fetchDataset(type: 'services'): Promise<Service[]>;
 export async function fetchDataset(type: DatasetType): Promise<Instrument[] | Service[]>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function fetchDataset(type: DatasetType): Promise<any[]> {
   if (type === 'instruments') {
     const res = await fetch(`${CDN_HOST}/instrument.json`);

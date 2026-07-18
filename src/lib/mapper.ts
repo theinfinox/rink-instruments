@@ -147,10 +147,12 @@ export function normalizeApplications(raw: string | undefined | null): string[] 
 
 // ── Flexible Getter ───────────────────────────────────────────
 // Normalizes keys (removes non-alphanumeric) to match JSON keys
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function getValFromObj(obj: Record<string, any>, possibleKeys: string[], fallback: string = ''): string {
   if (!obj) return fallback;
   
   // Create a normalized version of the object keys mapping to actual values
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const normalizedObj: Record<string, any> = {};
   for (const [k, v] of Object.entries(obj)) {
     const cleanKey = k.toLowerCase().replace(/[^a-z0-9]/g, '');

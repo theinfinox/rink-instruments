@@ -41,7 +41,7 @@ function normalizeText(text: string): string {
 type OramaDB = Awaited<ReturnType<typeof create>>;
 
 const _oramaDBs: Partial<Record<DatasetType, OramaDB>> = {};
-const _indexedData: Partial<Record<DatasetType, any[]>> = {};
+const _indexedData: Partial<Record<DatasetType, (Instrument | Service)[]>> = {};
 const _indexTs: Partial<Record<DatasetType, number>> = {};
 const INDEX_TTL = 60 * 1000; // Rebuild every 60s (matches ISR)
 
@@ -126,12 +126,13 @@ export async function oramaSearch<T = Instrument | Service>(
   const { db, data } = await getIndex(dataset);
   const q = query.trim();
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const getDocId = (item: any) => item.id || item.serviceName;
 
   if (!q) {
-    let filtered = data;
+    const filtered = data;
     return {
-      results: filtered.slice(0, limit).map(t => ({ item: t, score: 1 })),
+      results: filtered.slice(0, limit).map(t => ({ item: t as unknown as T, score: 1 })),
       query: q,
       totalFound: filtered.length,
       elapsed: Date.now() - startTime,
@@ -143,7 +144,7 @@ export async function oramaSearch<T = Instrument | Service>(
   const exactIdMatch = data.find(t => getDocId(t)?.toLowerCase() === qLower);
   if (exactIdMatch) {
     return {
-      results: [{ item: exactIdMatch, score: 1000 }],
+      results: [{ item: exactIdMatch as unknown as T, score: 1000 }],
       query: q,
       totalFound: 1,
       elapsed: Date.now() - startTime,
@@ -193,7 +194,7 @@ export async function oramaSearch<T = Instrument | Service>(
     oramaResults = await search(db, { ...searchConfig, tolerance: 1 });
   }
 
-  let results: OramaSearchResult<T>[] = [];
+  const results: OramaSearchResult<T>[] = [];
   for (const hit of oramaResults.hits) {
     const hitId = (hit.document as { id: string }).id;
     const item = data.find(t => getDocId(t) === hitId);

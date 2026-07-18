@@ -44,6 +44,7 @@ export default function FloatingParticles({ count = 15 }: Props) {
       };
     });
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setParticles(items);
   }, [count]);
 

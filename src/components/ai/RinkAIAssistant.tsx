@@ -4,7 +4,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import {
   Sparkles, X, Send, ArrowRight, ExternalLink,
-  FlaskConical, Building2, Layers, TrendingUp,
+  Building2, Layers,
   ChevronDown, RotateCcw, Loader2
 } from 'lucide-react';
 import type { AISearchResponse, AISearchResult } from '@/lib/aiSearch';

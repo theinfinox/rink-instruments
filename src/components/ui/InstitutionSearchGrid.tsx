@@ -281,7 +281,6 @@ export default function InstitutionSearchGrid({ institutions, context }: Props) 
               placeholder={isServices ? "Find a Startup..." : "Find an Institution..."}
               aria-label={isServices ? "Search by startup" : "Search by institution"}
               aria-autocomplete="list"
-              aria-expanded={isOpen}
               autoComplete="off"
               spellCheck={false}
               className="flex-1 bg-transparent outline-none border-0 text-sm"

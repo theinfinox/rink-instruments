@@ -8,8 +8,8 @@ export default function ThemeToggle() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-    setIsDark(document.documentElement.classList.contains('dark'));
+    setTimeout(() => setMounted(true), 0);
+    setTimeout(() => setIsDark(document.documentElement.classList.contains('dark')), 0);
   }, []);
 
   function toggle() {

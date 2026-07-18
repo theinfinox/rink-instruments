@@ -130,9 +130,7 @@ export function getConversationalResponse(intent: ConversationIntent, query: str
   };
 }
 
-// ── Minimum score threshold (prevents false positives) ───────
-// Raised from 30 to 50 to require stronger matches
-const MIN_SCORE_THRESHOLD = 50;
+
 
 // ── Common stop words ─────────────────────────────────────────
 const STOP_WORDS = new Set([
@@ -225,74 +223,9 @@ function detectStartupIntent(query: string): boolean {
   return /i want to start|i want to build|i want to launch|starting a|build a|launch a|open a|i am looking for|looking for|show me|find me|suggest|recommend/i.test(query);
 }
 
-// ──────────────────────────────────────────────────────────────
-// FIELD SCORING
-// Priority 1: Exact phrase match (highest score)
-// Priority 2: All tokens present (high score)
-// Priority 3: Most tokens present (medium score)
-// Priority 4: Word-boundary match (lower score)
-// Priority 5: Substring match for longer tokens only (lowest)
-// ──────────────────────────────────────────────────────────────
 
-function scoreField(fieldText: string, rawQuery: string, tokens: string[], weight: number): number {
-  if (!fieldText || !fieldText.trim()) return 0;
-  const lower = fieldText.toLowerCase();
-  const queryLower = rawQuery.toLowerCase().trim();
-  const escapedQuery = queryLower.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-  // P1 — Exact full field match
-  if (lower === queryLower) {
-    return weight * 5.0;
-  }
 
-  // P2 — Exact phrase match with word boundaries (e.g., \bcontrol\b matches "pest control" but not "pest controller")
-  const exactPhraseRegex = new RegExp(`\\b${escapedQuery}\\b`, 'i');
-  if (exactPhraseRegex.test(lower)) {
-    return weight * 3.5;
-  }
-
-  // P3 — Partial/substring match of the entire phrase (e.g. matching "control" in "controller")
-  if (lower.includes(queryLower)) {
-    return weight * 1.5;
-  }
-
-  // P4 — Token-level matching
-  if (tokens.length === 0) return 0;
-
-  let exactTokenHits = 0;
-  let prefixTokenHits = 0;
-  let substringTokenHits = 0;
-
-  for (const tok of tokens) {
-    const escapedTok = tok.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const exactWord = new RegExp(`\\b${escapedTok}\\b`, 'i');
-    const prefixWord = new RegExp(`\\b${escapedTok}`, 'i');
-
-    if (exactWord.test(lower)) {
-      exactTokenHits++;
-    } else if (prefixWord.test(lower)) {
-      prefixTokenHits++;
-    } else if (lower.includes(tok)) {
-      substringTokenHits++;
-    }
-  }
-
-  const totalHits = exactTokenHits + prefixTokenHits + substringTokenHits;
-  if (totalHits === 0) return 0;
-
-  // Prefer exact token hits, then prefix hits, then substring hits
-  let tokenScore = 0;
-  tokenScore += (exactTokenHits / tokens.length) * weight * 1.0;
-  tokenScore += (prefixTokenHits / tokens.length) * weight * 0.5;
-  tokenScore += (substringTokenHits / tokens.length) * weight * 0.15;
-
-  return tokenScore;
-}
-
-function scoreArrayField(arr: string[], rawQuery: string, tokens: string[], weight: number): number {
-  if (!arr || arr.length === 0) return 0;
-  return scoreField(arr.join(' '), rawQuery, tokens, weight);
-}
 
 // ── Build response message ────────────────────────────────────
 function buildMessage(

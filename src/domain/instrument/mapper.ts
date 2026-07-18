@@ -1,5 +1,5 @@
 import { Instrument } from '@/types/instrument';
-import { InstrumentViewModel, Action } from './view-model';
+import { InstrumentViewModel } from './view-model';
 import { getImageUrl } from '@/lib/utils';
 
 function mapLocation(instrument: Instrument): InstrumentViewModel['location'] {

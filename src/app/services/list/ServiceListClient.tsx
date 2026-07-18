@@ -37,7 +37,7 @@ interface Props {
 
 export default function ServiceListClient({
   initialResult, categories, startups,
-  certifications, districts, totalCount, initialFilters
+  certifications, districts, initialFilters
 }: Props) {
   const router = useRouter();
   const pathname = usePathname();
@@ -258,7 +258,7 @@ export default function ServiceListClient({
                   <Filter className="w-7 h-7 text-text-secondary" />
                 </div>
                 <h3 className="text-lg font-bold text-slate-800 mb-2">No services found</h3>
-                <p className="text-slate-500 max-w-sm mx-auto mb-6">Try adjusting your filters or search terms to find what you're looking for.</p>
+                <p className="text-slate-500 max-w-sm mx-auto mb-6">Try adjusting your filters or search terms to find what you&apos;re looking for.</p>
                 <button onClick={clearFilters} className="btn-primary">
                   Clear All Filters
                 </button>

@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { SearchResult, Sector, Institution } from '@/types';
+import { Sector, Institution } from '@/types';
 import TechnologyCard from '@/components/ui/TechnologyCard';
 import { Instrument } from '@/types/instrument';
 import SearchBar from '@/components/ui/SearchBar';
@@ -38,38 +38,9 @@ interface Props {
   initialFilters: InitialFilters;
 }
 
-function FilterSelect({
-  label, value, onChange, options, id
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-  options: string[];
-  id: string;
-}) {
-  return (
-    <div className="filter-group">
-      <label htmlFor={id} className="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2">
-        {label}
-      </label>
-      <select
-        id={id}
-        value={value}
-        onChange={e => onChange(e.target.value)}
-        className="w-full text-sm border border-border rounded-lg px-3 py-2 text-text-primary bg-card focus:outline-none focus:border-accent-secondary focus:ring-1 focus:ring-accent-secondary/20"
-      >
-        <option value="">All {label}</option>
-        {options.map(opt => (
-          <option key={opt} value={opt}>{opt}</option>
-        ))}
-      </select>
-    </div>
-  );
-}
-
 export default function TechListClient({
   initialResult, sectors, institutions,
-  patentStatuses, districts, totalCount, initialFilters
+  patentStatuses, districts, initialFilters
 }: Props) {
   const router = useRouter();
   const pathname = usePathname();
@@ -293,7 +264,7 @@ export default function TechListClient({
                   <Filter className="w-7 h-7 text-text-secondary" />
                 </div>
                 <h3 className="text-lg font-bold text-slate-800 mb-2">No instruments found</h3>
-                <p className="text-slate-500 max-w-sm mx-auto mb-6">Try adjusting your filters or search terms to find what you're looking for.</p>
+                <p className="text-slate-500 max-w-sm mx-auto mb-6">Try adjusting your filters or search terms to find what you&apos;re looking for.</p>
                 <button onClick={clearFilters} className="btn-primary">
                   Clear All Filters
                 </button>

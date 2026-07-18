@@ -28,7 +28,7 @@ export const getSafeUrl = (url: string | null | undefined): string => {
       return url;
     }
     return '#';
-  } catch (_) {
+  } catch {
     return '#';
   }
 };

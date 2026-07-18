@@ -4,17 +4,15 @@ import { useState, useMemo } from 'react';
 import { Instrument } from '@/types/instrument';
 import { toInstrumentViewModel } from '@/domain/instrument/mapper';
 import Link from 'next/link';
-import { Building2, ArrowRight, FlaskConical, ShieldCheck, CheckCircle, Star } from 'lucide-react';
+import { Building2, ArrowRight } from 'lucide-react';
 import { SectorIllustration, SECTOR_ACCENTS } from './SectorCard';
 import { motion, useReducedMotion } from 'framer-motion';
 
 interface Props {
   instrument: Instrument;
   compact?: boolean;
-  featured?: boolean;
 }
-
-export default function TechnologyCard({ instrument, compact = false, featured = false }: Props) {
+export default function TechnologyCard({ instrument, compact = false }: Props) {
   const [imageFailed, setImageFailed]   = useState(false);
   const [imageLoaded, setImageLoaded]   = useState(false);
   const prefersReduced = useReducedMotion();
@@ -50,6 +48,7 @@ export default function TechnologyCard({ instrument, compact = false, featured =
           <div className="flex gap-3">
             <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-gray-50 border border-gray-100 relative">
               {hasImage ? (
+                // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={displayImage!}
                   alt={vm.title}
