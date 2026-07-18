@@ -21,7 +21,7 @@ export default function ServiceCard({ service, compact = false, featured = false
   const displayImage = service.thumbnail;
   const hasImage = !!displayImage && !imageFailed;
   
-  const sectorSlug = service.sector.toLowerCase().replace(/\s+/g, '-');
+  const sectorSlug = (service.sector || service.category || 'general').toLowerCase().replace(/\s+/g, '-');
   const serviceId = service.id || service.serviceName;
 
   const cardMotion = prefersReduced

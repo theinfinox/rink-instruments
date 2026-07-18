@@ -24,15 +24,6 @@ export default function BrowseByInstitution({ institutions, context }: Props) {
         {/* ── Search + Filtered Grid ── */}
         <InstitutionSearchGrid institutions={institutions} context={context} />
 
-        {/* ── View all link ── */}
-        <div className="mt-8 flex justify-center">
-          <Link
-            href={isServices ? "/services/list" : "/institutions"}
-            className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#1B4D9B] hover:text-[#0A2164] transition-colors"
-          >
-            {isServices ? 'View all services →' : 'View all institutions →'}
-          </Link>
-        </div>
       </div>
     </section>
   );

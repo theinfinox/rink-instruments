@@ -13,6 +13,7 @@ interface Props<T> {
   title?: string;
   ctaText?: string;
   ctaLink?: string;
+  ctaMessage?: string;
 }
 
 export default function FeaturedCarousel<T>({ 
@@ -20,7 +21,8 @@ export default function FeaturedCarousel<T>({
   itemType, 
   title = "Featured Innovation Opportunities", 
   ctaText = "Browse All Instruments", 
-  ctaLink = "/instruments" 
+  ctaLink = "/instruments",
+  ctaMessage = "Ready to Discover Commercially Viable Technologies?"
 }: Props<T>) {
   const containerRef   = useRef<HTMLDivElement>(null);
   const isInteracting  = useRef(false);
@@ -174,7 +176,7 @@ export default function FeaturedCarousel<T>({
         }}
       >
         <p className="text-[#1b60bb] text-[16px] md:text-[20px] font-medium text-center mb-4 leading-snug">
-          Ready to Discover Commercially Viable Technologies?
+          {ctaMessage}
         </p>
         <Link
           href={ctaLink}
