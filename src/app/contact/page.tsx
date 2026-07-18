@@ -4,7 +4,7 @@ import { MapPin, Mail, Phone } from 'lucide-react';
 export const metadata: Metadata = {
   title: 'Contact RINK | Research Innovation Network Kerala',
   description:
-    'Contact the RINK Technology Transfer Portal — an initiative of Research Innovation Network Kerala (RINK) under Kerala Startup Mission (KSUM).',
+    'Contact the RINK Instruments and Services Portal — an initiative of Research Innovation Network Kerala (RINK) under Kerala Startup Mission (KSUM).',
 };
 
 export default function ContactPage() {
@@ -19,9 +19,9 @@ export default function ContactPage() {
           </h1>
 
           <p className="font-sans text-slate-700 leading-relaxed mb-4 max-w-xl">
-            The RINK Technology Transfer Portal, an initiative of Research Innovation Network Kerala (RINK)
-            under Kerala Startup Mission (KSUM), showcases commercially viable technologies from Kerala&apos;s
-            leading research institutions.
+            The RINK Instruments and Services Portal, an initiative of Research Innovation Network Kerala (RINK)
+            under Kerala Startup Mission (KSUM), showcases instruments and services from Kerala&apos;s
+            leading research institutions and startups.
           </p>
 
           <a

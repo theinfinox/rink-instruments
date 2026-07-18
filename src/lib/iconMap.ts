@@ -1,5 +1,5 @@
 // ============================================================
-// RINK Technology Transfer Portal — Centralized Icon Mapping
+// RINK Instruments and Services Portal — Centralized Icon Mapping
 // Using Lucide React exclusively for a consistent visual system
 // ============================================================
 

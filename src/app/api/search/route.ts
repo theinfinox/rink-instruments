@@ -1,5 +1,5 @@
 // ============================================================
-// RINK Technology Transfer Portal — Orama Search API
+// RINK Instruments and Services Portal — Orama Search API
 // Replaces Gemini-based /api/ai-search for technology queries
 // ============================================================
 

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 
 export const metadata = {
-  title: 'Browse by Category — RINK Technology Transfer Portal',
+  title: 'Browse by Category — RINK Instruments and Services Portal',
   description: 'Explore instruments by category. Find equipment across various domains.',
 };
 

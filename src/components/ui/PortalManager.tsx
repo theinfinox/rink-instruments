@@ -232,7 +232,7 @@ export default function PortalManager({ instruments, services, initialView }: Po
       <section className="relative z-50">
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('/images/hero-bg.png')" }}
+          style={{ backgroundImage: "url('/images/hero-bg.webp')" }}
           aria-hidden
         />
         <div
@@ -272,6 +272,7 @@ export default function PortalManager({ instruments, services, initialView }: Po
         totalInstruments={data.totalItems} 
         totalCategories={data.totalCategories} 
         totalInstitutions={data.totalInstitutions} 
+        totalDistricts={data.districts.length}
         context={data.context}
       />
 

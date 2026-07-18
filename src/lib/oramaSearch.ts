@@ -1,5 +1,5 @@
 // ============================================================
-// RINK Technology Transfer Portal — Orama Search Engine
+// RINK Instruments and Services Portal — Orama Search Engine
 // High-performance full-text search with typo tolerance
 // Replaces Gemini as primary search. Google Sheet remains source of truth.
 // ============================================================

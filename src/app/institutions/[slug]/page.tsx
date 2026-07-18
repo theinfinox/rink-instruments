@@ -43,7 +43,7 @@ export async function generateMetadata({ params }: Props) {
   const inst = institutions.get(slug);
   if (!inst) return { title: 'Institution Not Found — RINK' };
   
-  const metaDescription = `Explore ${inst.tech_count} instruments from ${inst.name}. Partner with top Kerala research institutions through the RINK Technology Transfer Portal.`;
+  const metaDescription = `Explore ${inst.tech_count} instruments from ${inst.name}. Partner with top Kerala research institutions through the RINK Instruments and Services Portal.`;
   
   return {
     title: `${inst.name} Instruments | RINK Kerala`,

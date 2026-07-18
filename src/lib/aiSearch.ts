@@ -88,11 +88,11 @@ export function classifyIntent(query: string): ConversationIntent {
 export function getConversationalResponse(intent: ConversationIntent, query: string): AISearchResponse {
   const normalizedQuery = query.toLowerCase().replace(/[^a-z0-9\s]/g, '').trim();
 
-  let greetingMsg = `Hello! Welcome to the **RINK Technology Transfer Portal**.\n\nWhat startup idea or technology area are you exploring today?`;
+  let greetingMsg = `Hello! Welcome to the **RINK Instruments and Services Portal**.\n\nWhat startup idea or technology area are you exploring today?`;
   if (normalizedQuery === 'hi') {
     greetingMsg = 'Hello! What startup idea are you exploring today?';
   } else if (normalizedQuery === 'hello') {
-    greetingMsg = 'Welcome to the RINK Technology Transfer Portal.';
+    greetingMsg = 'Welcome to the RINK Instruments and Services Portal.';
   }
 
   const messages: Record<ConversationIntent, string> = {

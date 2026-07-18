@@ -467,7 +467,7 @@ export default function RinkAIAssistant() {
                             background: 'var(--card-secondary)', border: '1px solid var(--border)', borderRadius: 8,
                           }}
                         >
-                          Browse all in Technology Transfer Portal <ArrowRight size={12} />
+                          Browse all in Instruments and Services Portal <ArrowRight size={12} />
                         </Link>
                       </div>
                     )}

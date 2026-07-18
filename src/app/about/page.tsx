@@ -4,7 +4,7 @@ import { Target, Users, Building2, ArrowRight, Globe, MapPin, Phone, Mail, Light
 import PartnerLogoWall from '@/components/ui/PartnerLogoWall';
 
 export const metadata: Metadata = {
-  title: 'About RINK | Kerala Startup Mission Technology Transfer Portal',
+  title: 'About RINK | Kerala Startup Mission | Instruments and Services Portal',
   description: 'Learn about RINK — Research Innovation Network Kerala — Kerala Startup Mission\'s initiative connecting research institutions with startups for technology commercialization.',
 };
 
@@ -32,13 +32,13 @@ export default async function AboutPage() {
           </div>
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-200 rounded-full text-xs font-semibold text-[#0A2164] mb-5">
             <Lightbulb className="w-3.5 h-3.5" />
-            About RINK Technology Transfer Portal
+            About RINK Instruments and Services Portal
           </div>
           <h1 className="text-4xl md:text-5xl font-heading font-black text-gray-900 mb-4">
             Bridging Research &amp; Entrepreneurship
           </h1>
           <p className="text-gray-600 leading-relaxed text-base max-w-2xl mx-auto font-sans">
-            RINK Technology Transfer Portal is a sub-portal of the Research Innovation Network Kerala (RINK),
+            RINK Instruments and Services Portal is a sub-portal of the Research Innovation Network Kerala (RINK),
             an initiative by the Kerala Startup Mission (KSUM) to connect research institutions
             with startup founders and entrepreneurs.
           </p>

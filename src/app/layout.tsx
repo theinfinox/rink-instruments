@@ -4,10 +4,10 @@ import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 
 export const metadata: Metadata = {
-  title: 'RINK Technology Transfer Portal | Research Innovation Network Kerala',
+  title: 'RINK Instruments and Services Portal | Research Innovation Network Kerala',
   description:
-    'Connecting Research • Innovation • Commercialization. Discover and license commercializable technologies developed by Kerala research institutions.',
-  keywords: 'Kerala startup, research technology, technology transfer, KSUM, RINK, CTCRI, CPCRI, NIIST, commercialization, innovation',
+    'Discover and license instruments and services from Kerala\u2019s leading research institutions and startups — Kerala Startup Mission.',
+  keywords: 'Kerala startup, research technology, KSUM, RINK, CTCRI, CPCRI, NIIST',
   icons: {
     icon: [
       { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   },
   manifest: '/site.webmanifest',
   openGraph: {
-    title: 'RINK Technology Transfer Portal',
+    title: 'RINK Instruments and Services Portal',
     description: 'Connecting Research • Innovation • Commercialization — Kerala Startup Mission',
     type: 'website',
   },
