@@ -113,7 +113,7 @@ export default function FeaturedCarousel<T>({
       >
         <div className="text-center px-4">
           <span className="block text-[11px] font-bold uppercase tracking-[0.2em] text-[#1b60bb]/70 mb-2">
-            Innovation Showcase
+            Instrument Showcase
           </span>
           <h2 className="font-serif font-black text-[28px] sm:text-[38px] md:text-[46px] text-[#1b60bb] tracking-wide leading-tight">
             {title}

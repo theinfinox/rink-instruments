@@ -14,10 +14,10 @@ export default function BrowseByInstitution({ institutions, context }: Props) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="mb-8">
           <div className="text-xs font-bold text-[#1B4D9B] uppercase tracking-widest mb-3">
-            {isServices ? 'Browse by Startup' : 'Browse by Institution'}
+            {isServices ? 'Browse by' : 'Browse by'}
           </div>
           <h2 className="text-3xl font-heading font-bold text-[#0F172A]">
-            {isServices ? 'Services From Kerala\'s Promising Startups' : 'Technologies From Kerala\'s Leading Research Institutions'}
+            {isServices ? 'List of Services' : 'List of Research & Technology Institutions'}
           </h2>
         </div>
 
