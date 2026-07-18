@@ -668,10 +668,17 @@ h1, h2, h3, h4, h5, h6 {
 .page-enter { animation: slideUp 0.4s ease-out both; }
 
 /* ── Scrollbar ── */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: #F9FAFB; }
-::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+*::-webkit-scrollbar { 
+  display: none !important; 
+  width: 0 !important;
+  height: 0 !important;
+}
+html, body, * {
+  -ms-overflow-style: none !important;  /* IE and Edge */
+  scrollbar-width: none !important;  /* Firefox */
+}
 
 /* ── Mobile Responsive ── */
 @media (max-width: 768px) {

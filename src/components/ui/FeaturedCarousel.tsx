@@ -123,7 +123,7 @@ export default function FeaturedCarousel<T>({
 
       {/* ── CAROUSEL CONTENT ── */}
       <div
-        className="w-full relative z-10 py-16 lg:py-20"
+        className="w-full relative z-10 py-12 lg:py-16"
         onMouseEnter={pause}
         onMouseLeave={resume}
         onTouchStart={pause}
@@ -132,7 +132,7 @@ export default function FeaturedCarousel<T>({
         {/* Scrolling Container */}
         <div
           ref={containerRef}
-          className="flex gap-5 overflow-x-auto px-[10vw] cursor-grab active:cursor-grabbing featured-scroller"
+          className="flex gap-5 overflow-hidden px-[10vw] py-4 featured-scroller"
           style={{
             WebkitOverflowScrolling: 'touch',
             scrollbarWidth: 'none',

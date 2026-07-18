@@ -66,14 +66,8 @@ export default function PortalManager({ instruments, services, initialView }: Po
   const router = useRouter();
   const pathname = usePathname();
 
-  // Sync browser history so back/forward buttons work and links can be shared
-  useEffect(() => {
-    if (view === 'instruments' && pathname !== '/') {
-      router.replace('/', { scroll: false });
-    } else if (view === 'services' && pathname !== '/services') {
-      router.replace('/services', { scroll: false });
-    }
-  }, [view, pathname, router]);
+  // We manage the URL via window.history to prevent Next.js navigation flickers
+  // during the artificial loading transition.
 
   const handleViewChange = (newView: PortalView) => {
     if (newView === view || isTransitioning) return;
@@ -88,11 +82,18 @@ export default function PortalManager({ instruments, services, initialView }: Po
       // Swap the actual underlying data
       setActiveDataView(newView);
       
-      // 4. Wait a short moment to simulate processing and ensure DOM is ready
+      // Update URL without triggering a Next.js re-render/suspense
+      if (newView === 'instruments' && pathname !== '/') {
+        window.history.replaceState(null, '', '/');
+      } else if (newView === 'services' && pathname !== '/services') {
+        window.history.replaceState(null, '', '/services');
+      }
+      
+      // 4. Wait to simulate processing and ensure DOM is ready
       setTimeout(() => {
         // Fade out the overlay
         setIsTransitioning(false);
-      }, 1000); // 1000ms artificial loading time to make it feel deliberate
+      }, 2000); // 2000ms artificial loading time to make it feel deliberate
     }, 300);
   };
 
@@ -218,7 +219,7 @@ export default function PortalManager({ instruments, services, initialView }: Po
     <div className="min-h-screen bg-[#F6F8FC] relative">
       {/* ── LOADING OVERLAY ── */}
       <div 
-        className={`fixed inset-0 z-[100] bg-[#F6F8FC]/80 backdrop-blur-md flex flex-col items-center justify-center transition-opacity duration-300 ease-in-out ${
+        className={`fixed inset-0 z-[100] bg-white flex flex-col items-center justify-center transition-opacity duration-300 ease-in-out ${
           isTransitioning ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
       >
