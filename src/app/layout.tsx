@@ -39,7 +39,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
         />
       </head>
-      <body suppressHydrationWarning className="flex flex-col min-h-screen bg-background text-text-primary relative pb-16 md:pb-0">
+      <body suppressHydrationWarning className="flex flex-col min-h-screen bg-background text-text-primary relative pt-16 pb-16 md:pb-0">
         <Navbar />
         <main className="flex-1 relative z-10">{children}</main>
         <Footer />
