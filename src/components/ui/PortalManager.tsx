@@ -93,7 +93,7 @@ export default function PortalManager({ instruments, services, initialView }: Po
       setTimeout(() => {
         // Fade out the overlay
         setIsTransitioning(false);
-      }, 2000); // 2000ms artificial loading time to make it feel deliberate
+      }, 200); // 200ms artificial loading time to make it feel deliberate
     }, 300);
   };
 
