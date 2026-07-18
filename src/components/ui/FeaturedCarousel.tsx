@@ -93,14 +93,21 @@ export default function FeaturedCarousel<T>({
   if (!isMounted) return null;
 
   return (
-    <div className="w-full relative flex flex-col bg-[#F6F8FC]">
-
-      {/* ── TOP WHITE PANEL — contains section title ── */}
+    <section 
+      className="w-full relative flex flex-col"
+      style={{
+        background: 'linear-gradient(180deg, #5BAEFF 0%, #3F8FEA 30%, #2367C9 70%, #153156 100%)'
+      }}
+    >
+      {/* ── TOP WHITE CURVED PANEL (Hero Cap / Mask) ── */}
       <div
-        className="w-full z-20 flex items-center justify-center"
+        className="relative z-20 flex items-center justify-center w-full"
         style={{
           height: 160,
           background: '#F6F8FC',
+          borderBottomLeftRadius: '3rem',
+          borderBottomRightRadius: '3rem',
+          boxShadow: '0 6px 32px rgba(0,0,0,0.10)',
         }}
       >
         <div className="text-center px-4">
@@ -113,79 +120,57 @@ export default function FeaturedCarousel<T>({
         </div>
       </div>
 
-      {/* ── Wrapper to blend backgrounds behind rounded corners ── */}
-      <div 
-        className="w-full relative" 
-        style={{ background: 'linear-gradient(180deg, #F6F8FC 50%, #ffffff 50%)' }}
+      {/* ── CAROUSEL CONTENT ── */}
+      <div
+        className="w-full relative z-10 py-16 lg:py-20"
+        onMouseEnter={pause}
+        onMouseLeave={resume}
+        onTouchStart={pause}
+        onTouchEnd={resume}
       >
-        {/* ── Main Blue Gradient Section ── */}
+        {/* Scrolling Container */}
         <div
-          className="relative overflow-hidden flex flex-col justify-center"
+          ref={containerRef}
+          className="flex gap-5 overflow-x-auto px-[10vw] cursor-grab active:cursor-grabbing featured-scroller"
           style={{
-            minHeight: 400,
-            background: 'linear-gradient(180deg, #36a8fb 0%, #1b60bb 45%, #153156 100%)',
-            borderTopLeftRadius: '3rem',
-            borderTopRightRadius: '3rem',
-            borderBottomLeftRadius: '3rem',
-            borderBottomRightRadius: '3rem',
-            boxShadow: 'inset 0 10px 32px rgba(0,0,0,0.15), inset 0 -10px 32px rgba(0,0,0,0.15)',
+            WebkitOverflowScrolling: 'touch',
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
           }}
         >
-          {/* ── CAROUSEL — native scrollLeft-based ── */}
-          <div
-            className="w-full relative z-10 py-12"
-            onMouseEnter={pause}
-            onMouseLeave={resume}
-            onTouchStart={pause}
-            onTouchEnd={resume}
-          >
-            {/* Left edge fade */}
-            <div
-              className="absolute inset-y-0 left-0 w-24 z-10 pointer-events-none"
-              style={{ background: 'linear-gradient(to right, rgba(27,96,187,0.55) 0%, transparent 100%)' }}
-            />
-            {/* Right edge fade */}
-            <div
-              className="absolute inset-y-0 right-0 w-24 z-10 pointer-events-none"
-              style={{ background: 'linear-gradient(to left, rgba(21,49,86,0.55) 0%, transparent 100%)' }}
-            />
+          <style>{`
+            .featured-scroller::-webkit-scrollbar { display: none; }
+          `}</style>
 
+          {tripled.map((item, idx) => {
+            const itemKey = (item as any).provider_key || (item as any).id || (item as any).ksumUid || `fallback-${idx}`;
+            return (
             <div
-              ref={containerRef}
-              className="flex gap-5 overflow-x-auto py-8 px-[10vw] cursor-grab active:cursor-grabbing featured-scroller"
-              style={{
-                WebkitOverflowScrolling: 'touch',
-                scrollbarWidth: 'none',
-                msOverflowStyle: 'none',
-              }}
+              key={`${itemKey}-${idx}`}
+              className="flex-shrink-0 w-[240px] xs:w-[260px] sm:w-[280px] md:w-[320px] relative h-[360px] sm:h-[380px] md:h-[420px]"
+              onMouseEnter={pause}
+              onMouseLeave={resume}
             >
-              <style>{`
-                .featured-scroller::-webkit-scrollbar { display: none; }
-              `}</style>
-
-              {tripled.map((item, idx) => {
-                const itemKey = (item as any).provider_key || (item as any).id || (item as any).ksumUid || `fallback-${idx}`;
-                return (
-                <div key={`${itemKey}-${idx}`} className="w-[300px] sm:w-[320px] md:w-[350px] flex-shrink-0 snap-center snap-always">
-                  {itemType === 'instrument' ? (
-                    <TechnologyCard instrument={item as any} featured />
-                  ) : (
-                    <ServiceCard service={item as any} featured />
-                  )}
-                </div>
-                );
-              })}
+                {itemType === 'instrument' ? (
+                  <TechnologyCard instrument={item as any} featured />
+                ) : (
+                  <ServiceCard service={item as any} featured />
+                )}
             </div>
-          </div>
+            );
+          })}
         </div>
       </div>
 
-      {/* ── BOTTOM WHITE PANEL — contains CTA ── */}
+      {/* ── BOTTOM WHITE CURVED PANEL (Browse Cap / Mask) ── */}
       <div
-        className="w-full z-20 flex flex-col items-center justify-center px-4"
+        className="relative z-20 flex flex-col items-center justify-center px-4 w-full"
         style={{
           height: 160,
           background: '#ffffff',
+          borderTopLeftRadius: '3rem',
+          borderTopRightRadius: '3rem',
+          boxShadow: '0 -6px 32px rgba(0,0,0,0.10)',
         }}
       >
         <p className="text-[#1b60bb] text-[16px] md:text-[20px] font-medium text-center mb-4 leading-snug">
@@ -204,7 +189,6 @@ export default function FeaturedCarousel<T>({
           />
         </Link>
       </div>
-
-    </div>
+    </section>
   );
 }
