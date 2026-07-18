@@ -133,7 +133,7 @@ export default function PortalManager({ instruments, services, initialView }: Po
         title: "Discover Research Instruments from Kerala's Leading Institutions",
         subtitle: "RESEARCH INNOVATION NETWORK KERALA . INSTRUMENTATION PORTAL",
         context: 'instruments' as const,
-        featuredTitle: "Featured Innovation Opportunities",
+        featuredTitle: "Available Instrumentation Facilities",
         featuredCtaText: "Browse All Instruments",
         featuredCtaLink: "/instruments",
         featuredCtaMessage: "Ready to Discover Commercially Viable Technologies?",
