@@ -67,7 +67,7 @@ export default function TechnologyCard({ instrument, compact = false }: Props) {
               <span className="inline-block text-[9px] font-bold text-[#1b60bb] uppercase tracking-wider mb-1">
                 {sectorName}
               </span>
-              <h4 className="font-heading font-bold text-gray-900 text-[14px] leading-tight line-clamp-2 group-hover:text-[#0A2164] transition-colors">
+              <h4 className="font-heading font-bold text-gray-900 text-[14px] leading-tight group-hover:text-[#0A2164] transition-colors">
                 {vm.displayTitle}
               </h4>
               <div className="flex items-center gap-1 mt-1.5">
@@ -191,47 +191,49 @@ export default function TechnologyCard({ instrument, compact = false }: Props) {
             </span>
           </div>
 
-          {/* Title — fixed 2 lines */}
+          {/* Title — full name */}
           <h3
-            className="font-heading font-bold leading-snug line-clamp-2 transition-colors duration-200 group-hover:text-[#1b60bb] mb-2"
-            style={{ fontSize: 15, color: '#0f172a', minHeight: '2.5rem' }}
+            className="font-heading font-bold leading-snug transition-colors duration-200 group-hover:text-[#1b60bb] mb-2"
+            style={{ fontSize: 15, color: '#0f172a' }}
           >
             {vm.displayTitle}
           </h3>
 
-          {/* Short description — fixed 2 lines */}
-          {shortDesc && (
-            <p
-              className="line-clamp-2 font-sans leading-relaxed mb-3"
-              style={{ fontSize: 12, color: '#64748b', minHeight: '2.25rem' }}
-            >
-              {shortDesc}
-            </p>
-          )}
-
-          {/* Metadata row */}
-          <div className="flex flex-wrap items-center gap-1.5 mb-3">
-            {vm.tags.slice(0, 2).map((tag, i) => (
-              <span
-                key={i}
-                className="inline-flex items-center px-2 py-0.5 rounded-full font-semibold"
-                style={{ fontSize: 10, background: 'rgba(37,99,235,0.07)', color: '#1d4ed8', border: '1px solid rgba(37,99,235,0.12)' }}
+          <div className="mt-auto flex flex-col gap-0">
+            {/* Short description — fixed 2 lines */}
+            {shortDesc && (
+              <p
+                className="line-clamp-2 font-sans leading-relaxed mb-3"
+                style={{ fontSize: 12, color: '#64748b', minHeight: '2.25rem' }}
               >
-                {tag}
-              </span>
-            ))}
-            {vm.id && (
-              <span
-                className="inline-flex items-center px-2 py-0.5 rounded-full font-mono font-semibold"
-                style={{ fontSize: 9.5, background: 'rgba(100,116,139,0.07)', color: '#64748b', border: '1px solid rgba(100,116,139,0.12)' }}
-              >
-                # {vm.id}
-              </span>
+                {shortDesc}
+              </p>
             )}
+
+            {/* Metadata row */}
+            <div className="flex flex-wrap items-center gap-1.5 mb-3">
+              {vm.tags.slice(0, 2).map((tag, i) => (
+                <span
+                  key={i}
+                  className="inline-flex items-center px-2 py-0.5 rounded-full font-semibold"
+                  style={{ fontSize: 10, background: 'rgba(37,99,235,0.07)', color: '#1d4ed8', border: '1px solid rgba(37,99,235,0.12)' }}
+                >
+                  {tag}
+                </span>
+              ))}
+              {vm.id && (
+                <span
+                  className="inline-flex items-center px-2 py-0.5 rounded-full font-mono font-semibold"
+                  style={{ fontSize: 9.5, background: 'rgba(100,116,139,0.07)', color: '#64748b', border: '1px solid rgba(100,116,139,0.12)' }}
+                >
+                  # {vm.id}
+                </span>
+              )}
+            </div>
           </div>
 
           {/* CTA Footer */}
-          <div className="mt-auto pt-3 border-t flex items-center justify-between" style={{ borderColor: 'rgba(15,23,42,0.06)' }}>
+          <div className="pt-3 border-t flex items-center justify-between" style={{ borderColor: 'rgba(15,23,42,0.06)' }}>
             <span className="text-[11px] font-medium" style={{ color: '#94a3b8' }}>
               Equipment Access
             </span>

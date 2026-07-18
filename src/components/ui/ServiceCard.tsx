@@ -60,7 +60,7 @@ export default function ServiceCard({ service, compact = false }: Props) {
               <span className="inline-block text-[9px] font-bold text-[#1b60bb] uppercase tracking-wider mb-1">
                 {service.category || service.sector}
               </span>
-              <h4 className="font-heading font-bold text-gray-900 text-[14px] leading-tight line-clamp-2 group-hover:text-[#0A2164] transition-colors">
+              <h4 className="font-heading font-bold text-gray-900 text-[14px] leading-tight group-hover:text-[#0A2164] transition-colors">
                 {service.serviceName}
               </h4>
               <div className="flex items-center gap-1 mt-1.5">
@@ -171,29 +171,31 @@ export default function ServiceCard({ service, compact = false }: Props) {
           </div>
 
           <h3
-            className="font-heading font-bold leading-snug line-clamp-2 transition-colors duration-200 group-hover:text-[#1b60bb] mb-2"
-            style={{ fontSize: 15, color: '#0f172a', minHeight: '2.5rem' }}
+            className="font-heading font-bold leading-snug transition-colors duration-200 group-hover:text-[#1b60bb] mb-2"
+            style={{ fontSize: 15, color: '#0f172a' }}
           >
             {service.serviceName}
           </h3>
 
-          <div className="flex flex-wrap items-center gap-2 mb-3">
-            <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-[#f8fafc] border border-[#e2e8f0]">
-              <Layers className="w-3 h-3 text-[#64748b]" />
-              <span className="text-[10px] font-semibold text-[#475569] truncate max-w-[120px]">
-                {service.category || 'General Service'}
-              </span>
-            </div>
-          </div>
-
-          {service.certifications && (
-            <div className="mt-auto pt-3 border-t border-slate-100/60">
-              <div className="flex items-center gap-1.5 text-[11px] text-[#64748b]">
-                <CheckCircle className="w-3 h-3 text-[#10b981]" />
-                <span className="font-medium text-[#334155]">{service.certifications}</span>
+          <div className="mt-auto flex flex-col gap-0">
+            <div className="flex flex-wrap items-center gap-2 mb-3">
+              <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-[#f8fafc] border border-[#e2e8f0]">
+                <Layers className="w-3 h-3 text-[#64748b]" />
+                <span className="text-[10px] font-semibold text-[#475569] truncate max-w-[120px]">
+                  {service.category || 'General Service'}
+                </span>
               </div>
             </div>
-          )}
+
+            {service.certifications && (
+              <div className="pt-3 border-t border-slate-100/60">
+                <div className="flex items-center gap-1.5 text-[11px] text-[#64748b]">
+                  <CheckCircle className="w-3 h-3 text-[#10b981]" />
+                  <span className="font-medium text-[#334155]">{service.certifications}</span>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </motion.div>
     </Link>
