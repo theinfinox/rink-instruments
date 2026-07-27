@@ -69,6 +69,7 @@ export class InstitutionRepository {
       slug,
       name,
       tech_count: 1,
+      has_verified_mou: false,
       address: instrument.address !== 'None' ? instrument.address : undefined,
     };
   }
@@ -111,14 +112,26 @@ export class InstitutionRepository {
 
   /**
    * Factory method to build InstitutionRepository from raw instrument.json output
-   * handles both main_data and instituitiion_list tabs
+   * handles main_data, instituitiion_list, and mou tabs
    */
   static fromInstrumentData(
     mainData: Instrument[] = [],
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    institutionList: any[] = []
+    institutionList: any[] = [],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    mouList: any[] = []
   ): InstitutionRepository {
     const institutionMap = new Map<string, Institution>();
+    const mouMap = new Map<string, boolean>();
+
+    // 0. Build O(1) MoU lookup map indexed ONLY by institution_id
+    if (Array.isArray(mouList)) {
+      mouList.forEach(raw => {
+        if (raw?.institution_id && raw?.verification_status === 'Verified') {
+          mouMap.set(raw.institution_id, true);
+        }
+      });
+    }
 
     // 1. First populate from official institution_list array (authoritative metadata source)
     institutionList.forEach(raw => {
@@ -131,6 +144,7 @@ export class InstitutionRepository {
           slug,
           name,
           tech_count: 0,
+          has_verified_mou: mouMap.get(id) === true,
           latitude: raw.latitude,
           longitude: raw.longitude,
           link: raw.link,
@@ -154,6 +168,7 @@ export class InstitutionRepository {
             slug,
             name,
             tech_count: 0,
+            has_verified_mou: mouMap.get(id) === true,
             address: inst.address !== 'None' ? inst.address : undefined,
             contact_email: inst.enquiry_mail !== 'None' ? inst.enquiry_mail : undefined,
             contact_phone: inst.enquiry_contact_number !== 'None' ? inst.enquiry_contact_number : undefined,
@@ -170,6 +185,7 @@ export class InstitutionRepository {
             slug,
             name,
             tech_count: 0,
+            has_verified_mou: false,
             address: inst.address !== 'None' ? inst.address : undefined,
           });
         }

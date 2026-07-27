@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { ArrowRight, Calendar } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
 
+import MouBadge from './MouBadge';
+
 interface Props {
   institution: Institution;
 }
@@ -221,6 +223,7 @@ export default function InstitutionCard({ institution }: Props) {
               <span className="inline-flex items-center text-[10px] font-bold px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200">
                 {institution.tech_count} {institution.tech_count === 1 ? 'Opportunity' : 'Opportunities'}
               </span>
+              <MouBadge hasVerifiedMou={institution.has_verified_mou} />
             </div>
             {institution.last_updated && (
               <div className="flex items-center gap-1.5 text-[10px] text-gray-500 font-medium uppercase tracking-wider mt-0.5">

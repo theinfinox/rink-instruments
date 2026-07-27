@@ -4,6 +4,7 @@ import { InstitutionRepository } from '@/repositories/InstitutionRepository';
 import { precisionSearch } from '@/lib/searchEngine';
 import { SearchIndexItem } from '@/types';
 import { Instrument } from '@/types/instrument';
+import { toInstrumentViewModel } from '@/domain/instrument/mapper';
 
 export const metadata = {
   title: 'All Instruments — RINK Instruments and Services Portal',
@@ -31,7 +32,7 @@ export default async function TechnologiesPage({ searchParams }: Props) {
   const instruments = bundle.main_data;
   const rawInstitutions = bundle.instituitiion_list;
   
-  const repo = InstitutionRepository.fromInstrumentData(instruments, rawInstitutions);
+  const repo = InstitutionRepository.fromInstrumentData(instruments, rawInstitutions, bundle.mou_list);
   const institutions = repo.getAll();
 
   // Extract Categories (Tags), Districts, and Verification Statuses
@@ -125,8 +126,11 @@ export default async function TechnologiesPage({ searchParams }: Props) {
   const perPage = 12;
   const paginatedInstruments = filtered.slice((page - 1) * perPage, page * perPage);
 
+  // Map instruments to InstrumentViewModels ON THE SERVER with full InstitutionRepository & MoU context
+  const paginatedViewModels = paginatedInstruments.map(inst => toInstrumentViewModel(inst, repo));
+
   const result = {
-    technologies: paginatedInstruments,
+    technologies: paginatedViewModels,
     total: filtered.length,
     page,
     per_page: perPage

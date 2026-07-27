@@ -131,6 +131,7 @@ export function toInstrumentViewModel(
   repo?: InstitutionRepository
 ): Readonly<InstrumentViewModel> {
   const activeRepo = repo || InstitutionRepository.getGlobal() || undefined;
+  const instEntity = activeRepo ? (activeRepo.getById(instrument.institution_id) || activeRepo.getByName(instrument.institution_name)) : undefined;
 
   const id = instrument.provider_key || instrument.id || '';
   const title = instrument.instruments;
@@ -140,6 +141,8 @@ export function toInstrumentViewModel(
   const institutionName = activeRepo 
     ? activeRepo.resolveDisplayName(instrument)
     : (instrument.institution_name || instrument.matched_institution || '');
+
+  const hasVerifiedMou = instEntity?.has_verified_mou === true;
     
   const facility = instrument.name_of_facility && instrument.name_of_facility !== 'None' ? instrument.name_of_facility : null;
   
@@ -161,6 +164,8 @@ export function toInstrumentViewModel(
     acronym,
     displayTitle,
     institution: institutionName,
+    institution_id: instrument.institution_id || instEntity?.institution_id,
+    hasVerifiedMou,
     facility,
     location,
     media,

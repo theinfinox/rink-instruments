@@ -5,15 +5,16 @@ import { useRouter, usePathname } from 'next/navigation';
 import { Sector, Institution } from '@/types';
 import TechnologyCard from '@/components/ui/TechnologyCard';
 import { Instrument } from '@/types/instrument';
+import { InstrumentViewModel } from '@/domain/instrument/view-model';
 import SearchBar from '@/components/ui/SearchBar';
 import {
   Filter, X, ChevronLeft, ChevronRight, SlidersHorizontal,
   LayoutGrid, List, Loader2
 } from 'lucide-react';
 
-// We locally redefine SearchResult since it relies on Instrument now
+// We locally redefine SearchResult since it accepts InstrumentViewModels or Instruments
 interface LocalSearchResult {
-  technologies: Instrument[];
+  technologies: (Instrument | InstrumentViewModel)[];
   total: number;
   page: number;
   per_page: number;
@@ -278,8 +279,8 @@ export default function TechListClient({
                     ? 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5'
                     : 'flex flex-col gap-3'
                 }>
-                  {technologies.map((tech: Instrument) => (
-                    <TechnologyCard key={tech.provider_key || tech.id} instrument={tech} compact={viewMode === 'list'} />
+                  {technologies.map((tech: Instrument | InstrumentViewModel) => (
+                    <TechnologyCard key={tech.id} instrument={tech} compact={viewMode === 'list'} />
                   ))}
                 </div>
 

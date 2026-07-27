@@ -5,6 +5,7 @@ import TechImage from '@/components/ui/TechImage';
 import { CDN_HOST } from '@/lib/utils';
 import { Instrument } from '@/types/instrument';
 import { toInstrumentViewModel } from '@/domain/instrument/mapper';
+import MouBadge from '@/components/ui/MouBadge';
 const GOOGLE_FORM_URL =
   'https://docs.google.com/forms/d/e/1FAIpQLSfJlFIqrK5Dzd5R-Voh19OvhUKxj7OzEqeW8XIdjJMNKxc8Eg/viewform';
 
@@ -56,17 +57,21 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   };
 }
 
-// ── Page ──────────────────────────────────────────────────────
+import { fetchInstrumentBundle } from '@/lib/dataFetcher';
+import { InstitutionRepository } from '@/repositories/InstitutionRepository';
 
 export default async function TechnologyDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   
-  const res = await fetch(`${CDN_HOST}/instrument.json`);
-  const data = await res.json();
-  const instruments: Instrument[] = data.main_data || [];
+  const bundle = await fetchInstrumentBundle();
+  const instruments = bundle.main_data;
+  const repo = InstitutionRepository.fromInstrumentData(instruments, bundle.instituitiion_list, bundle.mou_list);
   
   const rawTech = instruments.find(t => (t.provider_key || t.id) === id);
   if (!rawTech) notFound();
+
+  const instEntity = repo.getInstitution(rawTech);
+  const hasVerifiedMou = instEntity.has_verified_mou === true;
   
   const vm = toInstrumentViewModel(rawTech);
   
@@ -126,10 +131,11 @@ export default async function TechnologyDetailPage({ params }: { params: Promise
               <div className="flex flex-col gap-5">
 
                 {/* Category chips */}
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 items-center">
                   <span className="bg-slate-50 border border-slate-200 text-slate-700 rounded-sm text-xs px-3 py-1 font-sans font-semibold">
                     {vm.location.district || 'General'}
                   </span>
+                  <MouBadge hasVerifiedMou={hasVerifiedMou} />
                   {vm.tags.map((t, i) => (
                     <span key={i} className="bg-slate-50 border border-slate-200 text-slate-700 rounded-sm text-xs px-3 py-1 font-sans">
                       {t}

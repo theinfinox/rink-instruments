@@ -9,7 +9,7 @@ import { InstitutionRepository } from '@/repositories/InstitutionRepository';
 
 async function getRepo() {
   const bundle = await fetchInstrumentBundle();
-  const repo = InstitutionRepository.fromInstrumentData(bundle.main_data, bundle.instituitiion_list);
+  const repo = InstitutionRepository.fromInstrumentData(bundle.main_data, bundle.instituitiion_list, bundle.mou_list);
   return { repo, instruments: bundle.main_data };
 }
 

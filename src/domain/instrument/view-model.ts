@@ -20,6 +20,12 @@ export interface InstrumentViewModel {
   /** The name of the institution owning the instrument */
   institution: string;
 
+  /** Canonical institution_id */
+  institution_id?: string;
+
+  /** Inherited MoU verification status from parent institution */
+  hasVerifiedMou: boolean;
+
   /** Optional facility name within the institution */
   facility: string | null;
 
