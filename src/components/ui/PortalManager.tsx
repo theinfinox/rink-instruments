@@ -61,44 +61,42 @@ const SERVICE_SEARCH_CONFIG: SearchConfig = {
 
 export default function PortalManager({ instruments, services, initialView }: PortalManagerProps) {
   const [view, setView] = useState<PortalView>(initialView);
-  const [activeDataView, setActiveDataView] = useState<PortalView>(initialView);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
 
-  // We manage the URL via window.history to prevent Next.js navigation flickers
-  // during the artificial loading transition.
+  // Keep view synchronized with initialView on props update / Back-Forward navigation
+  useEffect(() => {
+    setView(initialView);
+  }, [initialView]);
+
+  // Reset loading transition after App Router navigation completes
+  useEffect(() => {
+    if (isTransitioning) {
+      const timer = setTimeout(() => {
+        setIsTransitioning(false);
+      }, 200);
+      return () => clearTimeout(timer);
+    }
+  }, [pathname, isTransitioning]);
 
   const handleViewChange = (newView: PortalView) => {
     if (newView === view || isTransitioning) return;
     
-    // 1. Update the toggle switch immediately
+    // 1. Update view state immediately for dynamic toggle feedback
     setView(newView); 
-    // 2. Start the loading overlay fade-in
+    // 2. Start loading overlay fade-in
     setIsTransitioning(true);
 
-    // 3. Wait for the overlay to fully cover the screen (300ms transition)
+    // 3. Wait for overlay fade-in animation, then trigger App Router navigation
     setTimeout(() => {
-      // Swap the actual underlying data
-      setActiveDataView(newView);
-      
-      // Update URL without triggering a Next.js re-render/suspense
-      if (newView === 'instruments' && pathname !== '/') {
-        window.history.replaceState(null, '', '/');
-      } else if (newView === 'services' && pathname !== '/services') {
-        window.history.replaceState(null, '', '/services');
-      }
-      
-      // 4. Wait to simulate processing and ensure DOM is ready
-      setTimeout(() => {
-        // Fade out the overlay
-        setIsTransitioning(false);
-      }, 200); // 200ms artificial loading time to make it feel deliberate
+      const targetRoute = newView === 'instruments' ? '/' : '/services';
+      router.push(targetRoute);
     }, 300);
   };
 
   const data = useMemo(() => {
-    if (activeDataView === 'instruments') {
+    if (view === 'instruments') {
       const featured = instruments.filter(inst => inst.image_link && inst.image_link !== 'None' && inst.image_link.trim() !== '').slice(0, 20);
       const institutionMap = new Map<string, { slug: string, name: string, tech_count: number }>();
       const districtMap = new Map<string, District>(baseDistricts.map(d => [d.slug, { ...d }]));
@@ -181,7 +179,7 @@ export default function PortalManager({ instruments, services, initialView }: Po
         itemName: "Service",
       };
     }
-  }, [activeDataView, instruments, services]);
+  }, [view, instruments, services]);
 
   const getSpans = (total: number, cols: number) => {
     if (total === 0) return [];
@@ -261,8 +259,8 @@ export default function PortalManager({ instruments, services, initialView }: Po
 
           <div className="w-full hero-search-breathe">
             <HeroSearch 
-              key={`${activeDataView}-search`} 
-              config={activeDataView === 'services' ? SERVICE_SEARCH_CONFIG : INSTRUMENT_SEARCH_CONFIG} 
+              key={`${view}-search`} 
+              config={view === 'services' ? SERVICE_SEARCH_CONFIG : INSTRUMENT_SEARCH_CONFIG} 
             />
           </div>
         </div>
@@ -293,10 +291,10 @@ export default function PortalManager({ instruments, services, initialView }: Po
           <div className="max-w-xl mb-12">
             <div className="text-xs font-bold text-[#1B4D9B] uppercase tracking-widest mb-3">Explore by District</div>
             <h2 className="text-3xl font-heading font-bold text-[#0F172A] mb-3">
-              Browse {activeDataView === 'services' ? 'Services' : 'Instruments'} by Region
+              Browse {view === 'services' ? 'Services' : 'Instruments'} by Region
             </h2>
             <p className="text-[#475569] text-base font-sans">
-              Find {activeDataView === 'services' ? 'startup services' : 'testing facilities and research equipment'} across all 14 districts of Kerala.
+              Find {view === 'services' ? 'startup services' : 'testing facilities and research equipment'} across all 14 districts of Kerala.
             </p>
           </div>
 

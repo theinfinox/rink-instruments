@@ -25,7 +25,6 @@ const SERVICES_NAV_LINKS = [
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
-  const [hash, setHash] = useState('');
   const pathname = usePathname();
   const isServicesContext = pathname.startsWith('/services');
   const navLinks = isServicesContext ? SERVICES_NAV_LINKS : INSTRUMENTS_NAV_LINKS;
@@ -36,15 +35,6 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handler);
   }, []);
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setHash(window.location.hash);
-      const handleHashChange = () => setHash(window.location.hash);
-      window.addEventListener('hashchange', handleHashChange);
-      return () => window.removeEventListener('hashchange', handleHashChange);
-    }
-  }, [pathname]);
-
   if (pathname === '/yaml-builder') {
     return null;
   }
@@ -52,9 +42,9 @@ export default function Navbar() {
   const isLinkActive = (href: string) => {
     if (href === '/' && !isServicesContext) return pathname === '/';
     if (href === '/' && isServicesContext) return false;
-    if (href === '/services') return pathname === '/services' && !hash;
+    if (href === '/services') return pathname === '/services' || pathname.startsWith('/services');
     if (href === '/services#startups') {
-      return pathname === '/services/list' || (pathname === '/services' && hash === '#startups');
+      return pathname === '/services/list';
     }
     if (href.startsWith('/#')) return false;
     return pathname === href || pathname.startsWith(href);
@@ -70,8 +60,6 @@ export default function Navbar() {
         const element = document.getElementById(targetHash);
         if (element) {
           element.scrollIntoView({ behavior: 'smooth' });
-          window.history.pushState(null, '', href);
-          setHash(`#${targetHash}`);
         }
       }
     }
