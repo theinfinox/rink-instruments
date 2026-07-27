@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
-import { Instrument } from '@/types/instrument';
 import { Service } from '@/types/service';
 import { SearchIndexItem } from '@/types';
-import { fetchDataset, DatasetType } from '@/lib/dataFetcher';
+import { fetchDataset, fetchInstrumentBundle, DatasetType } from '@/lib/dataFetcher';
+import { InstitutionRepository } from '@/repositories/InstitutionRepository';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,21 +11,24 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const dataset = (searchParams.get('dataset') as DatasetType) || 'instruments';
 
-    const items = await fetchDataset(dataset);
-    
     let index: SearchIndexItem[] = [];
 
     if (dataset === 'instruments') {
-      const instruments = items as Instrument[];
+      const bundle = await fetchInstrumentBundle();
+      const instruments = bundle.main_data;
+      const repo = InstitutionRepository.fromInstrumentData(instruments, bundle.instituitiion_list);
+
       index = instruments.map(inst => {
         const tags = Array.isArray(inst.tag) ? inst.tag : (inst.tag ? inst.tag.split(',') : []);
         const sectorName = tags.length > 0 ? tags[0].trim() : 'General';
+        const instEntity = repo.getInstitution(inst);
         
         return {
           id: inst.provider_key || inst.id || '',
           name: inst.instruments || '',
-          institution: inst.institution_name || '',
-          institution_slug: (inst.institution_name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+          institution: instEntity.name,
+          institution_slug: instEntity.slug,
+          institution_id: instEntity.institution_id || inst.institution_id || '',
           category: sectorName,
           category_slug: sectorName.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
           ip_status: inst.warnings || '',
@@ -36,13 +39,14 @@ export async function GET(request: Request) {
         };
       });
     } else {
-      const services = items as Service[];
+      const services = await fetchDataset('services') as Service[];
       index = services.map(srv => {
         return {
           id: srv.id || srv.serviceName, 
           name: srv.serviceName,
           institution: srv.startupName,
           institution_slug: srv.startupName.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+          institution_id: srv.ksumUid || '',
           category: srv.category,
           category_slug: srv.category.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
           ip_status: srv.certifications || '',

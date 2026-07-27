@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import Link from 'next/link';
 import { Search, Loader2, ArrowRight, Building2, Layers, RotateCcw } from 'lucide-react';
 import type { AISearchResponse, AISearchResult } from '@/lib/aiSearch';
+import { toInstrumentViewModel } from '@/domain/instrument/mapper';
 
 const PLACEHOLDERS = [
   'Describe your startup idea...',
@@ -28,15 +29,16 @@ function Bold({ text }: { text: string }) {
 
 function ResultCard({ r }: { r: AISearchResult }) {
   const instr = r.instrument;
+  const vm = useMemo(() => toInstrumentViewModel(instr), [instr]);
   const tags = Array.isArray(instr.tag) ? instr.tag : (instr.tag ? instr.tag.split(',') : []);
   return (
     <Link
-      href={`/instruments/${instr.id}`}
+      href={`/instruments/${vm.id}`}
       className="block bg-white/5 border border-white/10 backdrop-blur-sm rounded-md p-4 hover:border-[#F5B400]/40 hover:bg-white/[0.08] transition-all"
     >
-      <div className="font-semibold text-white text-sm leading-snug mb-2 line-clamp-2">{instr.instruments}</div>
+      <div className="font-semibold text-white text-sm leading-snug mb-2 line-clamp-2">{vm.displayTitle}</div>
       <div className="flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-slate-300">
-        <span className="inline-flex items-center gap-1"><Building2 className="w-3 h-3 opacity-70" /> {instr.institution_name}</span>
+        <span className="inline-flex items-center gap-1"><Building2 className="w-3 h-3 opacity-70" /> {vm.institution}</span>
         {tags.length > 0 && <span className="inline-flex items-center gap-1"><Layers className="w-3 h-3 opacity-70" /> {tags[0]}</span>}
       </div>
     </Link>

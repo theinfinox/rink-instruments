@@ -9,11 +9,16 @@ import { Instrument } from '@/types/instrument';
 import { Service } from '@/types/service';
 import { fetchDataset, DatasetType } from '@/lib/dataFetcher';
 
-// ── Orama schema ─────────────────────────────────────────────
+// ── Orama schema with faceted metadata fields ───────────────────
 const SCHEMA = {
   id: 'string' as const,
   name: 'string' as const,
   institution: 'string' as const,
+  institutionId: 'string' as const,
+  institutionName: 'string' as const,
+  institutionShort: 'string' as const,
+  provider: 'string' as const,
+  district: 'string' as const,
   category: 'string' as const,
   problem_solved: 'string' as const,
   description: 'string' as const,
@@ -62,9 +67,14 @@ async function getIndex(dataset: DatasetType) {
     for (const tech of techs) {
       const tags = Array.isArray(tech.tag) ? tech.tag : (tech.tag ? tech.tag.split(',') : []);
       await insert(db, {
-        id: tech.id,
+        id: tech.id || '',
         name: normalizeText(tech.instruments || ''),
-        institution: normalizeText(tech.institution_name || ''),
+        institution: normalizeText(`${tech.institution_name || ''} ${tech.matched_institution || ''}`),
+        institutionId: tech.institution_id || '',
+        institutionName: normalizeText(tech.institution_name || ''),
+        institutionShort: normalizeText(tech.acronym || ''),
+        provider: normalizeText(tech.provider_key || ''),
+        district: normalizeText(tech.standardized_district || tech.district || ''),
         category: normalizeText(tags.join(' ')),
         problem_solved: normalizeText(tech.name_of_facility || ''),
         description: normalizeText(tech.address || ''),
@@ -79,6 +89,11 @@ async function getIndex(dataset: DatasetType) {
         id,
         name: normalizeText(srv.serviceName || ''),
         institution: normalizeText(srv.startupName || ''),
+        institutionId: srv.ksumUid || '',
+        institutionName: normalizeText(srv.startupName || ''),
+        institutionShort: '',
+        provider: '',
+        district: normalizeText(srv.district || ''),
         category: normalizeText(srv.category || ''),
         problem_solved: normalizeText(srv.sector || ''),
         description: normalizeText(srv.description || ''),
@@ -116,6 +131,7 @@ export async function oramaSearch<T = Instrument | Service>(
   filters?: {
     sector?: string;
     institution?: string;
+    institution_id?: string;
     type?: string;
     patent?: string;
     potential?: string;
@@ -130,7 +146,11 @@ export async function oramaSearch<T = Instrument | Service>(
   const getDocId = (item: any) => item.id || item.serviceName;
 
   if (!q) {
-    const filtered = data;
+    let filtered = data;
+    if (filters?.institution_id) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      filtered = filtered.filter((i: any) => i.institution_id === filters.institution_id);
+    }
     return {
       results: filtered.slice(0, limit).map(t => ({ item: t as unknown as T, score: 1 })),
       query: q,
@@ -171,6 +191,7 @@ export async function oramaSearch<T = Instrument | Service>(
       problem_solved: 70,
       description: 60,
       institution: 40,
+      institutionName: 40,
       category: 35,
     },
     limit: 100,

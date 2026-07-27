@@ -11,9 +11,13 @@ import HeroMetrics from '@/components/ui/HeroMetrics';
 import BrowseByInstitution from '@/components/ui/BrowseByInstitution';
 import ResearchParticles from '@/components/ui/ResearchParticles';
 import DatasetToggle, { PortalView } from '@/components/ui/DatasetToggle';
+import { Institution } from '@/types';
+import { InstitutionRepository } from '@/repositories/InstitutionRepository';
 
 interface PortalManagerProps {
   instruments: Instrument[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  institutionList?: any[];
   services: Service[];
   initialView: PortalView;
 }
@@ -59,11 +63,14 @@ const SERVICE_SEARCH_CONFIG: SearchConfig = {
   ariaLabel: 'Search services',
 };
 
-export default function PortalManager({ instruments, services, initialView }: PortalManagerProps) {
+export default function PortalManager({ instruments, institutionList = [], services, initialView }: PortalManagerProps) {
   const [view, setView] = useState<PortalView>(initialView);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
+
+  // Load canonical InstitutionRepository instances with official instituitiion_list dataset
+  const repo = useMemo(() => InstitutionRepository.fromInstrumentData(instruments, institutionList), [instruments, institutionList]);
 
   // Keep view synchronized with initialView on props update / Back-Forward navigation
   useEffect(() => {
@@ -98,17 +105,18 @@ export default function PortalManager({ instruments, services, initialView }: Po
   const data = useMemo(() => {
     if (view === 'instruments') {
       const featured = instruments.filter(inst => inst.image_link && inst.image_link !== 'None' && inst.image_link.trim() !== '').slice(0, 20);
-      const institutionMap = new Map<string, { slug: string, name: string, tech_count: number }>();
       const districtMap = new Map<string, District>(baseDistricts.map(d => [d.slug, { ...d }]));
       const sectorMap = new Map<string, boolean>();
 
+      // Count instruments per canonical institution_id
+      const instCountMap = new Map<string, number>();
+
       instruments.forEach((inst) => {
-        if (inst.institution_name) {
-          const name = inst.institution_name;
-          const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-          if (!institutionMap.has(slug)) institutionMap.set(slug, { slug, name, tech_count: 0 });
-          institutionMap.get(slug)!.tech_count++;
+        const id = inst.institution_id || (inst.institution_name ? repo.getByName(inst.institution_name)?.institution_id : null);
+        if (id) {
+          instCountMap.set(id, (instCountMap.get(id) || 0) + 1);
         }
+
         const rawTags = Array.isArray(inst.tag) ? inst.tag : (inst.tag ? inst.tag.split(',') : []);
         rawTags.forEach((t) => { if (t.trim()) sectorMap.set(t.trim(), true); });
 
@@ -118,7 +126,15 @@ export default function PortalManager({ instruments, services, initialView }: Po
         }
       });
 
-      const institutions = Array.from(institutionMap.values()).sort((a, b) => b.tech_count - a.tech_count);
+      // Use Institution base objects strictly from InstitutionRepository
+      const institutions: Institution[] = repo.getAll()
+        .map(inst => ({
+          ...inst,
+          tech_count: instCountMap.get(inst.institution_id || '') || 0,
+        }))
+        .filter(inst => inst.tech_count > 0)
+        .sort((a, b) => b.tech_count - a.tech_count);
+
       const districts = Array.from(districtMap.values()).filter(d => d.tech_count > 0);
 
       return {
@@ -140,7 +156,7 @@ export default function PortalManager({ instruments, services, initialView }: Po
       };
     } else {
       const featured = services.filter(svc => svc.thumbnail).slice(0, 20);
-      const startupMap = new Map<string, { slug: string, name: string, tech_count: number }>();
+      const startupMap = new Map<string, Institution>();
       const districtMap = new Map<string, District>(baseDistricts.map(d => [d.slug, { ...d }]));
       const sectorMap = new Map<string, boolean>();
 
@@ -179,7 +195,7 @@ export default function PortalManager({ instruments, services, initialView }: Po
         itemName: "Service",
       };
     }
-  }, [view, instruments, services]);
+  }, [view, instruments, services, repo]);
 
   const getSpans = (total: number, cols: number) => {
     if (total === 0) return [];

@@ -1,5 +1,4 @@
-import { fetchDataset } from '@/lib/dataFetcher';
-import { Instrument } from '@/types/instrument';
+import { fetchDataset, fetchInstrumentBundle } from '@/lib/dataFetcher';
 import { Service } from '@/types/service';
 import PortalManager from '@/components/ui/PortalManager';
 
@@ -11,14 +10,15 @@ export const metadata = {
 
 export default async function HomePage() {
   // Fetch both datasets concurrently
-  const [instruments, services] = await Promise.all([
-    fetchDataset('instruments') as Promise<Instrument[]>,
+  const [instrumentBundle, services] = await Promise.all([
+    fetchInstrumentBundle(),
     fetchDataset('services') as Promise<Service[]>,
   ]);
 
   return (
     <PortalManager 
-      instruments={instruments} 
+      instruments={instrumentBundle.main_data} 
+      institutionList={instrumentBundle.instituitiion_list}
       services={services} 
       initialView="instruments" 
     />

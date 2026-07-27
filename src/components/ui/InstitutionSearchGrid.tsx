@@ -129,7 +129,7 @@ function InstitutionGridCard({ inst, context }: { inst: Institution, context?: '
 
       {/* Text */}
       <div className="min-w-0 flex-1">
-        <div className="font-heading font-bold text-[#0F172A] text-sm leading-snug line-clamp-2 group-hover:text-[#1B4D9B] transition-colors">
+        <div title={inst.name} className="font-heading font-bold text-[#0F172A] text-sm leading-snug line-clamp-3 group-hover:text-[#1B4D9B] transition-colors">
           {inst.name}
         </div>
         <div className="text-xs font-bold text-[#1B4D9B] mt-1.5">

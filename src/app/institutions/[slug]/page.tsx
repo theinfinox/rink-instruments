@@ -4,28 +4,13 @@ import { ArrowLeft } from 'lucide-react';
 import InstitutionFilterView from './InstitutionFilterView';
 import InstitutionEcosystemBackground from '@/components/ui/InstitutionEcosystemBackground';
 import { getSectorIcon } from '@/components/ui/SectorIcons';
-import { CDN_HOST } from '@/lib/utils';
-import { Instrument } from '@/types/instrument';
+import { fetchInstrumentBundle } from '@/lib/dataFetcher';
+import { InstitutionRepository } from '@/repositories/InstitutionRepository';
 
-// Helper to get institutions from CDN
-async function getInstitutionData() {
-  const res = await fetch(`${CDN_HOST}/instrument.json`, { next: { revalidate: 60 } });
-  if (!res.ok) return { institutions: new Map(), instruments: [] };
-  const data = await res.json();
-  const instruments: Instrument[] = data.main_data || [];
-  
-  const institutionMap = new Map<string, { slug: string, name: string, tech_count: number }>();
-  instruments.forEach((inst) => {
-    const instName = inst.institution_name?.trim();
-    if (instName) {
-      const slug = instName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-      if (!institutionMap.has(slug)) {
-        institutionMap.set(slug, { slug, name: instName, tech_count: 0 });
-      }
-      institutionMap.get(slug)!.tech_count++;
-    }
-  });
-  return { institutions: institutionMap, instruments };
+async function getRepo() {
+  const bundle = await fetchInstrumentBundle();
+  const repo = InstitutionRepository.fromInstrumentData(bundle.main_data, bundle.instituitiion_list);
+  return { repo, instruments: bundle.main_data };
 }
 
 interface Props {
@@ -33,14 +18,14 @@ interface Props {
 }
 
 export async function generateStaticParams() {
-  const { institutions } = await getInstitutionData();
-  return Array.from(institutions.values()).map(i => ({ slug: i.slug }));
+  const { repo } = await getRepo();
+  return repo.getAll().map(i => ({ slug: i.slug }));
 }
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
-  const { institutions } = await getInstitutionData();
-  const inst = institutions.get(slug);
+  const { repo } = await getRepo();
+  const inst = repo.getBySlug(slug);
   if (!inst) return { title: 'Institution Not Found — RINK' };
   
   const metaDescription = `Explore ${inst.tech_count} instruments from ${inst.name}. Partner with top Kerala research institutions through the RINK Instruments and Services Portal.`;
@@ -75,12 +60,16 @@ const getPrimarySectorSlug = (slug: string): string => {
 
 export default async function InstitutionDetailPage({ params }: Props) {
   const { slug } = await params;
-  const { institutions, instruments } = await getInstitutionData();
-  const institution = institutions.get(slug);
+  const { repo, instruments } = await getRepo();
+  const institution = repo.getBySlug(slug);
 
   if (!institution) notFound();
 
+  // Filter instruments using canonical institution_id (with name slug fallback)
   const institutionInstruments = instruments.filter(inst => {
+    if (institution.institution_id && inst.institution_id) {
+      return inst.institution_id === institution.institution_id;
+    }
     return inst.institution_name?.toLowerCase().replace(/[^a-z0-9]+/g, '-') === slug;
   });
 

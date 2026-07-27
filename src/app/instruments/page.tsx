@@ -1,6 +1,6 @@
-import { CDN_HOST } from '@/lib/utils';
-import { Instrument } from '@/types/instrument';
+import { fetchInstrumentBundle } from '@/lib/dataFetcher';
 import TechListClient from './TechListClient';
+import { InstitutionRepository } from '@/repositories/InstitutionRepository';
 
 export const metadata = {
   title: 'All Instruments — RINK Instruments and Services Portal',
@@ -23,27 +23,20 @@ export default async function TechnologiesPage({ searchParams }: Props) {
   const params = await searchParams;
   const page = parseInt(params.page ?? '1', 10);
 
-  // Fetch Instrumentation Data
-  const res = await fetch(`${CDN_HOST}/instrument.json`);
-  const data = await res.json();
-  const instruments: Instrument[] = data.main_data || [];
+  // Fetch Instrumentation Bundle (main_data + instituitiion_list)
+  const bundle = await fetchInstrumentBundle();
+  const instruments = bundle.main_data;
+  const rawInstitutions = bundle.instituitiion_list;
   
-  // Extract Institutions, Categories (Tags), Districts, and Verification Statuses
+  const repo = InstitutionRepository.fromInstrumentData(instruments, rawInstitutions);
+  const institutions = repo.getAll();
+
+  // Extract Categories (Tags), Districts, and Verification Statuses
   const sectorMap = new Map<string, { slug: string, name: string, tech_count: number, icon: string, color: string }>();
-  const institutionMap = new Map<string, { slug: string, name: string, tech_count: number }>();
   const districtSet = new Set<string>();
   const statusSet = new Set<string>();
 
   instruments.forEach(inst => {
-    if (inst.institution_name) {
-      const name = inst.institution_name;
-      const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-      if (!institutionMap.has(slug)) {
-        institutionMap.set(slug, { slug, name, tech_count: 0 });
-      }
-      institutionMap.get(slug)!.tech_count++;
-    }
-
     const rawTags = Array.isArray(inst.tag) ? inst.tag : (inst.tag ? inst.tag.split(',') : []);
     rawTags.forEach((t) => {
       const name = t.trim();
@@ -56,10 +49,9 @@ export default async function TechnologiesPage({ searchParams }: Props) {
     });
 
     if (inst.standardized_district) districtSet.add(inst.standardized_district.trim());
-    if (inst.warnings) statusSet.add(inst.warnings.trim()); // 'verified', 'attention', etc.
+    if (inst.warnings) statusSet.add(inst.warnings.trim());
   });
 
-  const institutions = Array.from(institutionMap.values()).sort((a, b) => b.tech_count - a.tech_count);
   const sectors = Array.from(sectorMap.values()).sort((a, b) => b.tech_count - a.tech_count);
   const districts = Array.from(districtSet).filter(Boolean).sort();
   const statuses = Array.from(statusSet).filter(Boolean).sort();
@@ -70,7 +62,8 @@ export default async function TechnologiesPage({ searchParams }: Props) {
     const q = params.q.toLowerCase();
     filtered = filtered.filter(i => 
       (i.instruments && i.instruments.toLowerCase().includes(q)) || 
-      (i.institution_name && i.institution_name.toLowerCase().includes(q))
+      (i.institution_name && i.institution_name.toLowerCase().includes(q)) ||
+      (i.matched_institution && i.matched_institution.toLowerCase().includes(q))
     );
   }
   if (params.sector) {
@@ -82,14 +75,19 @@ export default async function TechnologiesPage({ searchParams }: Props) {
   }
   if (params.institution) {
     const institutionQuery = params.institution;
-    filtered = filtered.filter(i => i.institution_name && i.institution_name.toLowerCase().replace(/[^a-z0-9]+/g, '-') === institutionQuery);
+    const matchedInst = repo.getBySlug(institutionQuery);
+    filtered = filtered.filter(i => {
+      if (matchedInst?.institution_id && i.institution_id) {
+        return i.institution_id === matchedInst.institution_id;
+      }
+      return i.institution_name && i.institution_name.toLowerCase().replace(/[^a-z0-9]+/g, '-') === institutionQuery;
+    });
   }
   if (params.district) {
     const districtQuery = params.district.toLowerCase();
     filtered = filtered.filter(i => i.standardized_district && i.standardized_district.toLowerCase() === districtQuery);
   }
   if (params.patent) {
-    // using 'patent' query param for verification status
     const patentQuery = params.patent;
     filtered = filtered.filter(i => i.warnings === patentQuery);
   }

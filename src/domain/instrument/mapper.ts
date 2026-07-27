@@ -1,17 +1,39 @@
 import { Instrument } from '@/types/instrument';
 import { InstrumentViewModel } from './view-model';
 import { getImageUrl } from '@/lib/utils';
+import { InstitutionRepository } from '@/repositories/InstitutionRepository';
 
-function mapLocation(instrument: Instrument): InstrumentViewModel['location'] {
-  const addressStr = instrument.address && instrument.address !== 'None' ? instrument.address : '';
-  const query = encodeURIComponent(`${instrument.institution_name} ${addressStr}`.trim());
+function mapLocation(instrument: Instrument, repo?: InstitutionRepository): InstrumentViewModel['location'] {
+  const activeRepo = repo || InstitutionRepository.getGlobal() || undefined;
+  const instEntity = activeRepo ? (activeRepo.getById(instrument.institution_id) || activeRepo.getByName(instrument.institution_name)) : undefined;
+  
+  const addressStr = instEntity?.address || (instrument.address && instrument.address !== 'None' ? instrument.address : null);
+  
+  let coordinates: InstrumentViewModel['location']['coordinates'] = undefined;
+  if (instEntity?.latitude && instEntity?.longitude) {
+    const lat = parseFloat(instEntity.latitude);
+    const lng = parseFloat(instEntity.longitude);
+    if (!isNaN(lat) && !isNaN(lng)) {
+      coordinates = { latitude: lat, longitude: lng };
+    }
+  }
+
+  let mapUrl: string | null = null;
+  if (instEntity?.link) {
+    mapUrl = instEntity.link;
+  } else if (coordinates) {
+    mapUrl = `https://www.google.com/maps?q=${coordinates.latitude},${coordinates.longitude}`;
+  } else {
+    const instName = activeRepo ? activeRepo.resolveDisplayName(instrument) : (instrument.institution_name || instrument.matched_institution || '');
+    const query = encodeURIComponent(`${instName} ${addressStr || ''}`.trim());
+    mapUrl = `https://www.google.com/maps/search/?api=1&query=${query}`;
+  }
   
   return {
-    district: instrument.standardized_district,
-    address: addressStr || null,
-    // coordinates are not currently provided by backend, leaving room for future expansion
-    coordinates: undefined,
-    mapUrl: `https://www.google.com/maps/search/?api=1&query=${query}`,
+    district: instrument.standardized_district || instrument.district,
+    address: addressStr,
+    coordinates,
+    mapUrl,
   };
 }
 
@@ -19,23 +41,26 @@ function mapMedia(instrument: Instrument): InstrumentViewModel['media'] {
   const thumbnail = instrument.image_link ? getImageUrl(instrument.image_link) : null;
   return {
     thumbnail,
-    gallery: thumbnail ? [thumbnail] : [], // future proofing for gallery array
+    gallery: thumbnail ? [thumbnail] : [],
   };
 }
 
-function mapContact(instrument: Instrument): InstrumentViewModel['contact'] {
-  const phone = instrument.enquiry_contact_number && instrument.enquiry_contact_number !== 'None' ? instrument.enquiry_contact_number : null;
-  const email = instrument.enquiry_mail && instrument.enquiry_mail !== 'None' ? instrument.enquiry_mail : null;
-  
-  // Try to use a fallback link for website if booking isn't available
-  const website = instrument.website_booking_link_fallback && instrument.website_booking_link_fallback !== 'None' 
-    ? instrument.website_booking_link_fallback 
-    : null;
+function mapContact(instrument: Instrument, repo?: InstitutionRepository): InstrumentViewModel['contact'] {
+  const activeRepo = repo || InstitutionRepository.getGlobal() || undefined;
+  const instEntity = activeRepo ? (activeRepo.getById(instrument.institution_id) || activeRepo.getByName(instrument.institution_name)) : undefined;
+
+  const phone = instEntity?.contact_phone || (instrument.enquiry_contact_number && instrument.enquiry_contact_number !== 'None' ? instrument.enquiry_contact_number : null);
+  const email = instEntity?.contact_email || (instrument.enquiry_mail && instrument.enquiry_mail !== 'None' ? instrument.enquiry_mail : null);
+  const website = instEntity?.website || (instrument.website_booking_link_fallback && instrument.website_booking_link_fallback !== 'None' ? instrument.website_booking_link_fallback : null);
 
   return { phone, email, website };
 }
 
-function mapActions(instrument: Instrument, contact: InstrumentViewModel['contact']): InstrumentViewModel['actions'] {
+function mapActions(
+  instrument: Instrument, 
+  contact: InstrumentViewModel['contact'],
+  location: InstrumentViewModel['location']
+): InstrumentViewModel['actions'] {
   const actions: InstrumentViewModel['actions'] = {
     primary: null,
     secondary: [],
@@ -66,7 +91,6 @@ function mapActions(instrument: Instrument, contact: InstrumentViewModel['contac
     };
   }
 
-  // Populate secondary actions if they exist and aren't the primary action
   if (contact.email && actions.primary?.type !== 'email') {
     actions.secondary.push({
       label: 'Email',
@@ -91,7 +115,6 @@ function mapActions(instrument: Instrument, contact: InstrumentViewModel['contac
     });
   }
 
-  const location = mapLocation(instrument);
   if (location.mapUrl) {
     actions.secondary.push({
       label: 'Open in Maps',
@@ -103,12 +126,21 @@ function mapActions(instrument: Instrument, contact: InstrumentViewModel['contac
   return actions;
 }
 
-export function toInstrumentViewModel(instrument: Instrument): Readonly<InstrumentViewModel> {
+export function toInstrumentViewModel(
+  instrument: Instrument,
+  repo?: InstitutionRepository
+): Readonly<InstrumentViewModel> {
+  const activeRepo = repo || InstitutionRepository.getGlobal() || undefined;
+
   const id = instrument.provider_key || instrument.id || '';
   const title = instrument.instruments;
   const acronym = instrument.acronym && instrument.acronym !== 'None' ? instrument.acronym : null;
   const displayTitle = acronym ? `${title} (${acronym})` : title;
   
+  const institutionName = activeRepo 
+    ? activeRepo.resolveDisplayName(instrument)
+    : (instrument.institution_name || instrument.matched_institution || '');
+    
   const facility = instrument.name_of_facility && instrument.name_of_facility !== 'None' ? instrument.name_of_facility : null;
   
   let tags: string[] = [];
@@ -118,17 +150,17 @@ export function toInstrumentViewModel(instrument: Instrument): Readonly<Instrume
     tags = [instrument.tag];
   }
 
-  const location = mapLocation(instrument);
+  const location = mapLocation(instrument, activeRepo);
   const media = mapMedia(instrument);
-  const contact = mapContact(instrument);
-  const actions = mapActions(instrument, contact);
+  const contact = mapContact(instrument, activeRepo);
+  const actions = mapActions(instrument, contact, location);
 
   return Object.freeze({
     id,
     title,
     acronym,
     displayTitle,
-    institution: instrument.institution_name,
+    institution: institutionName,
     facility,
     location,
     media,

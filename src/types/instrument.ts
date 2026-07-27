@@ -10,6 +10,9 @@ export interface Instrument {
   district: string;
   name_of_facility: string;
   institution_name: string;
+  matched_institution?: string;
+  institution_id?: string;
+  match_score?: string;
   address: string;
   enquiry_contact_number: string;
   enquiry_mail: string;
@@ -18,5 +21,5 @@ export interface Instrument {
   standardized_district: string;
   tag: string | string[];
   provider_key: string;
-  warnings: string;
+  warnings?: string;
 }

@@ -32,6 +32,7 @@ async function getSearchIndex() {
 
       return {
         id: item.id || '',
+        institution_id: item.institution_id || '',
         search_instruments: instruments.replace(/[-_/]/g, ' ').toLowerCase(),
         search_instruments1: instruments1.replace(/[-_/]/g, ' ').toLowerCase(),
         instruments,
@@ -40,6 +41,7 @@ async function getSearchIndex() {
         district: item.district || '',
         name_of_facility: item.name_of_facility || '',
         institution_name: item.institution_name || '',
+        matched_institution: item.matched_institution || '',
         address: item.address || '',
         standardized_district: item.standardized_district || item.district || '',
         correct_provider_key: item.correct_provider_key || '',
@@ -49,7 +51,8 @@ async function getSearchIndex() {
 
     globalDb = await create({
       schema: {
-        id: 'string', // crucial for returning IDs
+        id: 'string',
+        institution_id: 'string',
         search_instruments: 'string',
         search_instruments1: 'string',
         instruments: 'string',
@@ -58,6 +61,7 @@ async function getSearchIndex() {
         district: 'string',
         name_of_facility: 'string',
         institution_name: 'string',
+        matched_institution: 'string',
         address: 'string',
         standardized_district: 'string',
         correct_provider_key: 'string',
@@ -96,11 +100,12 @@ export async function GET(request: NextRequest) {
   const results = await oramaSearch(db, {
     term: normalizedTerm,
     limit: 1000,
-    properties: ['search_instruments', 'search_instruments1', 'institution_name'],
+    properties: ['search_instruments', 'search_instruments1', 'institution_name', 'matched_institution'],
     boost: {
       search_instruments: 100,
       search_instruments1: 80,
-      institution_name: 40
+      institution_name: 40,
+      matched_institution: 40,
     },
     exact: forceExactMatch,
     tolerance: forceExactMatch ? 0 : 1,
