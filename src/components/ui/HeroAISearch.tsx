@@ -4,7 +4,6 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import Link from 'next/link';
 import { Search, Loader2, ArrowRight, Building2, Layers, RotateCcw } from 'lucide-react';
 import type { AISearchResponse, AISearchResult } from '@/lib/aiSearch';
-import { toInstrumentViewModel } from '@/domain/instrument/mapper';
 
 const PLACEHOLDERS = [
   'Describe your startup idea...',
@@ -28,9 +27,10 @@ function Bold({ text }: { text: string }) {
 }
 
 function ResultCard({ r }: { r: AISearchResult }) {
-  const instr = r.instrument;
-  const vm = useMemo(() => toInstrumentViewModel(instr), [instr]);
-  const tags = Array.isArray(instr.tag) ? instr.tag : (instr.tag ? instr.tag.split(',') : []);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const vm = (r as any).viewModel;
+  if (!vm) return null;
+  const tags = vm.tags || [];
   return (
     <Link
       href={`/instruments/${vm.id}`}

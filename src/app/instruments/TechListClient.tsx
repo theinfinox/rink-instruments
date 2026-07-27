@@ -12,9 +12,9 @@ import {
   LayoutGrid, List, Loader2
 } from 'lucide-react';
 
-// We locally redefine SearchResult since it accepts InstrumentViewModels or Instruments
+// We locally redefine SearchResult using InstrumentViewModels
 interface LocalSearchResult {
-  technologies: (Instrument | InstrumentViewModel)[];
+  technologies: InstrumentViewModel[];
   total: number;
   page: number;
   per_page: number;
@@ -279,7 +279,7 @@ export default function TechListClient({
                     ? 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5'
                     : 'flex flex-col gap-3'
                 }>
-                  {technologies.map((tech: Instrument | InstrumentViewModel) => (
+                  {technologies.map((tech: InstrumentViewModel) => (
                     <TechnologyCard key={tech.id} instrument={tech} compact={viewMode === 'list'} />
                   ))}
                 </div>

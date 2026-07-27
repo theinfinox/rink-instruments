@@ -6,8 +6,9 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { runAISearch } from '@/lib/aiSearch';
-import { CDN_HOST } from '@/lib/utils';
-import { Instrument } from '@/types/instrument';
+import { fetchInstrumentBundle } from '@/lib/dataFetcher';
+import { InstitutionRepository } from '@/repositories/InstitutionRepository';
+import { toInstrumentViewModel } from '@/domain/instrument/mapper';
 
 export async function POST(request: NextRequest) {
   try {
@@ -28,15 +29,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Fetch all instruments from live CDN
-    const res = await fetch(`${CDN_HOST}/instrument.json`);
-    const data = await res.json();
-    const instruments: Instrument[] = data.main_data || [];
+    // Fetch bundle and initialize repository
+    const bundle = await fetchInstrumentBundle();
+    const repo = InstitutionRepository.fromInstrumentData(bundle.main_data, bundle.instituitiion_list, bundle.mou_list);
 
     // Run AI search scoring
-    const result = await runAISearch(query, instruments);
+    const result = await runAISearch(query, bundle.main_data);
 
-    return NextResponse.json(result);
+    // Map matched instruments to InstrumentViewModel on the server
+    const mappedResults = {
+      ...result,
+      results: result.results.map(r => ({
+        ...r,
+        viewModel: toInstrumentViewModel(r.instrument, repo)
+      }))
+    };
+
+    return NextResponse.json(mappedResults);
   } catch (err) {
     console.error('[RINK AI] Search error:', err);
     return NextResponse.json(
@@ -49,9 +58,17 @@ export async function POST(request: NextRequest) {
 // Also support GET for quick testing
 export async function GET(request: NextRequest) {
   const query = request.nextUrl.searchParams.get('q') || '';
-  const res = await fetch(`${CDN_HOST}/instrument.json`);
-  const data = await res.json();
-  const instruments: Instrument[] = data.main_data || [];
-  const result = await runAISearch(query, instruments);
-  return NextResponse.json(result);
+  const bundle = await fetchInstrumentBundle();
+  const repo = InstitutionRepository.fromInstrumentData(bundle.main_data, bundle.instituitiion_list, bundle.mou_list);
+  const result = await runAISearch(query, bundle.main_data);
+
+  const mappedResults = {
+    ...result,
+    results: result.results.map(r => ({
+      ...r,
+      viewModel: toInstrumentViewModel(r.instrument, repo)
+    }))
+  };
+
+  return NextResponse.json(mappedResults);
 }

@@ -1,12 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { Instrument } from '@/types/instrument';
+import { InstrumentViewModel } from '@/domain/instrument/view-model';
 import TechnologyCard from '@/components/ui/TechnologyCard';
 import { FlaskConical } from 'lucide-react';
 
 interface Props {
-  initialInstruments: Instrument[];
+  initialInstruments: InstrumentViewModel[];
 }
 
 const TABS = [
@@ -19,40 +19,32 @@ const TABS = [
   { label: 'KSCSTE', value: 'kscste' },
 ];
 
-const matchesInstitution = (inst: Instrument, filter: string) => {
+const matchesInstitution = (inst: InstrumentViewModel, filter: string) => {
   if (filter === 'all') return true;
-  const name = inst.institution_name?.toLowerCase() || '';
-  
-  if (filter === 'kau') return name.includes('kau') || name.includes('agricultural university');
-  if (filter === 'cpcri') return name.includes('cpcri');
-  if (filter === 'ctcri') return name.includes('ctcri');
-  if (filter === 'niist') return name.includes('niist');
-  if (filter === 'cwrdm') return name.includes('cwrdm');
-  if (filter === 'kscste') return name.includes('kscste') || name.includes('kfri') || name.includes('jntbgri');
-  
-  return false;
+  const name = inst.institution?.toLowerCase() || '';
+  return name.includes(filter);
 };
 
 export default function CategoryFilterView({ initialInstruments }: Props) {
   const [activeTab, setActiveTab] = useState('all');
 
-  const filteredTechs = initialInstruments.filter(inst => matchesInstitution(inst, activeTab));
+  const filteredTechs = initialInstruments.filter(tech => matchesInstitution(tech, activeTab));
 
   return (
-    <div className="space-y-8">
-      {/* Horizontally scrollable institution filter tabs */}
-      <div className="border-b border-border">
-        <div className="flex overflow-x-auto pb-3 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-none sm:flex-wrap gap-2">
-          {TABS.map(tab => {
+    <div>
+      {/* Tabs */}
+      <div className="border-b border-border mb-6">
+        <div className="flex items-center gap-2 overflow-x-auto pb-3 scrollbar-none">
+          {TABS.map((tab) => {
             const isActive = activeTab === tab.value;
             return (
               <button
                 key={tab.value}
                 onClick={() => setActiveTab(tab.value)}
-                className={`flex-shrink-0 px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-md border transition-all duration-200 cursor-pointer ${
+                className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
                   isActive
-                    ? 'bg-accent text-[#04142B] border-accent shadow-md shadow-accent/15'
-                    : 'bg-card border-border text-text-secondary hover:text-text-primary hover:border-text-secondary/20'
+                    ? 'bg-accent text-white shadow-sm'
+                    : 'bg-card text-text-secondary border border-border hover:border-accent/30 hover:text-text-primary'
                 }`}
               >
                 {tab.label}
@@ -68,13 +60,13 @@ export default function CategoryFilterView({ initialInstruments }: Props) {
           <FlaskConical className="w-12 h-12 text-text-secondary/50 mx-auto mb-4 animate-pulse" />
           <h3 className="font-heading font-bold text-heading text-lg mb-1">No Instruments Found</h3>
           <p className="text-text-secondary text-sm">
-            We couldn&apos;t find any instruments from this institution in this category.
+            We couldn&apos;t find any instruments matching the active institution filter.
           </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
           {filteredTechs.map(tech => (
-            <TechnologyCard key={tech.provider_key || tech.id} instrument={tech} />
+            <TechnologyCard key={tech.id} instrument={tech} />
           ))}
         </div>
       )}

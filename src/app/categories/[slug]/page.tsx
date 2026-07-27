@@ -4,15 +4,16 @@ import { ArrowLeft } from 'lucide-react';
 import CategoryFilterView from './CategoryFilterView';
 import { getSectorIcon } from '@/components/ui/SectorIcons';
 import SectorBackground from '@/components/ui/SectorBackgrounds';
-import { CDN_HOST } from '@/lib/utils';
+import { fetchInstrumentBundle } from '@/lib/dataFetcher';
+import { InstitutionRepository } from '@/repositories/InstitutionRepository';
+import { toInstrumentViewModel } from '@/domain/instrument/mapper';
 import { Instrument } from '@/types/instrument';
 
-// Helper to get category map from CDN
+// Helper to get category map from bundle
 async function getCategoryData() {
-  const res = await fetch(`${CDN_HOST}/instrument.json`, { next: { revalidate: 60 } });
-  if (!res.ok) return { categories: new Map(), instruments: [] };
-  const data = await res.json();
-  const instruments: Instrument[] = data.main_data || [];
+  const bundle = await fetchInstrumentBundle();
+  const repo = InstitutionRepository.fromInstrumentData(bundle.main_data, bundle.instituitiion_list, bundle.mou_list);
+  const instruments: Instrument[] = bundle.main_data;
   
   const categoryMap = new Map<string, { slug: string, name: string, tech_count: number, color: string }>();
   instruments.forEach((inst) => {
@@ -27,7 +28,7 @@ async function getCategoryData() {
       categoryMap.get(slug)!.tech_count++;
     });
   });
-  return { categories: categoryMap, instruments };
+  return { categories: categoryMap, instruments, repo };
 }
 
 interface Props {
@@ -60,7 +61,7 @@ export async function generateMetadata({ params }: Props) {
 
 export default async function CategoryDetailPage({ params }: Props) {
   const { slug } = await params;
-  const { categories, instruments } = await getCategoryData();
+  const { categories, instruments, repo } = await getCategoryData();
   const sector = categories.get(slug);
   
   if (!sector) notFound();
@@ -69,6 +70,8 @@ export default async function CategoryDetailPage({ params }: Props) {
     const rawTags = Array.isArray(inst.tag) ? inst.tag : (inst.tag ? inst.tag.split(',') : []);
     return rawTags.some((t: string) => t.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-') === slug);
   });
+
+  const categoryViewModels = categoryInstruments.map(inst => toInstrumentViewModel(inst, repo));
 
   return (
     <div className="min-h-screen bg-background">
@@ -100,7 +103,7 @@ export default async function CategoryDetailPage({ params }: Props) {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
-        <CategoryFilterView initialInstruments={categoryInstruments} />
+        <CategoryFilterView initialInstruments={categoryViewModels} />
       </div>
     </div>
   );

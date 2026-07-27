@@ -1,12 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { Instrument } from '@/types/instrument';
+import { InstrumentViewModel } from '@/domain/instrument/view-model';
 import TechnologyCard from '@/components/ui/TechnologyCard';
 import { FlaskConical } from 'lucide-react';
 
 interface Props {
-  initialInstruments: Instrument[];
+  initialInstruments: InstrumentViewModel[];
 }
 
 const TABS = [
@@ -20,9 +20,9 @@ const TABS = [
   { label: 'AI & Software', value: 'ai' },
 ];
 
-const matchesSector = (inst: Instrument, filter: string) => {
+const matchesSector = (inst: InstrumentViewModel, filter: string) => {
   if (filter === 'all') return true;
-  const tagsStr = Array.isArray(inst.tag) ? inst.tag.join(' ').toLowerCase() : (inst.tag?.toLowerCase() || '');
+  const tagsStr = (inst.tags || []).join(' ').toLowerCase();
   
   if (filter === 'agriculture') return tagsStr.includes('agriculture') || tagsStr.includes('agri');
   if (filter === 'food technology') return tagsStr.includes('food');
@@ -76,7 +76,7 @@ export default function InstitutionFilterView({ initialInstruments }: Props) {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
           {filteredTechs.map(tech => (
-            <TechnologyCard key={tech.provider_key || tech.id} instrument={tech} />
+            <TechnologyCard key={tech.id} instrument={tech} />
           ))}
         </div>
       )}

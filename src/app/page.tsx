@@ -1,6 +1,8 @@
 import { fetchDataset, fetchInstrumentBundle } from '@/lib/dataFetcher';
 import { Service } from '@/types/service';
 import PortalManager from '@/components/ui/PortalManager';
+import { InstitutionRepository } from '@/repositories/InstitutionRepository';
+import { toInstrumentViewModel } from '@/domain/instrument/mapper';
 
 export const metadata = {
   title: 'RINK Instrumentation Portal — Kerala Startup Mission',
@@ -15,9 +17,17 @@ export default async function HomePage() {
     fetchDataset('services') as Promise<Service[]>,
   ]);
 
+  const repo = InstitutionRepository.fromInstrumentData(
+    instrumentBundle.main_data,
+    instrumentBundle.instituitiion_list,
+    instrumentBundle.mou_list
+  );
+
+  const instrumentViewModels = instrumentBundle.main_data.map(inst => toInstrumentViewModel(inst, repo));
+
   return (
     <PortalManager 
-      instruments={instrumentBundle.main_data} 
+      instruments={instrumentViewModels} 
       institutionList={instrumentBundle.instituitiion_list}
       mouList={instrumentBundle.mou_list}
       services={services} 

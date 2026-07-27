@@ -1,9 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { Instrument } from '@/types/instrument';
 import { InstrumentViewModel } from '@/domain/instrument/view-model';
-import { toInstrumentViewModel } from '@/domain/instrument/mapper';
 import Link from 'next/link';
 import { Building2, ArrowRight } from 'lucide-react';
 import { SectorIllustration, SECTOR_ACCENTS } from './SectorCard';
@@ -11,7 +9,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import MouBadge from './MouBadge';
 
 interface Props {
-  instrument: Instrument | InstrumentViewModel;
+  instrument: InstrumentViewModel;
   compact?: boolean;
 }
 export default function TechnologyCard({ instrument, compact = false }: Props) {
@@ -19,22 +17,15 @@ export default function TechnologyCard({ instrument, compact = false }: Props) {
   const [imageLoaded, setImageLoaded]   = useState(false);
   const prefersReduced = useReducedMotion();
 
-  const vm: InstrumentViewModel = useMemo(() => {
-    if ('displayTitle' in instrument) {
-      return instrument as InstrumentViewModel;
-    }
-    return toInstrumentViewModel(instrument);
-  }, [instrument]);
+  const vm = instrument;
 
   // Resolve image source
   const displayImage = vm.media.thumbnail;
   const hasImage = !!displayImage && !imageFailed;
 
   // Short description mapping
-  const rawInst = instrument as Instrument;
-  const shortDesc = vm.facility || rawInst.name_of_facility || '';
-  const tagList = vm.tags || (Array.isArray(rawInst.tag) ? rawInst.tag : (rawInst.tag ? rawInst.tag.split(',') : []));
-  const sectorName = tagList.length > 0 ? tagList[0]?.trim() : 'General';
+  const shortDesc = vm.facility || '';
+  const sectorName = vm.tags && vm.tags.length > 0 ? vm.tags[0].trim() : 'General';
   const sectorSlug = sectorName.toLowerCase().replace(/\s+/g, '-');
 
   const cardMotion = prefersReduced

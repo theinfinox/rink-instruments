@@ -33,13 +33,12 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const res = await fetch(`${CDN_HOST}/instrument.json`);
-  const data = await res.json();
-  const instruments: Instrument[] = data.main_data || [];
-  const rawTech = instruments.find(t => (t.provider_key || t.id) === id);
+  const bundle = await fetchInstrumentBundle();
+  const repo = InstitutionRepository.fromInstrumentData(bundle.main_data, bundle.instituitiion_list, bundle.mou_list);
+  const rawTech = bundle.main_data.find(t => (t.provider_key || t.id) === id);
   if (!rawTech) return { title: 'Instrument Not Found — RINK' };
   
-  const vm = toInstrumentViewModel(rawTech);
+  const vm = toInstrumentViewModel(rawTech, repo);
   const shortDesc = vm.facility || vm.location.address || 'Discover this instrument on RINK.';
   const contactStr = vm.ui.hasContact 
     ? 'Contact the institution for details.' : 'View institution details for booking.';
@@ -73,7 +72,7 @@ export default async function TechnologyDetailPage({ params }: { params: Promise
   const instEntity = repo.getInstitution(rawTech);
   const hasVerifiedMou = instEntity.has_verified_mou === true;
   
-  const vm = toInstrumentViewModel(rawTech);
+  const vm = toInstrumentViewModel(rawTech, repo);
   
   // Create a sector slug based on the district for routing, same as the mapper
   const sectorSlug = vm.location.district ? vm.location.district.toLowerCase().replace(/[^a-z0-9]+/g, '-') : 'general';
@@ -86,7 +85,7 @@ export default async function TechnologyDetailPage({ params }: { params: Promise
   const related = instruments
     .filter(t => (t.standardized_district?.toLowerCase().replace(/[^a-z0-9]+/g, '-') || 'general') === sectorSlug && (t.provider_key || t.id) !== id)
     .slice(0, 4)
-    .map(t => toInstrumentViewModel(t));
+    .map(t => toInstrumentViewModel(t, repo));
 
   return (
     <div className="min-h-screen bg-white text-gray-900 font-sans">

@@ -6,6 +6,7 @@ import InstitutionEcosystemBackground from '@/components/ui/InstitutionEcosystem
 import { getSectorIcon } from '@/components/ui/SectorIcons';
 import { fetchInstrumentBundle } from '@/lib/dataFetcher';
 import { InstitutionRepository } from '@/repositories/InstitutionRepository';
+import { toInstrumentViewModel } from '@/domain/instrument/mapper';
 
 async function getRepo() {
   const bundle = await fetchInstrumentBundle();
@@ -73,6 +74,8 @@ export default async function InstitutionDetailPage({ params }: Props) {
     return inst.institution_name?.toLowerCase().replace(/[^a-z0-9]+/g, '-') === slug;
   });
 
+  const institutionViewModels = institutionInstruments.map(inst => toInstrumentViewModel(inst, repo));
+
   const logoSrc = CUSTOM_LOGOS[slug.toLowerCase()];
   const primarySectorSlug = getPrimarySectorSlug(slug);
 
@@ -111,7 +114,7 @@ export default async function InstitutionDetailPage({ params }: Props) {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
-        <InstitutionFilterView initialInstruments={institutionInstruments} />
+        <InstitutionFilterView initialInstruments={institutionViewModels} />
       </div>
     </div>
   );

@@ -3,9 +3,8 @@ import { InstrumentViewModel } from './view-model';
 import { getImageUrl } from '@/lib/utils';
 import { InstitutionRepository } from '@/repositories/InstitutionRepository';
 
-function mapLocation(instrument: Instrument, repo?: InstitutionRepository): InstrumentViewModel['location'] {
-  const activeRepo = repo || InstitutionRepository.getGlobal() || undefined;
-  const instEntity = activeRepo ? (activeRepo.getById(instrument.institution_id) || activeRepo.getByName(instrument.institution_name)) : undefined;
+function mapLocation(instrument: Instrument, repo: InstitutionRepository): InstrumentViewModel['location'] {
+  const instEntity = repo.getById(instrument.institution_id) || repo.getByName(instrument.institution_name);
   
   const addressStr = instEntity?.address || (instrument.address && instrument.address !== 'None' ? instrument.address : null);
   
@@ -24,7 +23,7 @@ function mapLocation(instrument: Instrument, repo?: InstitutionRepository): Inst
   } else if (coordinates) {
     mapUrl = `https://www.google.com/maps?q=${coordinates.latitude},${coordinates.longitude}`;
   } else {
-    const instName = activeRepo ? activeRepo.resolveDisplayName(instrument) : (instrument.institution_name || instrument.matched_institution || '');
+    const instName = repo.resolveDisplayName(instrument);
     const query = encodeURIComponent(`${instName} ${addressStr || ''}`.trim());
     mapUrl = `https://www.google.com/maps/search/?api=1&query=${query}`;
   }
@@ -45,9 +44,8 @@ function mapMedia(instrument: Instrument): InstrumentViewModel['media'] {
   };
 }
 
-function mapContact(instrument: Instrument, repo?: InstitutionRepository): InstrumentViewModel['contact'] {
-  const activeRepo = repo || InstitutionRepository.getGlobal() || undefined;
-  const instEntity = activeRepo ? (activeRepo.getById(instrument.institution_id) || activeRepo.getByName(instrument.institution_name)) : undefined;
+function mapContact(instrument: Instrument, repo: InstitutionRepository): InstrumentViewModel['contact'] {
+  const instEntity = repo.getById(instrument.institution_id) || repo.getByName(instrument.institution_name);
 
   const phone = instEntity?.contact_phone || (instrument.enquiry_contact_number && instrument.enquiry_contact_number !== 'None' ? instrument.enquiry_contact_number : null);
   const email = instEntity?.contact_email || (instrument.enquiry_mail && instrument.enquiry_mail !== 'None' ? instrument.enquiry_mail : null);
@@ -128,20 +126,16 @@ function mapActions(
 
 export function toInstrumentViewModel(
   instrument: Instrument,
-  repo?: InstitutionRepository
+  repo: InstitutionRepository
 ): Readonly<InstrumentViewModel> {
-  const activeRepo = repo || InstitutionRepository.getGlobal() || undefined;
-  const instEntity = activeRepo ? (activeRepo.getById(instrument.institution_id) || activeRepo.getByName(instrument.institution_name)) : undefined;
+  const instEntity = repo.getById(instrument.institution_id) || repo.getByName(instrument.institution_name);
 
   const id = instrument.provider_key || instrument.id || '';
   const title = instrument.instruments;
   const acronym = instrument.acronym && instrument.acronym !== 'None' ? instrument.acronym : null;
   const displayTitle = acronym ? `${title} (${acronym})` : title;
   
-  const institutionName = activeRepo 
-    ? activeRepo.resolveDisplayName(instrument)
-    : (instrument.institution_name || instrument.matched_institution || '');
-
+  const institutionName = repo.resolveDisplayName(instrument);
   const hasVerifiedMou = instEntity?.has_verified_mou === true;
     
   const facility = instrument.name_of_facility && instrument.name_of_facility !== 'None' ? instrument.name_of_facility : null;
@@ -153,9 +147,9 @@ export function toInstrumentViewModel(
     tags = [instrument.tag];
   }
 
-  const location = mapLocation(instrument, activeRepo);
+  const location = mapLocation(instrument, repo);
   const media = mapMedia(instrument);
-  const contact = mapContact(instrument, activeRepo);
+  const contact = mapContact(instrument, repo);
   const actions = mapActions(instrument, contact, location);
 
   return Object.freeze({

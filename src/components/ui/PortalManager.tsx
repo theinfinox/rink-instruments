@@ -14,8 +14,10 @@ import DatasetToggle, { PortalView } from '@/components/ui/DatasetToggle';
 import { Institution } from '@/types';
 import { InstitutionRepository } from '@/repositories/InstitutionRepository';
 
+import { InstrumentViewModel } from '@/domain/instrument/view-model';
+
 interface PortalManagerProps {
-  instruments: Instrument[];
+  instruments: InstrumentViewModel[];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   institutionList?: any[];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -72,7 +74,8 @@ export default function PortalManager({ instruments, institutionList = [], mouLi
   const pathname = usePathname();
 
   // Load canonical InstitutionRepository instances with official instituitiion_list dataset
-  const repo = useMemo(() => InstitutionRepository.fromInstrumentData(instruments, institutionList), [instruments, institutionList]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const repo = useMemo(() => InstitutionRepository.fromInstrumentData(instruments as any[], institutionList), [instruments, institutionList]);
 
   // Keep view synchronized with initialView on props update / Back-Forward navigation
   useEffect(() => {
@@ -106,7 +109,10 @@ export default function PortalManager({ instruments, institutionList = [], mouLi
 
   const data = useMemo(() => {
     if (view === 'instruments') {
-      const featured = instruments.filter(inst => inst.image_link && inst.image_link !== 'None' && inst.image_link.trim() !== '').slice(0, 20);
+      const featured = instruments.filter(inst => {
+        const img = inst.media?.thumbnail;
+        return img && img !== 'None' && img.trim() !== '';
+      }).slice(0, 20);
       const districtMap = new Map<string, District>(baseDistricts.map(d => [d.slug, { ...d }]));
       const sectorMap = new Map<string, boolean>();
 
@@ -114,16 +120,16 @@ export default function PortalManager({ instruments, institutionList = [], mouLi
       const instCountMap = new Map<string, number>();
 
       instruments.forEach((inst) => {
-        const id = inst.institution_id || (inst.institution_name ? repo.getByName(inst.institution_name)?.institution_id : null);
+        const id = inst.institution_id;
         if (id) {
           instCountMap.set(id, (instCountMap.get(id) || 0) + 1);
         }
 
-        const rawTags = Array.isArray(inst.tag) ? inst.tag : (inst.tag ? inst.tag.split(',') : []);
-        rawTags.forEach((t) => { if (t.trim()) sectorMap.set(t.trim(), true); });
+        const tags = inst.tags || [];
+        tags.forEach((t) => { if (t.trim()) sectorMap.set(t.trim(), true); });
 
-        if (inst.standardized_district && inst.standardized_district !== 'None') {
-          const slug = inst.standardized_district.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+        if (inst.location?.district) {
+          const slug = inst.location.district.toLowerCase().replace(/[^a-z0-9]+/g, '-');
           if (districtMap.has(slug)) districtMap.get(slug)!.tech_count++;
         }
       });
