@@ -1,6 +1,9 @@
 import { fetchInstrumentBundle } from '@/lib/dataFetcher';
 import TechListClient from './TechListClient';
 import { InstitutionRepository } from '@/repositories/InstitutionRepository';
+import { precisionSearch } from '@/lib/searchEngine';
+import { SearchIndexItem } from '@/types';
+import { Instrument } from '@/types/instrument';
 
 export const metadata = {
   title: 'All Instruments — RINK Instruments and Services Portal',
@@ -56,16 +59,40 @@ export default async function TechnologiesPage({ searchParams }: Props) {
   const districts = Array.from(districtSet).filter(Boolean).sort();
   const statuses = Array.from(statusSet).filter(Boolean).sort();
 
-  // Basic filtering
+  // Build SearchIndex for precision search engine
+  const searchIndex: SearchIndexItem[] = instruments.map(inst => {
+    const tags = Array.isArray(inst.tag) ? inst.tag : (inst.tag ? inst.tag.split(',') : []);
+    const sectorName = tags.length > 0 ? tags[0].trim() : 'General';
+    const instEntity = repo.getInstitution(inst);
+    
+    return {
+      id: inst.provider_key || inst.id || '',
+      name: inst.instruments || '',
+      institution: instEntity.name,
+      institution_slug: instEntity.slug,
+      institution_id: instEntity.institution_id || inst.institution_id || '',
+      category: sectorName,
+      category_slug: sectorName.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+      ip_status: inst.warnings || '',
+      trl: inst.standardized_district || '',
+      keywords: tags,
+      problem_solved: inst.name_of_facility || '',
+      description: inst.address || '',
+    };
+  });
+
+  // Basic filtering & unified precision search ranking
   let filtered = instruments;
-  if (params.q) {
-    const q = params.q.toLowerCase();
-    filtered = filtered.filter(i => 
-      (i.instruments && i.instruments.toLowerCase().includes(q)) || 
-      (i.institution_name && i.institution_name.toLowerCase().includes(q)) ||
-      (i.matched_institution && i.matched_institution.toLowerCase().includes(q))
-    );
+
+  if (params.q && params.q.trim()) {
+    const scoredResults = await precisionSearch(params.q, searchIndex);
+    const instMap = new Map(instruments.map(i => [i.provider_key || i.id || '', i]));
+    
+    filtered = scoredResults
+      .map(item => instMap.get(item.id))
+      .filter((inst): inst is Instrument => inst !== undefined);
   }
+
   if (params.sector) {
     const sectorQuery = params.sector;
     filtered = filtered.filter(i => {
@@ -73,6 +100,7 @@ export default async function TechnologiesPage({ searchParams }: Props) {
       return tags.some(t => t.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-') === sectorQuery);
     });
   }
+
   if (params.institution) {
     const institutionQuery = params.institution;
     const matchedInst = repo.getBySlug(institutionQuery);
@@ -83,10 +111,12 @@ export default async function TechnologiesPage({ searchParams }: Props) {
       return i.institution_name && i.institution_name.toLowerCase().replace(/[^a-z0-9]+/g, '-') === institutionQuery;
     });
   }
+
   if (params.district) {
     const districtQuery = params.district.toLowerCase();
     filtered = filtered.filter(i => i.standardized_district && i.standardized_district.toLowerCase() === districtQuery);
   }
+
   if (params.patent) {
     const patentQuery = params.patent;
     filtered = filtered.filter(i => i.warnings === patentQuery);
