@@ -3,21 +3,32 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
-import { House, Building2, MapPin, Phone } from 'lucide-react';
+import { House, Layers, Microscope, Building2, MapPin, Phone, Rocket } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
 
-const NAV_LINKS = [
+const INSTRUMENTS_NAV_LINKS = [
   { label: 'Home',          href: '/',               icon: House },
+  { label: 'Services',      href: '/services',       icon: Layers },
   { label: 'Institutions',  href: '/#institutions',  icon: Building2 },
+  { label: 'Districts',     href: '/#districts',     icon: MapPin },
+  { label: 'Contact',       href: '/contact',        icon: Phone },
+];
+
+const SERVICES_NAV_LINKS = [
+  { label: 'Home',          href: '/',               icon: House },
+  { label: 'Instruments',   href: '/',               icon: Microscope },
+  { label: 'Startups',      href: '/services#startups', icon: Rocket },
   { label: 'Districts',     href: '/#districts',     icon: MapPin },
   { label: 'Contact',       href: '/contact',        icon: Phone },
 ];
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
+  const [hash, setHash] = useState('');
   const pathname = usePathname();
   const isServicesContext = pathname.startsWith('/services');
+  const navLinks = isServicesContext ? SERVICES_NAV_LINKS : INSTRUMENTS_NAV_LINKS;
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 10);
@@ -25,9 +36,46 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handler);
   }, []);
 
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setHash(window.location.hash);
+      const handleHashChange = () => setHash(window.location.hash);
+      window.addEventListener('hashchange', handleHashChange);
+      return () => window.removeEventListener('hashchange', handleHashChange);
+    }
+  }, [pathname]);
+
   if (pathname === '/yaml-builder') {
     return null;
   }
+
+  const isLinkActive = (href: string) => {
+    if (href === '/' && !isServicesContext) return pathname === '/';
+    if (href === '/' && isServicesContext) return false;
+    if (href === '/services') return pathname === '/services' && !hash;
+    if (href === '/services#startups') {
+      return pathname === '/services/list' || (pathname === '/services' && hash === '#startups');
+    }
+    if (href.startsWith('/#')) return false;
+    return pathname === href || pathname.startsWith(href);
+  };
+
+  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (href.includes('#')) {
+      const [targetPath, targetHash] = href.split('#');
+      const cleanTargetPath = targetPath || '/';
+      
+      if (pathname === cleanTargetPath || (cleanTargetPath === '/services' && isServicesContext)) {
+        e.preventDefault();
+        const element = document.getElementById(targetHash);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+          window.history.pushState(null, '', href);
+          setHash(`#${targetHash}`);
+        }
+      }
+    }
+  };
 
   return (
     <>
@@ -57,20 +105,24 @@ export default function Navbar() {
             {/* ── Desktop Nav Links ── */}
             <div className="hidden md:flex items-center gap-3">
               <div className="flex items-center gap-1">
-                {NAV_LINKS.map(link => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className={clsx(
-                      'px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-150 font-sans',
-                      pathname === link.href
-                        ? 'text-[#0A2164] bg-blue-50'
-                        : 'text-gray-600 hover:text-[#0A2164] hover:bg-blue-50'
-                    )}
-                  >
-                    {link.label}
-                  </Link>
-                ))}
+                {navLinks.map((link, idx) => {
+                  const active = isLinkActive(link.href);
+                  return (
+                    <Link
+                      key={`${link.label}-${idx}`}
+                      href={link.href}
+                      onClick={(e) => handleLinkClick(e, link.href)}
+                      className={clsx(
+                        'px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-150 font-sans',
+                        active
+                          ? 'text-[#0A2164] bg-blue-50'
+                          : 'text-gray-600 hover:text-[#0A2164] hover:bg-blue-50'
+                      )}
+                    >
+                      {link.label}
+                    </Link>
+                  );
+                })}
               </div>
               <Link
                 href={isServicesContext ? "/services/list" : "/instruments"}
@@ -78,12 +130,10 @@ export default function Navbar() {
               >
                 {isServicesContext ? 'Browse Services' : 'Browse Instruments'}
               </Link>
-              
             </div>
 
             {/* ── Mobile actions ── */}
             <div className="flex items-center gap-2 md:hidden">
-              
               <Link
                 href={isServicesContext ? "/services/list" : "/instruments"}
                 className="px-3 py-2 text-xs font-bold rounded-lg bg-[#0A2164] text-white hover:bg-[#081A52] transition-colors font-heading"
@@ -102,75 +152,41 @@ export default function Navbar() {
         style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
       >
         <div className="flex items-stretch">
-          {NAV_LINKS.map(link => {
+          {navLinks.map((link, idx) => {
             const Icon = link.icon;
-            const isActive = pathname === link.href;
+            const active = isLinkActive(link.href);
             return (
               <Link
-                key={link.href}
+                key={`${link.label}-${idx}`}
                 href={link.href}
                 aria-label={link.label}
+                onClick={(e) => handleLinkClick(e, link.href)}
                 className={clsx(
                   'flex flex-col items-center justify-center flex-1 gap-1 py-3 min-h-[64px] transition-all duration-200 select-none relative',
-                  isActive
+                  active
                     ? 'text-[#0A2164]'
                     : 'text-gray-500 hover:text-[#0A2164]'
                 )}
               >
-                {isActive && (
-                  <span className="absolute top-0 inset-x-4 h-1 bg-[#0A2164] rounded-b-md shadow-[0_2px_8px_rgba(10,33,100,0.4)]" />
+                {active && (
+                  <span className="absolute top-0 inset-x-3 h-1 bg-[#0A2164] rounded-b-md shadow-[0_2px_8px_rgba(10,33,100,0.4)]" />
                 )}
                 <Icon
                   className={clsx(
-                    'w-6 h-6 transition-all duration-200 mt-1',
-                    isActive && 'scale-110'
+                    'w-5 h-5 transition-all duration-200 mt-1',
+                    active && 'scale-110'
                   )}
-                  strokeWidth={isActive ? 2.5 : 2}
+                  strokeWidth={active ? 2.5 : 2}
                 />
                 <span className={clsx(
-                  'text-[11px] font-bold tracking-wide transition-colors',
-                  isActive ? 'text-[#0A2164]' : 'text-gray-500'
+                  'text-[10px] font-bold tracking-wide transition-colors truncate px-0.5',
+                  active ? 'text-[#0A2164]' : 'text-gray-500'
                 )}>
                   {link.label}
                 </span>
               </Link>
             );
           })}
-
-          {/* Instruments / Services shortcut */}
-          <Link
-            href={isServicesContext ? "/services/list" : "/instruments"}
-            aria-label={isServicesContext ? "Browse Services" : "Browse Instruments"}
-            className={clsx(
-              'flex flex-col items-center justify-center flex-1 gap-1 py-3 min-h-[64px] transition-all duration-200 select-none relative',
-              (pathname.startsWith('/instruments') || pathname.startsWith('/services/list'))
-                ? 'text-[#0A2164]'
-                : 'text-gray-500 hover:text-[#0A2164]'
-            )}
-          >
-            {(pathname.startsWith('/instruments') || pathname.startsWith('/services/list')) && (
-              <span className="absolute top-0 inset-x-4 h-1 bg-[#0A2164] rounded-b-md shadow-[0_2px_8px_rgba(10,33,100,0.4)]" />
-            )}
-            <svg
-              className={clsx(
-                'w-6 h-6 mt-1 transition-all duration-200',
-                (pathname.startsWith('/instruments') || pathname.startsWith('/services/list')) && 'scale-110'
-              )}
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={(pathname.startsWith('/instruments') || pathname.startsWith('/services/list')) ? 2.5 : 2}
-            >
-              <rect x="3" y="3" width="18" height="18" rx="2" />
-              <path d="M9 9h6M9 13h6M9 17h4" />
-            </svg>
-            <span className={clsx(
-              'text-[11px] font-bold tracking-wide',
-              (pathname.startsWith('/instruments') || pathname.startsWith('/services/list')) ? 'text-[#0A2164]' : 'text-gray-500'
-            )}>
-              {isServicesContext ? 'Services' : 'Instruments'}
-            </span>
-          </Link>
         </div>
       </nav>
     </>
