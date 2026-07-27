@@ -18,6 +18,8 @@ interface PortalManagerProps {
   instruments: Instrument[];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   institutionList?: any[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  mouList?: any[];
   services: Service[];
   initialView: PortalView;
 }
@@ -63,7 +65,7 @@ const SERVICE_SEARCH_CONFIG: SearchConfig = {
   ariaLabel: 'Search services',
 };
 
-export default function PortalManager({ instruments, institutionList = [], services, initialView }: PortalManagerProps) {
+export default function PortalManager({ instruments, institutionList = [], mouList = [], services, initialView }: PortalManagerProps) {
   const [view, setView] = useState<PortalView>(initialView);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const router = useRouter();
@@ -126,11 +128,22 @@ export default function PortalManager({ instruments, institutionList = [], servi
         }
       });
 
+      // Build MoU lookup map ONCE for the page lifecycle: O(1) lookups using institution_id
+      const mouMap = new Map<string, boolean>();
+      if (Array.isArray(mouList)) {
+        mouList.forEach((item) => {
+          if (item?.institution_id && item?.verification_status === 'Verified') {
+            mouMap.set(item.institution_id, true);
+          }
+        });
+      }
+
       // Use Institution base objects strictly from InstitutionRepository
       const institutions: Institution[] = repo.getAll()
         .map(inst => ({
           ...inst,
           tech_count: instCountMap.get(inst.institution_id || '') || 0,
+          has_verified_mou: inst.institution_id ? (mouMap.get(inst.institution_id) === true) : false,
         }))
         .filter(inst => inst.tech_count > 0)
         .sort((a, b) => b.tech_count - a.tech_count);

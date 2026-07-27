@@ -19,6 +19,7 @@ export default async function HomePage() {
     <PortalManager 
       instruments={instrumentBundle.main_data} 
       institutionList={instrumentBundle.instituitiion_list}
+      mouList={instrumentBundle.mou_list}
       services={services} 
       initialView="instruments" 
     />

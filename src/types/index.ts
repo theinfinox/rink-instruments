@@ -74,6 +74,7 @@ export interface Institution {
   plus_code?: string;
   correct_provider_key?: string;
   reason_classification?: string;
+  has_verified_mou?: boolean;
 }
 
 // ── Search & Filter Types ───────────────────────────────────

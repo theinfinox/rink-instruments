@@ -132,8 +132,15 @@ function InstitutionGridCard({ inst, context }: { inst: Institution, context?: '
         <div title={inst.name} className="font-heading font-bold text-[#0F172A] text-sm leading-snug line-clamp-3 group-hover:text-[#1B4D9B] transition-colors">
           {inst.name}
         </div>
-        <div className="text-xs font-bold text-[#1B4D9B] mt-1.5">
-          {inst.tech_count} {inst.tech_count === 1 ? (isServices ? 'service' : 'technology') : (isServices ? 'services' : 'technologies')}
+        <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+          <span className="text-xs font-bold text-[#1B4D9B]">
+            {inst.tech_count} {inst.tech_count === 1 ? (isServices ? 'service' : 'technology') : (isServices ? 'services' : 'technologies')}
+          </span>
+          {inst.has_verified_mou && (
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200 leading-none">
+              MoU
+            </span>
+          )}
         </div>
       </div>
 
