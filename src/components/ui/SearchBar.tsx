@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Search, ArrowRight, Building2, Layers } from 'lucide-react';
 
 import { type SearchIndexItem } from '@/types';
+import { precisionSearch } from '@/lib/searchEngine';
 
 interface Props {
   size?: 'lg' | 'md';
@@ -57,24 +58,19 @@ export default function SearchBar({
       .catch(() => {/* silent */});
   }, [dataset]);
 
-  // Debounced search
-  const doSearch = useCallback((q: string) => {
+  // Debounced search — delegates to unified precisionSearch engine
+  const doSearch = useCallback(async (q: string) => {
     if (!q.trim() || q.length < 2) {
       setSuggestions([]);
       setOpen(false);
       return;
     }
-    const ql = q.toLowerCase();
-    const matched = allItems.filter(item =>
-      item.name.toLowerCase().includes(ql) ||
-      item.institution.toLowerCase().includes(ql) ||
-      item.category.toLowerCase().includes(ql) ||
-      item.keywords.some(k => k.toLowerCase().includes(ql)) ||
-      item.problem_solved.toLowerCase().includes(ql)
-    ).slice(0, 7);
 
-    setSuggestions(matched);
-    setOpen(matched.length > 0);
+    const results = await precisionSearch(q, allItems);
+    const top7 = results.slice(0, 7);
+
+    setSuggestions(top7);
+    setOpen(top7.length > 0);
     setActiveIdx(-1);
   }, [allItems]);
 
