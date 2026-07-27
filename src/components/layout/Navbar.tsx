@@ -25,6 +25,10 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handler);
   }, []);
 
+  if (pathname === '/yaml-builder') {
+    return null;
+  }
+
   return (
     <>
       {/* ── TOP NAVIGATION BAR ── */}
