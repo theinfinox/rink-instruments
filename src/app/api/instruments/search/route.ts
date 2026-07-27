@@ -90,11 +90,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to initialize search index' }, { status: 500 });
   }
 
-  const isUppercase = q === q.toUpperCase() && /[A-Z]/.test(q);
-  const isShortWord = q.length >= 2 && q.length <= 6 && !q.includes(' ');
-  const hasTrailingSpace = q.endsWith(' ');
   const cleanQuery = q.trim();
-  const forceExactMatch = (isUppercase && isShortWord) || (hasTrailingSpace && cleanQuery.length > 0);
+  const isShortWord = cleanQuery.length >= 2 && cleanQuery.length <= 6 && !cleanQuery.includes(' ');
+  const hasTrailingSpace = q.endsWith(' ');
+  const forceExactMatch = isShortWord || (hasTrailingSpace && cleanQuery.length > 0);
   const normalizedTerm = cleanQuery.replace(/[-_/]/g, ' ').toLowerCase();
 
   const results = await oramaSearch(db, {

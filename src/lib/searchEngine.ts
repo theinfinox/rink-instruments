@@ -2,17 +2,17 @@
  * RINK Precision Search Engine
  * ────────────────────────────────────────────────────────────────
  * Priority pipeline:
- *   1. Exact Technology ID match               (score 1000)
- *   2. Partial ID match                        (score 850)
- *   3. Exact Technology Name match             (score 900)
- *   4. Prefix match on Technology Name         (score 700)
- *   5. Whole-word match in Technology Name     (score 500)
- *   6. Substring match in Technology Name      (score 420)
- *   7. Institution match                       (score 350–380)
- *   8. Category match                            (score 300–320)
- *   9. Keyword match                           (score 160–220)
- *  10. Problem Solved match                    (score 110–130)
- *  12. Orama full-text (Desc)   (score ≤80)
+ *   1. Exact Technology ID match                             (score 1000)
+ *   2. Exact Name or Exact Acronym field match               (score 950)
+ *   3. Standalone Acronym / Word Boundary Token match in Name (score 880)
+ *   4. Partial ID match                                      (score 850)
+ *   5. Prefix match on Technology Name                       (score 700)
+ *   6. Substring match in Technology Name                    (score 420)
+ *   7. Institution match                                     (score 350–380)
+ *   8. Category match                                        (score 300–320)
+ *   9. Keyword match                                         (score 160–220)
+ *  10. Problem Solved match                                  (score 110–130)
+ *  12. Orama full-text (Desc)                                (score ≤78)
  *
  * Minimum relevance threshold: 80
  */
@@ -52,7 +52,7 @@ async function getOramaDb(items: SearchIndexItem[]): Promise<AnyOrama> {
     id:               'string',
     name:             'string',
     institution:      'string',
-    category:           'string',
+    category:         'string',
     keywords_str:     'string',
     problem_solved:   'string',
     description:      'string',
@@ -63,7 +63,7 @@ async function getOramaDb(items: SearchIndexItem[]): Promise<AnyOrama> {
       id:               item.id,
       name:             item.name,
       institution:      item.institution,
-      category:           item.category,
+      category:         item.category,
       keywords_str:     item.keywords.join(' '),
       problem_solved:   item.problem_solved || '',
       description:      item.description || '',
@@ -95,48 +95,55 @@ function scoreItem(item: SearchIndexItem, q: string): ScoredItem | null {
   const nId          = norm(item.id);
   const nName        = norm(item.name);
   const nInstitution = norm(item.institution);
-  const nCategory      = norm(item.category);
+  const nCategory    = norm(item.category);
   const nProblem     = norm(item.problem_solved || '');
   const nKeywords    = item.keywords.map(norm);
 
   const jId          = nId.replace(/\s+/g, '');
   const jName        = nName.replace(/\s+/g, '');
   const jInstitution = nInstitution.replace(/\s+/g, '');
-  const jCategory      = nCategory.replace(/\s+/g, '');
+  const jCategory    = nCategory.replace(/\s+/g, '');
   const jProblem     = nProblem.replace(/\s+/g, '');
 
   // Safe regex: escape special chars
   let wordBoundary: RegExp;
   try {
-    wordBoundary = new RegExp(`\\b${nq.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`);
+    wordBoundary = new RegExp(`\\b${nq.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
   } catch {
     wordBoundary = /(?!)/; // never matches
   }
 
-  // Tier 1: Exact ID
+  // Tier 1: Exact ID Match
   if (nId === nq || jId === jQ) {
     return { ...item, _score: 1000, _matchField: 'id_exact' };
   }
-  // Tier 2: Partial ID (prefix or substring)
+
+  // Tier 2: Exact Name or Exact Acronym Field Match (e.g. "SEM")
+  const isAcronymMatch = item.problem_solved && norm(item.problem_solved) === nq; // problem_solved or acronym
+  if (nName === nq || jName === jQ || isAcronymMatch) {
+    return { ...item, _score: 950, _matchField: 'name_or_acronym_exact' };
+  }
+
+  // Tier 3: Standalone Acronym / Word Boundary Token Match in Title (e.g. "(SEM)" in "Scanning Electron Microscope (SEM)")
+  if (wordBoundary.test(nName)) {
+    return { ...item, _score: 880, _matchField: 'acronym_word_boundary' };
+  }
+
+  // Tier 4: Partial ID (prefix or substring)
   if (nId.startsWith(nq) || nId.includes(nq) || jId.includes(jQ)) {
     return { ...item, _score: 850, _matchField: 'id_partial' };
   }
-  // Tier 3: Exact Name
-  if (nName === nq || jName === jQ) {
-    return { ...item, _score: 900, _matchField: 'name_exact' };
-  }
-  // Tier 4: Prefix Name
+
+  // Tier 5: Prefix Name (e.g. "SEM Imaging System" or "Semiconductor...")
   if (nName.startsWith(nq) || jName.startsWith(jQ)) {
     return { ...item, _score: 700, _matchField: 'name_prefix' };
   }
-  // Tier 5: Whole-word in Name
-  if (wordBoundary.test(nName)) {
-    return { ...item, _score: 500, _matchField: 'name_word' };
-  }
-  // Tier 6: Substring Name
+
+  // Tier 6: Substring Name (e.g. "...semiconductor...")
   if (nName.includes(nq) || jName.includes(jQ)) {
     return { ...item, _score: 420, _matchField: 'name_substr' };
   }
+
   // Tier 7: Institution
   if (nInstitution === nq || jInstitution === jQ) return { ...item, _score: 380, _matchField: 'institution_exact' };
   if (nInstitution.includes(nq) || jInstitution.includes(jQ)) return { ...item, _score: 350, _matchField: 'institution_substr' };
@@ -191,7 +198,7 @@ export async function precisionSearch(
   try {
     const db = await getOramaDb(index);
     const oramaResult = await _search!(db, {
-      term: q,
+      term: q.toLowerCase(),
       properties: ['description', 'keywords_str', 'problem_solved'],
       limit: 20,
       tolerance: q.length > 5 ? 1 : 0,
