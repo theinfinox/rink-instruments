@@ -8,12 +8,13 @@ import type { Institution } from '@/types';
 
 import MouBadge from './MouBadge';
 import { toDriveEmbedUrl } from '@/lib/mapper';
+import { getImageUrl } from '@/lib/utils';
 
 // ── Helpers ─────────────────────────────────────────────────────
 function getLogo(inst: Institution): string | null {
   return (
+    (inst.logo_link ? getImageUrl(inst.logo_link) : null) ||
     (inst.original_logo_link ? toDriveEmbedUrl(inst.original_logo_link) : null) ||
-    inst.logo_link ||
     inst.logo_embed_url ||
     inst.institution_image_embed_url ||
     inst.institution_image ||
@@ -55,6 +56,7 @@ function SuggestionItem({
 }) {
   const isServices = context === 'services';
   const logo = getLogo(inst);
+  const [imageFailed, setImageFailed] = useState(false);
   return (
     <button
       type="button"
@@ -71,9 +73,15 @@ function SuggestionItem({
         className="flex-shrink-0 flex items-center justify-center overflow-hidden rounded-lg bg-gray-50 border border-gray-100"
         style={{ width: 32, height: 32 }}
       >
-        {logo ? (
+        {logo && !imageFailed ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={logo} alt={inst.name} className="object-contain w-6 h-6" loading="lazy" />
+          <img 
+            src={logo} 
+            alt={inst.name} 
+            className="object-contain w-6 h-6" 
+            loading="lazy" 
+            onError={() => setImageFailed(true)}
+          />
         ) : (
           <Building2 className="w-4 h-4 text-slate-300" />
         )}
@@ -94,6 +102,7 @@ function SuggestionItem({
 function InstitutionGridCard({ inst, context }: { inst: Institution, context?: 'instruments' | 'services' }) {
   const isServices = context === 'services';
   const logo = getLogo(inst);
+  const [imageFailed, setImageFailed] = useState(false);
   const linkHref = isServices 
     ? `/services/list?startup=${encodeURIComponent(inst.slug)}` 
     : `/instruments?institution=${encodeURIComponent(inst.slug)}`;
@@ -119,7 +128,7 @@ function InstitutionGridCard({ inst, context }: { inst: Institution, context?: '
           boxShadow: '0 2px 10px rgba(15,23,42,0.05)',
         }}
       >
-        {logo ? (
+        {logo && !imageFailed ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={logo}
@@ -127,6 +136,7 @@ function InstitutionGridCard({ inst, context }: { inst: Institution, context?: '
             className="object-contain"
             style={{ width: 64, height: 64, padding: 2 }}
             loading="lazy"
+            onError={() => setImageFailed(true)}
           />
         ) : (
           <div className="flex flex-col items-center justify-center gap-1">

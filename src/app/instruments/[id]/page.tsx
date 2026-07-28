@@ -2,11 +2,12 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ChevronRight, ArrowRight, FileText, Microscope, Building2 } from 'lucide-react';
 import TechImage from '@/components/ui/TechImage';
-import { CDN_HOST } from '@/lib/utils';
+import { CDN_HOST, getImageUrl } from '@/lib/utils';
 import { Instrument } from '@/types/instrument';
 import { toInstrumentViewModel } from '@/domain/instrument/mapper';
 import { toDriveEmbedUrl } from '@/lib/mapper';
 import MouBadge from '@/components/ui/MouBadge';
+import ClientPartnerLogo from './ClientPartnerLogo';
 const GOOGLE_FORM_URL =
   'https://docs.google.com/forms/d/e/1FAIpQLSfJlFIqrK5Dzd5R-Voh19OvhUKxj7OzEqeW8XIdjJMNKxc8Eg/viewform';
 
@@ -265,8 +266,8 @@ export default async function TechnologyDetailPage({ params }: { params: Promise
                         {(() => {
                           const inst = vm.institution_entity;
                           const logo = inst ? (
+                            (inst.logo_link ? getImageUrl(inst.logo_link) : null) ||
                             (inst.original_logo_link ? toDriveEmbedUrl(inst.original_logo_link) : null) ||
-                            inst.logo_link ||
                             inst.institution_image_embed_url ||
                             inst.institution_image ||
                             inst.logo_embed_url ||
@@ -275,13 +276,7 @@ export default async function TechnologyDetailPage({ params }: { params: Promise
                             null
                           ) : null;
                           
-                          if (logo) {
-                            return (
-                              // eslint-disable-next-line @next/next/no-img-element
-                              <img src={logo} alt={vm.institution} className="w-5 h-5 object-contain flex-shrink-0" loading="lazy" />
-                            );
-                          }
-                          return <Building2 className="w-4 h-4 text-slate-400 group-hover:text-[#0A2164] transition-colors flex-shrink-0" />;
+                          return <ClientPartnerLogo logo={logo} institutionName={vm.institution} />;
                         })()}
                         {vm.institution}
                       </Link>
