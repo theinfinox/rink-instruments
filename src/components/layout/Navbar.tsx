@@ -19,7 +19,7 @@ const SERVICES_NAV_LINKS = [
   { label: 'Home',          href: '/',               icon: House },
   { label: 'Instruments',   href: '/',               icon: Microscope },
   { label: 'Startups',      href: '/services#startups', icon: Rocket },
-  { label: 'Districts',     href: '/#districts',     icon: MapPin },
+  { label: 'Districts',     href: '/services#districts', icon: MapPin },
   { label: 'Contact',       href: '/contact',        icon: Phone },
 ];
 
@@ -55,7 +55,7 @@ export default function Navbar() {
       const [targetPath, targetHash] = href.split('#');
       const cleanTargetPath = targetPath || '/';
       
-      if (pathname === cleanTargetPath || (cleanTargetPath === '/services' && isServicesContext)) {
+      if (pathname === cleanTargetPath) {
         e.preventDefault();
         const element = document.getElementById(targetHash);
         if (element) {
