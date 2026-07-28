@@ -359,7 +359,7 @@ export default function InstitutionSearchGrid({ institutions, context }: Props) 
       {/* ── Institution Grid ── */}
       {filteredInstitutions.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredInstitutions.slice(0, 16).map(inst => (
+          {filteredInstitutions.map(inst => (
             <InstitutionGridCard key={inst.slug} inst={inst} context={context} />
           ))}
         </div>
