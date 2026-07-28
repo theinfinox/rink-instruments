@@ -159,6 +159,7 @@ export function toInstrumentViewModel(
     displayTitle,
     institution: institutionName,
     institution_id: instrument.institution_id || instEntity?.institution_id,
+    institution_entity: instEntity || undefined,
     hasVerifiedMou,
     facility,
     location,

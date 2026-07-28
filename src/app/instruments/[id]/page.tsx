@@ -5,6 +5,7 @@ import TechImage from '@/components/ui/TechImage';
 import { CDN_HOST } from '@/lib/utils';
 import { Instrument } from '@/types/instrument';
 import { toInstrumentViewModel } from '@/domain/instrument/mapper';
+import { toDriveEmbedUrl } from '@/lib/mapper';
 import MouBadge from '@/components/ui/MouBadge';
 const GOOGLE_FORM_URL =
   'https://docs.google.com/forms/d/e/1FAIpQLSfJlFIqrK5Dzd5R-Voh19OvhUKxj7OzEqeW8XIdjJMNKxc8Eg/viewform';
@@ -261,7 +262,27 @@ export default async function TechnologyDetailPage({ params }: { params: Promise
                         href={`/institutions/${vm.institution.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
                         className="group flex items-center gap-2 text-sm font-semibold text-[#0A2164] hover:underline font-sans"
                       >
-                        <Building2 className="w-4 h-4 text-slate-400 group-hover:text-[#0A2164] transition-colors flex-shrink-0" />
+                        {(() => {
+                          const inst = vm.institution_entity;
+                          const logo = inst ? (
+                            (inst.original_logo_link ? toDriveEmbedUrl(inst.original_logo_link) : null) ||
+                            inst.logo_link ||
+                            inst.institution_image_embed_url ||
+                            inst.institution_image ||
+                            inst.logo_embed_url ||
+                            inst.logo_url ||
+                            inst.image ||
+                            null
+                          ) : null;
+                          
+                          if (logo) {
+                            return (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img src={logo} alt={vm.institution} className="w-5 h-5 object-contain flex-shrink-0" loading="lazy" />
+                            );
+                          }
+                          return <Building2 className="w-4 h-4 text-slate-400 group-hover:text-[#0A2164] transition-colors flex-shrink-0" />;
+                        })()}
                         {vm.institution}
                       </Link>
                     </div>

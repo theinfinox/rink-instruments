@@ -1,3 +1,5 @@
+import { Institution } from '@/types';
+
 export interface Action {
   label: string;
   href: string;
@@ -22,6 +24,9 @@ export interface InstrumentViewModel {
 
   /** Canonical institution_id */
   institution_id?: string;
+
+  /** Complete institution entity if available */
+  institution_entity?: Institution;
 
   /** Inherited MoU verification status from parent institution */
   hasVerifiedMou: boolean;

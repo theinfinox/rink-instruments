@@ -7,10 +7,19 @@ import { useRouter } from 'next/navigation';
 import type { Institution } from '@/types';
 
 import MouBadge from './MouBadge';
+import { toDriveEmbedUrl } from '@/lib/mapper';
 
 // ── Helpers ─────────────────────────────────────────────────────
 function getLogo(inst: Institution): string | null {
-  return inst.logo_embed_url || inst.institution_image_embed_url || inst.institution_image || inst.image || null;
+  return (
+    (inst.original_logo_link ? toDriveEmbedUrl(inst.original_logo_link) : null) ||
+    inst.logo_link ||
+    inst.logo_embed_url ||
+    inst.institution_image_embed_url ||
+    inst.institution_image ||
+    inst.image ||
+    null
+  );
 }
 
 function norm(s: string): string {

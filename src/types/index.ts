@@ -64,6 +64,8 @@ export interface Institution {
   // Fields from Institution Details sheet / list
   logo_url?: string;
   logo_embed_url?: string;
+  original_logo_link?: string;
+  logo_link?: string;
   address?: string;
   website?: string;
   contact_email?: string;

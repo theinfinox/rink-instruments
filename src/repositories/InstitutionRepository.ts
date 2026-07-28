@@ -151,6 +151,8 @@ export class InstitutionRepository {
           plus_code: raw.plus_code,
           correct_provider_key: raw.correct_provider_key,
           reason_classification: raw.reason_classification,
+          logo_link: raw.logo_link,
+          original_logo_link: raw.original_logo_link,
         });
       }
     });
