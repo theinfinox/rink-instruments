@@ -25,29 +25,56 @@ const SERVICES_NAV_LINKS = [
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
+  const [hash, setHash] = useState('');
   const pathname = usePathname();
   const isServicesContext = pathname.startsWith('/services');
   const navLinks = isServicesContext ? SERVICES_NAV_LINKS : INSTRUMENTS_NAV_LINKS;
 
   useEffect(() => {
-    const handler = () => setScrolled(window.scrollY > 10);
-    window.addEventListener('scroll', handler, { passive: true });
-    return () => window.removeEventListener('scroll', handler);
-  }, []);
+    const scrollHandler = () => setScrolled(window.scrollY > 10);
+    window.addEventListener('scroll', scrollHandler, { passive: true });
+    
+    // Sync hash from URL initially and on changes
+    setHash(window.location.hash);
+    const hashChangeHandler = () => setHash(window.location.hash);
+    window.addEventListener('hashchange', hashChangeHandler);
+    
+    return () => {
+      window.removeEventListener('scroll', scrollHandler);
+      window.removeEventListener('hashchange', hashChangeHandler);
+    };
+  }, [pathname]);
 
   if (pathname === '/yaml-builder') {
     return null;
   }
 
+  const currentPathWithHash = `${pathname}${hash}`;
+
   const isLinkActive = (href: string) => {
-    if (href === '/' && !isServicesContext) return pathname === '/';
+    // 1. Exact match with current path + hash
+    if (currentPathWithHash === href) return true;
+
+    // 2. Special case for '/' (Instruments home)
+    if (href === '/' && !isServicesContext) return currentPathWithHash === '/';
+    
+    // 3. Special case for '/' in services context
     if (href === '/' && isServicesContext) return false;
-    if (href === '/services') return pathname === '/services' || pathname.startsWith('/services');
+
+    // 4. Special case for '/services' root link
+    if (href === '/services') return currentPathWithHash === '/services' || (pathname.startsWith('/services') && hash === '');
+
+    // 5. Hardcoded exception for startups list
     if (href === '/services#startups') {
-      return pathname === '/services/list';
+      return currentPathWithHash === '/services#startups' || pathname === '/services/list';
     }
-    if (href.startsWith('/#')) return false;
-    return pathname === href || pathname.startsWith(href);
+
+    // 6. Subpath matching (fallback for links without hash)
+    if (!href.includes('#')) {
+      return pathname === href || pathname.startsWith(href);
+    }
+    
+    return false;
   };
 
   const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
@@ -60,6 +87,11 @@ export default function Navbar() {
         const element = document.getElementById(targetHash);
         if (element) {
           element.scrollIntoView({ behavior: 'smooth' });
+          // Update URL without a full jump to maintain URL as source of truth
+          if (window.location.pathname + window.location.hash !== href) {
+            window.history.pushState(null, '', href);
+          }
+          setHash(`#${targetHash}`);
         }
       }
     }
