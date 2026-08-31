@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import Tooltip from './Tooltip';
 import { TabConfig } from './types';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Plus } from 'lucide-react';
+import MergeSourceCard from './MergeSourceCard';
 
 export default function TabCard({ tab, spreadsheetId, onChange, onRemove, onColumnsFetched }: { 
   tab: TabConfig, 
@@ -420,6 +421,67 @@ export default function TabCard({ tab, spreadsheetId, onChange, onRemove, onColu
                 </div>
               </div>
             </div>
+          )}
+        </div>
+
+        {/* 🟣 Merge Sources (Extension / Union Mapping) */}
+        <div className="border border-purple-200 bg-purple-50/20 p-3 rounded-md mt-2 transition-all">
+          <div className="flex items-center justify-between mb-1">
+            <div>
+              <label className="flex items-center text-xs font-bold text-purple-950">
+                Merge External Sources (Google Forms / Secondary Sheets)
+                <Tooltip text="Seamlessly merge secondary sheets (such as Google Form intake responses) into this tab with visual column mapping and defaults." />
+              </label>
+              <p className="text-[11px] text-gray-500 mt-0.5">
+                Appends records from another spreadsheet (e.g. intake forms) into this dataset at compile time.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                const newSources = [
+                  ...(tab.mergeSources || []),
+                  {
+                    name: 'Intake Form Responses',
+                    spreadsheetId: '',
+                    gid: 0,
+                    columnMapping: {},
+                    defaults: { source_type: 'intake_form', approval_status: 'Approved' },
+                    autoGenerateId: { enabled: true, prefix: 'inst_form', start: 200001 }
+                  }
+                ];
+                onChange({ ...tab, mergeSources: newSources });
+              }}
+              className="flex items-center gap-1 text-xs bg-purple-100 hover:bg-purple-200 text-purple-800 px-2.5 py-1 rounded font-medium transition-colors cursor-pointer shrink-0"
+            >
+              <Plus size={13} /> Add Merge Source
+            </button>
+          </div>
+
+          {tab.mergeSources && tab.mergeSources.length > 0 ? (
+            <div className="space-y-3 mt-3">
+              {tab.mergeSources.map((source, sIdx) => (
+                <MergeSourceCard
+                  key={sIdx}
+                  source={source}
+                  primaryColumns={availableColumns}
+                  onChange={(updatedSource) => {
+                    const newSources = [...tab.mergeSources!];
+                    newSources[sIdx] = updatedSource;
+                    onChange({ ...tab, mergeSources: newSources });
+                  }}
+                  onRemove={() => {
+                    const newSources = tab.mergeSources!.filter((_, idx) => idx !== sIdx);
+                    onChange({
+                      ...tab,
+                      mergeSources: newSources.length > 0 ? newSources : undefined
+                    });
+                  }}
+                />
+              ))}
+            </div>
+          ) : (
+            <p className="text-xs text-gray-400 italic mt-1">No secondary merge sources configured for this tab.</p>
           )}
         </div>
       </div>

@@ -15,6 +15,19 @@ export interface AutoGenerateIdConfig {
   start: number;
 }
 
+export interface MergeSourceConfig {
+  name?: string;
+  spreadsheetId: string;
+  gid: number;
+  hierarchical_rows?: boolean;
+  excludeColumns?: string[];
+  excludeRowsWhere?: ExcludeRowCondition[];
+  columnMapping?: Record<string, string>;
+  defaults?: Record<string, string>;
+  autoGenerateId?: AutoGenerateIdConfig;
+  imageColumns?: string | string[];
+}
+
 export interface TabConfig {
   name: string;
   gid: number;
@@ -29,6 +42,7 @@ export interface TabConfig {
     metadataColumns?: string[];
   };
   autoGenerateId?: AutoGenerateIdConfig;
+  mergeSources?: MergeSourceConfig[];
 }
 
 export interface JoinSource {
