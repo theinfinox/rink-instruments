@@ -22,17 +22,24 @@ const COMMON_TARGET_COLUMNS = [
 export default function MergeSourceCard({
   source,
   primaryColumns = [],
+  columnRegistry = {},
+  onRegisterColumns,
   onChange,
   onRemove
 }: {
   source: MergeSourceConfig;
   primaryColumns?: string[];
+  columnRegistry?: Record<string, string[]>;
+  onRegisterColumns?: (sheetId: string, gid: number | string, cols: string[]) => void;
   onChange: (updated: MergeSourceConfig) => void;
   onRemove: () => void;
 }) {
-  const [sourceColumns, setSourceColumns] = useState<string[]>([]);
+  const [localColumns, setLocalColumns] = useState<string[]>([]);
   const [isFetching, setIsFetching] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Read from columnRegistry if available, else local state
+  const sourceColumns = columnRegistry[`${source.spreadsheetId}_${source.gid || 0}`] || localColumns;
 
   const fetchSourceColumns = async () => {
     if (!source.spreadsheetId) {
@@ -45,7 +52,8 @@ export default function MergeSourceCard({
       const res = await fetch(`/api/sheet-metadata?spreadsheetId=${source.spreadsheetId}&gid=${source.gid || 0}`);
       const data = await res.json();
       if (res.ok && data.columns) {
-        setSourceColumns(data.columns);
+        setLocalColumns(data.columns);
+        if (onRegisterColumns) onRegisterColumns(source.spreadsheetId, source.gid || 0, data.columns);
       } else {
         setError(data.error || 'Failed to fetch columns');
       }
@@ -226,47 +234,61 @@ export default function MergeSourceCard({
           <div className="space-y-2 mt-2">
             {mappingEntries.map(([srcKey, targetVal], idx) => (
               <div key={idx} className="flex items-center gap-2">
-                {/* Source Column Input/Dropdown */}
-                <div className="w-1/2">
-                  {sourceColumns.length > 0 ? (
-                    <select
-                      className="w-full border border-gray-300 rounded p-1.5 text-xs bg-white focus:ring-purple-500"
-                      value={srcKey}
-                      onChange={(e) => updateMappingKey(srcKey, e.target.value, targetVal)}
-                    >
-                      <option value="" disabled>Select source column...</option>
-                      {sourceColumns.map(col => (
-                        <option key={col} value={col}>{col}</option>
-                      ))}
-                    </select>
-                  ) : (
+                {/* Source Column Smart Combobox */}
+                <div className="w-1/2 flex items-center gap-1">
+                  <div className="relative flex-1">
                     <input
                       type="text"
-                      className="w-full border border-gray-300 rounded p-1.5 text-xs font-mono"
+                      list={`src-cols-${source.gid}-${idx}`}
+                      className="w-full border border-gray-300 rounded p-1.5 text-xs font-mono bg-white"
                       placeholder="Source header (e.g. column_13)"
                       value={srcKey}
                       onChange={(e) => updateMappingKey(srcKey, e.target.value, targetVal)}
                     />
+                    <datalist id={`src-cols-${source.gid}-${idx}`}>
+                      {sourceColumns.map(col => (
+                        <option key={col} value={col} />
+                      ))}
+                    </datalist>
+                  </div>
+
+                  {sourceColumns.length > 0 && (
+                    <select
+                      className="border border-gray-200 rounded p-1.5 text-xs bg-gray-50 text-gray-600 max-w-[100px] truncate"
+                      value=""
+                      onChange={(e) => {
+                        if (e.target.value) {
+                          updateMappingKey(srcKey, e.target.value, targetVal);
+                        }
+                      }}
+                    >
+                      <option value="" disabled>Pick...</option>
+                      {sourceColumns.map(col => (
+                        <option key={col} value={col}>{col}</option>
+                      ))}
+                    </select>
                   )}
                 </div>
 
                 <ArrowRight size={14} className="text-purple-400 shrink-0" />
 
-                {/* Target Canonical Column Input/Dropdown */}
+                {/* Target Canonical Column Smart Combobox */}
                 <div className="w-1/2 flex items-center gap-1">
-                  <input
-                    type="text"
-                    list={`target-cols-${idx}`}
-                    className="w-full border border-gray-300 rounded p-1.5 text-xs font-mono"
-                    placeholder="Target key (e.g. instruments)"
-                    value={targetVal}
-                    onChange={(e) => updateMappingVal(srcKey, e.target.value)}
-                  />
-                  <datalist id={`target-cols-${idx}`}>
-                    {targetSuggestions.map(col => (
-                      <option key={col} value={col} />
-                    ))}
-                  </datalist>
+                  <div className="relative flex-1">
+                    <input
+                      type="text"
+                      list={`target-cols-${source.gid}-${idx}`}
+                      className="w-full border border-gray-300 rounded p-1.5 text-xs font-mono bg-white"
+                      placeholder="Target key (e.g. instruments)"
+                      value={targetVal}
+                      onChange={(e) => updateMappingVal(srcKey, e.target.value)}
+                    />
+                    <datalist id={`target-cols-${source.gid}-${idx}`}>
+                      {targetSuggestions.map(col => (
+                        <option key={col} value={col} />
+                      ))}
+                    </datalist>
+                  </div>
 
                   <button
                     type="button"

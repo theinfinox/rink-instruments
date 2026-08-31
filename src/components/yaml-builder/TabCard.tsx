@@ -1,19 +1,32 @@
 import React, { useState } from 'react';
 import Tooltip from './Tooltip';
 import { TabConfig } from './types';
-import { Loader2, Plus } from 'lucide-react';
+import { Loader2, Plus, Sparkles } from 'lucide-react';
 import MergeSourceCard from './MergeSourceCard';
 
-export default function TabCard({ tab, spreadsheetId, onChange, onRemove, onColumnsFetched }: { 
+export default function TabCard({ 
+  tab, 
+  spreadsheetId, 
+  columnRegistry = {},
+  onRegisterColumns,
+  onChange, 
+  onRemove, 
+  onColumnsFetched 
+}: { 
   tab: TabConfig, 
   spreadsheetId: string, 
+  columnRegistry?: Record<string, string[]>,
+  onRegisterColumns?: (sheetId: string, gid: number | string, cols: string[]) => void,
   onChange: (t: TabConfig) => void, 
   onRemove: () => void,
   onColumnsFetched?: (cols: string[]) => void
 }) {
-  const [availableColumns, setAvailableColumns] = useState<string[]>([]);
+  const [localColumns, setLocalColumns] = useState<string[]>([]);
   const [isFetching, setIsFetching] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Read from global column registry if available, else fall back to local state
+  const tabColumns = columnRegistry[`${spreadsheetId}_${tab.gid || 0}`] || localColumns;
 
   const fetchColumns = async () => {
     if (!spreadsheetId) {
@@ -26,8 +39,9 @@ export default function TabCard({ tab, spreadsheetId, onChange, onRemove, onColu
       const res = await fetch(`/api/sheet-metadata?spreadsheetId=${spreadsheetId}&gid=${tab.gid || 0}`);
       const data = await res.json();
       if (res.ok && data.columns) {
-        setAvailableColumns(data.columns);
+        setLocalColumns(data.columns);
         if (onColumnsFetched) onColumnsFetched(data.columns);
+        if (onRegisterColumns) onRegisterColumns(spreadsheetId, tab.gid || 0, data.columns);
       } else {
         setError(data.error || 'Failed to fetch columns');
       }
@@ -42,66 +56,102 @@ export default function TabCard({ tab, spreadsheetId, onChange, onRemove, onColu
     label: string, 
     tooltip: string, 
     values: string[] | undefined, 
-    onUpdate: (newVals: string[] | undefined) => void
+    onUpdate: (newVals: string[] | undefined) => void,
+    fieldId: string
   ) => {
     const currentVals = Array.isArray(values) ? values : (values ? [(values as string)] : []);
     
     return (
-      <div>
-        <label className="flex items-center text-xs font-medium text-gray-700 mb-1">
+      <div className="space-y-1.5">
+        <label className="flex items-center text-xs font-medium text-gray-700">
           {label} <Tooltip text={tooltip} />
         </label>
         
-        {availableColumns.length > 0 ? (
-          <div className="space-y-2">
-            <select 
-              className="block w-full truncate border border-gray-300 rounded p-1.5 text-sm focus:ring-blue-500 focus:border-blue-500 bg-white"
+        <div className="flex items-center gap-2">
+          {/* Smart Combobox */}
+          <div className="relative flex-1">
+            <input 
+              type="text" 
+              list={`list-${tab.gid}-${fieldId}`}
+              className="block w-full border border-gray-300 rounded p-1.5 text-xs bg-white focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 font-mono"
+              placeholder="+ Type or pick column to add..."
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  const target = e.currentTarget;
+                  const val = target.value.trim();
+                  if (val && !currentVals.includes(val)) {
+                    onUpdate([...currentVals, val]);
+                    target.value = '';
+                  }
+                }
+              }}
               onChange={(e) => {
-                if (!e.target.value) return;
-                if (!currentVals.includes(e.target.value)) {
-                  onUpdate([...currentVals, e.target.value]);
+                const val = e.target.value.trim();
+                // Auto-add if exact match selected from datalist
+                if (tabColumns.includes(val) && !currentVals.includes(val)) {
+                  onUpdate([...currentVals, val]);
+                  e.target.value = '';
+                }
+              }}
+            />
+            <datalist id={`list-${tab.gid}-${fieldId}`}>
+              {tabColumns.map(col => (
+                <option key={col} value={col} disabled={currentVals.includes(col)} />
+              ))}
+            </datalist>
+          </div>
+
+          {tabColumns.length > 0 && (
+            <select
+              className="border border-gray-300 rounded p-1.5 text-xs bg-gray-50 text-gray-700 hover:bg-gray-100 cursor-pointer max-w-[150px] truncate"
+              onChange={(e) => {
+                const val = e.target.value;
+                if (val && !currentVals.includes(val)) {
+                  onUpdate([...currentVals, val]);
                 }
                 e.target.value = '';
               }}
               defaultValue=""
             >
-              <option value="" disabled>+ Select column...</option>
-              {availableColumns.map(col => (
+              <option value="" disabled>+ Dropdown...</option>
+              {tabColumns.map(col => (
                 <option key={col} value={col} disabled={currentVals.includes(col)}>{col}</option>
               ))}
             </select>
-            <div className="flex flex-wrap gap-1">
-              {currentVals.map(val => (
-                <span key={val} className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
-                  {val}
-                  <button type="button" onClick={() => {
+          )}
+        </div>
+
+        {/* Selected Chips */}
+        {currentVals.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 pt-1">
+            {currentVals.map(val => (
+              <span key={val} className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-mono font-medium bg-blue-100 text-blue-800 border border-blue-200">
+                {val}
+                <button 
+                  type="button" 
+                  onClick={() => {
                     const newVals = currentVals.filter(v => v !== val);
                     onUpdate(newVals.length > 0 ? newVals : undefined);
-                  }} className="ml-1 text-blue-500 hover:text-blue-700 focus:outline-none">✕</button>
-                </span>
-              ))}
-            </div>
+                  }} 
+                  className="text-blue-500 hover:text-blue-700 font-bold focus:outline-none cursor-pointer"
+                >
+                  ✕
+                </button>
+              </span>
+            ))}
           </div>
-        ) : (
-          <input 
-            type="text" 
-            className="block w-full border border-gray-300 rounded p-1.5 text-sm focus:ring-blue-500 focus:border-blue-500"
-            placeholder="comma, separated, columns"
-            value={currentVals.join(', ')}
-            onChange={(e) => {
-              const val = e.target.value;
-              onUpdate(val ? val.split(',').map(s => s.trim()) : undefined);
-            }}
-          />
         )}
       </div>
     );
   };
+
   return (
-    <div className="bg-gray-50 p-4 rounded-md border border-gray-200 mt-4 relative">
+    <div className="bg-gray-50 p-4 rounded-md border border-gray-200 mt-4 relative transition-all">
       <button 
+        type="button"
         onClick={onRemove}
-        className="absolute top-4 right-4 text-red-500 hover:text-red-700 text-sm font-medium"
+        className="absolute top-4 right-4 text-red-500 hover:text-red-700 text-xs font-medium cursor-pointer"
       >
         Remove Tab
       </button>
@@ -114,7 +164,7 @@ export default function TabCard({ tab, spreadsheetId, onChange, onRemove, onColu
           </label>
           <input 
             type="text" 
-            className="mt-1 block w-full border border-gray-300 rounded p-1.5 text-sm transition-colors focus:ring-blue-500 focus:border-blue-500"
+            className="mt-1 block w-full border border-gray-300 rounded p-1.5 text-sm bg-white transition-colors focus:ring-blue-500 focus:border-blue-500"
             value={tab.name}
             onChange={(e) => onChange({...tab, name: e.target.value})}
             required
@@ -129,21 +179,24 @@ export default function TabCard({ tab, spreadsheetId, onChange, onRemove, onColu
           <div className="flex mt-1 gap-2">
             <input 
               type="number" 
-              className="block w-full border border-gray-300 rounded p-1.5 text-sm font-mono transition-colors focus:ring-blue-500 focus:border-blue-500"
+              className="block w-full border border-gray-300 rounded p-1.5 text-sm font-mono bg-white transition-colors focus:ring-blue-500 focus:border-blue-500"
               value={tab.gid}
               onChange={(e) => onChange({...tab, gid: parseInt(e.target.value) || 0})}
               required
             />
             <button
+              type="button"
               onClick={fetchColumns}
               disabled={isFetching}
-              className="whitespace-nowrap flex items-center gap-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3 rounded border border-indigo-200 text-xs font-medium transition-colors"
+              className="whitespace-nowrap flex items-center gap-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3 rounded border border-indigo-200 text-xs font-medium transition-colors cursor-pointer"
             >
               {isFetching ? <Loader2 className="animate-spin" size={14} /> : 'Fetch Columns'}
             </button>
           </div>
           {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
-          {availableColumns.length > 0 && <p className="text-xs text-green-600 mt-1">✓ Loaded {availableColumns.length} columns</p>}
+          {tabColumns.length > 0 && (
+            <p className="text-xs text-green-700 font-medium mt-1">✓ Loaded {tabColumns.length} columns</p>
+          )}
         </div>
       </div>
 
@@ -173,12 +226,12 @@ export default function TabCard({ tab, spreadsheetId, onChange, onRemove, onColu
         </div>
 
         {/* Exclude Columns */}
-        {renderMultiSelect('Exclude Columns', 'Comma-separated column headers to completely hide from the public API (e.g. internal_notes, pricing)', tab.excludeColumns, (v) => onChange({...tab, excludeColumns: v}))}
+        {renderMultiSelect('Exclude Columns', 'Column headers to completely hide from the public API (e.g. internal_notes, pricing)', tab.excludeColumns, (v) => onChange({...tab, excludeColumns: v}), 'exclude-cols')}
 
         {/* Image Columns */}
-        {renderMultiSelect('Image Columns', 'Comma-separated column headers that contain Google Drive Image Links. The system will auto-convert them to webp images.', Array.isArray(tab.imageColumns) ? tab.imageColumns : (tab.imageColumns ? [tab.imageColumns as string] : undefined), (v) => onChange({...tab, imageColumns: v}))}
+        {renderMultiSelect('Image Columns', 'Column headers containing Google Drive image links to auto-convert to WebP.', Array.isArray(tab.imageColumns) ? tab.imageColumns : (tab.imageColumns ? [tab.imageColumns as string] : undefined), (v) => onChange({...tab, imageColumns: v}), 'img-cols')}
 
-        {/* Exclude Rows Where */}
+        {/* Exclude Rows Where (Smart Combobox) */}
         <div className="border border-orange-100 bg-orange-50/30 p-3 rounded-md mt-2 transition-all">
           <div className="flex items-center justify-between mb-2">
             <label className="flex items-center text-xs font-bold text-orange-900">
@@ -186,11 +239,12 @@ export default function TabCard({ tab, spreadsheetId, onChange, onRemove, onColu
               <Tooltip text="Skip importing rows if a specific column matches a specific value." />
             </label>
             <button 
+              type="button"
               onClick={() => {
                 const newRules = [...(tab.excludeRowsWhere || []), { column: '', equals: '' }];
                 onChange({...tab, excludeRowsWhere: newRules});
               }}
-              className="text-xs bg-orange-100 hover:bg-orange-200 text-orange-800 px-2 py-1 rounded"
+              className="text-xs bg-orange-100 hover:bg-orange-200 text-orange-800 px-2 py-1 rounded font-medium cursor-pointer"
             >
               + Add Rule
             </button>
@@ -198,24 +252,12 @@ export default function TabCard({ tab, spreadsheetId, onChange, onRemove, onColu
           
           {tab.excludeRowsWhere?.map((rule, idx) => (
             <div key={idx} className="flex items-center gap-2 mt-2">
-              {availableColumns.length > 0 ? (
-                <select 
-                  className="w-1/2 truncate border border-orange-200 rounded p-1.5 text-sm bg-white"
-                  value={rule.column}
-                  onChange={(e) => {
-                    const newRules = [...tab.excludeRowsWhere!];
-                    newRules[idx] = { ...newRules[idx], column: e.target.value };
-                    onChange({...tab, excludeRowsWhere: newRules});
-                  }}
-                >
-                  <option value="" disabled>Select column...</option>
-                  {availableColumns.map(col => <option key={col} value={col}>{col}</option>)}
-                </select>
-              ) : (
+              <div className="w-1/2">
                 <input 
                   type="text"
+                  list={`exclude-rule-cols-${tab.gid}-${idx}`}
                   placeholder="Column (e.g. status)"
-                  className="w-1/2 border border-orange-200 rounded p-1.5 text-sm"
+                  className="w-full border border-orange-200 rounded p-1.5 text-xs bg-white font-mono"
                   value={rule.column}
                   onChange={(e) => {
                     const newRules = [...tab.excludeRowsWhere!];
@@ -223,12 +265,17 @@ export default function TabCard({ tab, spreadsheetId, onChange, onRemove, onColu
                     onChange({...tab, excludeRowsWhere: newRules});
                   }}
                 />
-              )}
+                <datalist id={`exclude-rule-cols-${tab.gid}-${idx}`}>
+                  {tabColumns.map(col => <option key={col} value={col} />)}
+                </datalist>
+              </div>
+
               <span className="text-xs text-gray-500 font-mono">==</span>
+
               <input 
                 type="text"
                 placeholder="Value (e.g. draft)"
-                className="w-1/2 border border-orange-200 rounded p-1.5 text-sm"
+                className="w-1/2 border border-orange-200 rounded p-1.5 text-xs bg-white"
                 value={rule.equals}
                 onChange={(e) => {
                   const newRules = [...tab.excludeRowsWhere!];
@@ -237,18 +284,19 @@ export default function TabCard({ tab, spreadsheetId, onChange, onRemove, onColu
                 }}
               />
               <button 
+                type="button"
                 onClick={() => {
                   const newRules = [...tab.excludeRowsWhere!];
                   newRules.splice(idx, 1);
                   onChange({...tab, excludeRowsWhere: newRules.length > 0 ? newRules : undefined});
                 }}
-                className="text-red-400 hover:text-red-600"
+                className="text-red-400 hover:text-red-600 p-1 cursor-pointer"
               >✕</button>
             </div>
           ))}
         </div>
 
-        {/* Split Columns */}
+        {/* Split Columns (Smart Combobox) */}
         <div className="border border-blue-100 bg-blue-50/30 p-3 rounded-md mt-2 transition-all">
           <div className="flex items-center justify-between mb-2">
             <label className="flex items-center text-xs font-bold text-blue-900">
@@ -256,11 +304,12 @@ export default function TabCard({ tab, spreadsheetId, onChange, onRemove, onColu
               <Tooltip text="Convert a comma-separated string in a cell into a real JSON array." />
             </label>
             <button 
+              type="button"
               onClick={() => {
                 const newSplit = [...(tab.splitColumns || []), { column: '', delimiter: ',' }];
                 onChange({...tab, splitColumns: newSplit});
               }}
-              className="text-xs bg-blue-100 hover:bg-blue-200 text-blue-800 px-2 py-1 rounded"
+              className="text-xs bg-blue-100 hover:bg-blue-200 text-blue-800 px-2 py-1 rounded font-medium cursor-pointer"
             >
               + Add Split
             </button>
@@ -268,24 +317,12 @@ export default function TabCard({ tab, spreadsheetId, onChange, onRemove, onColu
           
           {tab.splitColumns?.map((split, idx) => (
             <div key={idx} className="flex items-center gap-2 mt-2">
-              {availableColumns.length > 0 ? (
-                <select 
-                  className="w-2/3 truncate border border-blue-200 rounded p-1.5 text-sm bg-white"
-                  value={split.column}
-                  onChange={(e) => {
-                    const newSplit = [...tab.splitColumns!];
-                    newSplit[idx] = { ...newSplit[idx], column: e.target.value };
-                    onChange({...tab, splitColumns: newSplit});
-                  }}
-                >
-                  <option value="" disabled>Select column...</option>
-                  {availableColumns.map(col => <option key={col} value={col}>{col}</option>)}
-                </select>
-              ) : (
+              <div className="w-2/3">
                 <input 
                   type="text"
+                  list={`split-rule-cols-${tab.gid}-${idx}`}
                   placeholder="Column (e.g. tags)"
-                  className="w-2/3 border border-blue-200 rounded p-1.5 text-sm"
+                  className="w-full border border-blue-200 rounded p-1.5 text-xs bg-white font-mono"
                   value={split.column}
                   onChange={(e) => {
                     const newSplit = [...tab.splitColumns!];
@@ -293,11 +330,15 @@ export default function TabCard({ tab, spreadsheetId, onChange, onRemove, onColu
                     onChange({...tab, splitColumns: newSplit});
                   }}
                 />
-              )}
+                <datalist id={`split-rule-cols-${tab.gid}-${idx}`}>
+                  {tabColumns.map(col => <option key={col} value={col} />)}
+                </datalist>
+              </div>
+
               <input 
                 type="text"
-                placeholder="Delimiter (e.g. ,)"
-                className="w-1/3 border border-blue-200 rounded p-1.5 text-sm font-mono text-center"
+                placeholder="Delimiter (,)"
+                className="w-1/3 border border-blue-200 rounded p-1.5 text-xs font-mono text-center bg-white"
                 value={split.delimiter}
                 onChange={(e) => {
                   const newSplit = [...tab.splitColumns!];
@@ -306,12 +347,13 @@ export default function TabCard({ tab, spreadsheetId, onChange, onRemove, onColu
                 }}
               />
               <button 
+                type="button"
                 onClick={() => {
                   const newSplit = [...tab.splitColumns!];
                   newSplit.splice(idx, 1);
                   onChange({...tab, splitColumns: newSplit.length > 0 ? newSplit : undefined});
                 }}
-                className="text-red-400 hover:text-red-600"
+                className="text-red-400 hover:text-red-600 p-1 cursor-pointer"
               >✕</button>
             </div>
           ))}
@@ -330,7 +372,6 @@ export default function TabCard({ tab, spreadsheetId, onChange, onRemove, onColu
               checked={tab.aiSearch === undefined || tab.aiSearch.enabled !== false}
               onChange={(e) => {
                 if (e.target.checked) {
-                  // If they check it, we can either set true, or just clear the aiSearch object to use default
                   const newAiSearch = tab.aiSearch ? { ...tab.aiSearch, enabled: true } : { enabled: true };
                   onChange({...tab, aiSearch: newAiSearch});
                 } else {
@@ -348,15 +389,15 @@ export default function TabCard({ tab, spreadsheetId, onChange, onRemove, onColu
                   titleColumns: v
                 };
                 onChange({...tab, aiSearch: newAiSearch});
-              })}
+              }, 'ai-title')}
               
-              {renderMultiSelect('Metadata Columns', 'Exposed as key-value pairs.', tab.aiSearch?.metadataColumns, (v) => {
+              {renderMultiSelect('Metadata Columns', 'Exposed as key-value pairs for LLMs.', tab.aiSearch?.metadataColumns, (v) => {
                 const newAiSearch = { 
                   ...(tab.aiSearch || { enabled: true }), 
                   metadataColumns: v
                 };
                 onChange({...tab, aiSearch: newAiSearch});
-              })}
+              }, 'ai-meta')}
             </div>
           )}
         </div>
@@ -389,7 +430,7 @@ export default function TabCard({ tab, spreadsheetId, onChange, onRemove, onColu
                 <label className="block text-xs font-medium text-gray-700 mb-1">Target Field</label>
                 <input 
                   type="text" 
-                  className="w-full border border-gray-300 rounded p-1.5 text-sm"
+                  className="w-full border border-gray-300 rounded p-1.5 text-xs bg-white font-mono"
                   value={tab.autoGenerateId.field || 'id'}
                   onChange={(e) => {
                     onChange({...tab, autoGenerateId: { ...tab.autoGenerateId!, field: e.target.value }});
@@ -401,7 +442,7 @@ export default function TabCard({ tab, spreadsheetId, onChange, onRemove, onColu
                   <label className="block text-xs font-medium text-gray-700 mb-1">Prefix</label>
                   <input 
                     type="text" 
-                    className="w-full border border-gray-300 rounded p-1.5 text-sm"
+                    className="w-full border border-gray-300 rounded p-1.5 text-xs bg-white font-mono"
                     value={tab.autoGenerateId.prefix}
                     onChange={(e) => {
                       onChange({...tab, autoGenerateId: { ...tab.autoGenerateId!, prefix: e.target.value }});
@@ -412,7 +453,7 @@ export default function TabCard({ tab, spreadsheetId, onChange, onRemove, onColu
                   <label className="block text-xs font-medium text-gray-700 mb-1">Starting Number</label>
                   <input 
                     type="number" 
-                    className="w-full border border-gray-300 rounded p-1.5 text-sm"
+                    className="w-full border border-gray-300 rounded p-1.5 text-xs bg-white font-mono"
                     value={tab.autoGenerateId.start}
                     onChange={(e) => {
                       onChange({...tab, autoGenerateId: { ...tab.autoGenerateId!, start: parseInt(e.target.value) || 0 }});
@@ -464,7 +505,9 @@ export default function TabCard({ tab, spreadsheetId, onChange, onRemove, onColu
                 <MergeSourceCard
                   key={sIdx}
                   source={source}
-                  primaryColumns={availableColumns}
+                  primaryColumns={tabColumns}
+                  columnRegistry={columnRegistry}
+                  onRegisterColumns={onRegisterColumns}
                   onChange={(updatedSource) => {
                     const newSources = [...tab.mergeSources!];
                     newSources[sIdx] = updatedSource;
