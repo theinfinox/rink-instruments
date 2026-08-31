@@ -25,8 +25,9 @@ export default async function CategoriesPage() {
         const rawTags = Array.isArray(inst.tag) ? inst.tag : (inst.tag ? inst.tag.split(',') : []);
         rawTags.forEach((t: string) => {
           const name = t.trim();
-          if (!name) return;
-          const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+          if (!name || name.length > 80) return;
+          const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+          if (!slug || slug.length > 80) return;
           if (!categoryMap.has(slug)) {
             categoryMap.set(slug, { slug, name, tech_count: 0, icon: 'cpu', color: 'blue' });
           }

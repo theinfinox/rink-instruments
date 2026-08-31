@@ -9,7 +9,7 @@ export default function SheetCard({
   sheet, 
   onChange, 
   onRemove,
-  isExpanded = true,
+  isExpanded = false,
   onToggleExpand
 }: { 
   sheet: SheetConfig, 

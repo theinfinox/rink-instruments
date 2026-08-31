@@ -20,8 +20,9 @@ async function getCategoryData() {
     const rawTags = Array.isArray(inst.tag) ? inst.tag : (inst.tag ? inst.tag.split(',') : []);
     rawTags.forEach((t: string) => {
       const name = t.trim();
-      if (!name) return;
-      const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      if (!name || name.length > 80) return;
+      const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+      if (!slug || slug.length > 80) return;
       if (!categoryMap.has(slug)) {
         categoryMap.set(slug, { slug, name, tech_count: 0, color: '#1B4D9B' }); // default color
       }
@@ -68,7 +69,12 @@ export default async function CategoryDetailPage({ params }: Props) {
 
   const categoryInstruments = instruments.filter(inst => {
     const rawTags = Array.isArray(inst.tag) ? inst.tag : (inst.tag ? inst.tag.split(',') : []);
-    return rawTags.some((t: string) => t.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-') === slug);
+    return rawTags.some((t: string) => {
+      const name = t.trim();
+      if (!name || name.length > 80) return false;
+      const tagSlug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+      return tagSlug === slug;
+    });
   });
 
   const categoryViewModels = categoryInstruments.map(inst => toInstrumentViewModel(inst, repo));

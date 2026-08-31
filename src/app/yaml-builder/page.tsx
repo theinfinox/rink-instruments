@@ -17,8 +17,8 @@ export default function YamlBuilderPage() {
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
-  // UX State
-  const [expandedSheetIndex, setExpandedSheetIndex] = useState<number>(0);
+  // UX State: All sheets closed by default (-1)
+  const [expandedSheetIndex, setExpandedSheetIndex] = useState<number>(-1);
   const endOfListRef = useRef<HTMLDivElement>(null);
 
   // Parse YAML to JS Object
