@@ -1,9 +1,11 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
+import Link from 'next/link';
 import * as yaml from 'js-yaml';
-import { Copy, Check, Plus, Upload } from 'lucide-react';
+import { Copy, Check, Plus, Upload, BookOpen, Printer, FileText, Code2, Sparkles } from 'lucide-react';
 import SheetCard from '@/components/yaml-builder/SheetCard';
+import PipelineManualView from '@/components/yaml-builder/PipelineManualView';
 import { RinkConfig, SheetConfig } from '@/components/yaml-builder/types';
 
 const defaultConfig: RinkConfig = {
@@ -16,6 +18,7 @@ export default function YamlBuilderPage() {
   const [config, setConfig] = useState<RinkConfig>(defaultConfig);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [activeRightTab, setActiveRightTab] = useState<'yaml' | 'manual'>('yaml');
 
   // UX State: All sheets closed by default (-1)
   const [expandedSheetIndex, setExpandedSheetIndex] = useState<number>(-1);
@@ -85,7 +88,15 @@ export default function YamlBuilderPage() {
         {/* Left Side: Visual Editor */}
         <div className="flex-1 min-w-0 space-y-6">
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 transition-all hover:shadow-md">
-            <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">RINK Config Builder</h1>
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-2">
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">RINK Config Builder</h1>
+              <Link 
+                href="/yaml-builder/docs"
+                className="flex items-center gap-1.5 text-xs font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-3 py-1.5 rounded-lg transition-all shadow-xs cursor-pointer"
+              >
+                <BookOpen size={14} /> Manual & Guide
+              </Link>
+            </div>
             <p className="text-gray-600 mb-4 flex items-center text-sm">
               <Upload size={16} className="mr-2 text-gray-400" />
               Import your existing <code className="bg-gray-100 text-blue-600 px-1.5 py-0.5 ml-1 mr-1 rounded text-xs font-semibold">sheets.yaml</code> or build one from scratch.
@@ -145,31 +156,75 @@ export default function YamlBuilderPage() {
           </div>
         </div>
 
-        {/* Right Side: YAML Preview */}
-        <div className="w-full lg:w-1/3 flex flex-col h-[calc(100vh-4rem)] sticky top-8">
-          <div className="flex items-center justify-between mb-4 bg-gray-900 p-3 rounded-t-xl border border-gray-800">
-            <h2 className="text-lg font-bold text-white ml-2 flex items-center">
-              Generated YAML
-            </h2>
-            <button 
-              onClick={handleCopy}
-              className={`flex items-center text-sm px-4 py-1.5 rounded-lg transition-all font-medium cursor-pointer ${
-                copied 
-                  ? 'bg-green-500 text-white shadow-[0_0_10px_rgba(34,197,94,0.4)]' 
-                  : 'bg-white/10 hover:bg-white/20 text-gray-200 hover:text-white'
-              }`}
-            >
-              {copied ? (
-                <><Check size={16} className="mr-1.5" /> Copied!</>
-              ) : (
-                <><Copy size={16} className="mr-1.5" /> Copy Code</>
-              )}
-            </button>
+        {/* Right Side: YAML Preview & Dynamic Architecture Manual */}
+        <div className={`w-full ${activeRightTab === 'manual' ? 'lg:w-1/2' : 'lg:w-5/12'} flex flex-col h-[calc(100vh-4rem)] sticky top-8 transition-all duration-300`}>
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-2 bg-gray-900 p-2.5 rounded-t-xl border border-gray-800">
+            {/* View Mode Switcher */}
+            <div className="flex items-center bg-gray-800/80 p-0.5 rounded-lg border border-gray-700">
+              <button
+                type="button"
+                onClick={() => setActiveRightTab('yaml')}
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer ${
+                  activeRightTab === 'yaml'
+                    ? 'bg-blue-600 text-white shadow-sm'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                <Code2 size={13} /> YAML Code
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveRightTab('manual')}
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer ${
+                  activeRightTab === 'manual'
+                    ? 'bg-indigo-600 text-white shadow-sm'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                <Sparkles size={13} /> Visual Manual
+              </button>
+            </div>
+
+            {/* Action Buttons: Generate PDF & Copy Code */}
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => window.print()}
+                title="Print or Save as PDF"
+                className="flex items-center gap-1 bg-white/10 hover:bg-white/20 text-gray-200 hover:text-white text-xs px-2.5 py-1.5 rounded-lg font-medium transition-all cursor-pointer"
+              >
+                <Printer size={13} />
+                <span className="hidden sm:inline">Generate PDF</span>
+              </button>
+
+              <button 
+                type="button"
+                onClick={handleCopy}
+                className={`flex items-center text-xs px-3 py-1.5 rounded-lg transition-all font-medium cursor-pointer ${
+                  copied 
+                    ? 'bg-green-500 text-white shadow-[0_0_10px_rgba(34,197,94,0.4)]' 
+                    : 'bg-blue-600 hover:bg-blue-700 text-white'
+                }`}
+              >
+                {copied ? (
+                  <><Check size={13} className="mr-1" /> Copied!</>
+                ) : (
+                  <><Copy size={13} className="mr-1" /> Copy Code</>
+                )}
+              </button>
+            </div>
           </div>
+
           <div className="flex-1 bg-[#1e1e2e] rounded-b-xl p-5 overflow-auto shadow-2xl border border-t-0 border-gray-800">
-            <pre className="text-green-400 font-mono text-sm whitespace-pre-wrap break-all leading-relaxed">
-              {generatedYaml}
-            </pre>
+            {activeRightTab === 'yaml' ? (
+              <pre className="text-green-400 font-mono text-sm whitespace-pre-wrap break-all leading-relaxed">
+                {generatedYaml}
+              </pre>
+            ) : (
+              <div className="text-gray-900 bg-gray-50/50 p-4 rounded-xl">
+                <PipelineManualView config={config} />
+              </div>
+            )}
           </div>
         </div>
 
