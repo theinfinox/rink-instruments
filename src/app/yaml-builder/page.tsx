@@ -5,7 +5,7 @@ import Link from 'next/link';
 import * as yaml from 'js-yaml';
 import { Copy, Check, Plus, Upload, BookOpen, Printer, FileText, Code2, Sparkles } from 'lucide-react';
 import SheetCard from '@/components/yaml-builder/SheetCard';
-import PipelineManualView from '@/components/yaml-builder/PipelineManualView';
+import PipelineManualView, { printVisualManualOnly } from '@/components/yaml-builder/PipelineManualView';
 import { RinkConfig, SheetConfig } from '@/components/yaml-builder/types';
 
 const defaultConfig: RinkConfig = {
@@ -189,8 +189,8 @@ export default function YamlBuilderPage() {
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                onClick={() => window.print()}
-                title="Print or Save as PDF"
+                onClick={() => printVisualManualOnly('visual-manual-print-container')}
+                title="Generate PDF of Visual Manual"
                 className="flex items-center gap-1 bg-white/10 hover:bg-white/20 text-gray-200 hover:text-white text-xs px-2.5 py-1.5 rounded-lg font-medium transition-all cursor-pointer"
               >
                 <Printer size={13} />
@@ -216,15 +216,17 @@ export default function YamlBuilderPage() {
           </div>
 
           <div className="flex-1 bg-[#1e1e2e] rounded-b-xl p-5 overflow-auto shadow-2xl border border-t-0 border-gray-800">
-            {activeRightTab === 'yaml' ? (
+            <div className={activeRightTab === 'yaml' ? 'block' : 'hidden'}>
               <pre className="text-green-400 font-mono text-sm whitespace-pre-wrap break-all leading-relaxed">
                 {generatedYaml}
               </pre>
-            ) : (
+            </div>
+            
+            <div className={activeRightTab === 'manual' ? 'block' : 'hidden'}>
               <div className="text-gray-900 bg-gray-50/50 p-4 rounded-xl">
                 <PipelineManualView config={config} />
               </div>
-            )}
+            </div>
           </div>
         </div>
 
