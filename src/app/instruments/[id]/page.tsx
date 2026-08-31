@@ -120,8 +120,17 @@ export default async function TechnologyDetailPage({ params }: { params: Promise
               <Link href="/" className="hover:text-[#0A2164] transition-colors">Home</Link>
               <ChevronRight className="w-3 h-3 text-slate-300" />
               <Link href="/instruments" className="hover:text-[#0A2164] transition-colors">Instruments</Link>
-              <ChevronRight className="w-3 h-3 text-slate-300" />
-              <Link href={`/sectors/${sectorSlug}`} className="hover:text-[#0A2164] transition-colors">{vm.location.district || 'General'}</Link>
+              {vm.location.district && (
+                <>
+                  <ChevronRight className="w-3 h-3 text-slate-300" />
+                  <Link 
+                    href={`/instruments?district=${encodeURIComponent(vm.location.district)}`} 
+                    className="hover:text-[#0A2164] transition-colors"
+                  >
+                    {vm.location.district}
+                  </Link>
+                </>
+              )}
               <ChevronRight className="w-3 h-3 text-slate-300" />
               <span className="text-slate-900 font-medium truncate max-w-[200px] sm:max-w-sm">{vm.displayTitle}</span>
             </nav>

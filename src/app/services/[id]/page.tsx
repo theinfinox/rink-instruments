@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Building2, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Building2, ExternalLink, ChevronRight } from 'lucide-react';
 import { fetchDataset } from '@/lib/dataFetcher';
 import { Service } from '@/types/service';
 
@@ -39,7 +39,26 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
       <div className="max-w-4xl mx-auto px-4 py-12">
-        <Link href="/services/list" className="inline-flex items-center text-sm font-medium text-slate-500 hover:text-[#0A2164] transition-colors mb-8">
+        <nav className="flex items-center gap-1.5 text-xs text-slate-500 flex-wrap mb-4">
+          <Link href="/" className="hover:text-[#0A2164] transition-colors">Home</Link>
+          <ChevronRight className="w-3 h-3 text-slate-300" />
+          <Link href="/services/list" className="hover:text-[#0A2164] transition-colors">Services</Link>
+          {service.category && (
+            <>
+              <ChevronRight className="w-3 h-3 text-slate-300" />
+              <Link 
+                href={`/services/list?category=${encodeURIComponent(service.category)}`}
+                className="hover:text-[#0A2164] transition-colors"
+              >
+                {service.category}
+              </Link>
+            </>
+          )}
+          <ChevronRight className="w-3 h-3 text-slate-300" />
+          <span className="text-slate-900 font-medium truncate max-w-[200px] sm:max-w-sm">{service.serviceName}</span>
+        </nav>
+
+        <Link href="/services/list" className="inline-flex items-center text-sm font-medium text-slate-500 hover:text-[#0A2164] transition-colors mb-6">
           <ArrowLeft className="w-4 h-4 mr-1" />
           Back to Services
         </Link>

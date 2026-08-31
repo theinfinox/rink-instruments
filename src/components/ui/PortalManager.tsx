@@ -82,29 +82,32 @@ export default function PortalManager({ instruments, institutionList = [], mouLi
     setView(initialView);
   }, [initialView]);
 
-  // Reset loading transition after App Router navigation completes
+  // Handle browser Back / Forward buttons for soft navigation
   useEffect(() => {
-    if (isTransitioning) {
-      const timer = setTimeout(() => {
-        setIsTransitioning(false);
-      }, 200);
-      return () => clearTimeout(timer);
-    }
-  }, [pathname, isTransitioning]);
+    const handlePopState = () => {
+      const currentPath = window.location.pathname;
+      if (currentPath === '/services') {
+        setView('services');
+      } else if (currentPath === '/') {
+        setView('instruments');
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   const handleViewChange = (newView: PortalView) => {
-    if (newView === view || isTransitioning) return;
+    if (newView === view) return;
     
-    // 1. Update view state immediately for dynamic toggle feedback
+    // 1. Update view state immediately for instantaneous toggle feedback
     setView(newView); 
-    // 2. Start loading overlay fade-in
-    setIsTransitioning(true);
-
-    // 3. Wait for overlay fade-in animation, then trigger App Router navigation
-    setTimeout(() => {
-      const targetRoute = newView === 'instruments' ? '/' : '/services';
-      router.push(targetRoute);
-    }, 300);
+    
+    // 2. Soft update browser history URL without triggering a full page remount
+    const targetRoute = newView === 'instruments' ? '/' : '/services';
+    if (typeof window !== 'undefined' && window.location.pathname !== targetRoute) {
+      window.history.pushState(null, '', targetRoute);
+    }
   };
 
   const data = useMemo(() => {
