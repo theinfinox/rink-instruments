@@ -13,6 +13,7 @@ export interface Service {
   category: string;
   sector: string;
   keywords: string[];
+  equipmentUsed?: string[];
   certifications: string;
   infrastructure: string;
   
@@ -22,6 +23,7 @@ export interface Service {
   
   // Contact & Location
   district: string;
+  address?: string;
   email: string;
   phone: string;
   
