@@ -225,6 +225,40 @@ export default function TabCard({
           </div>
         </div>
 
+        {/* Skip First Data Rows */}
+        <div className="border border-blue-100 bg-blue-50/30 p-3 rounded-md mt-2 transition-all">
+          <div className="flex items-center justify-between">
+            <div>
+              <label className="flex items-center text-xs font-bold text-blue-900">
+                Skip Initial Data Rows
+                <Tooltip text="Number of data rows to skip immediately below the header (useful for ignoring sample rows, instructional placeholders, or secondary subtitles)." />
+              </label>
+              <p className="text-[11px] text-gray-500">
+                Ignores the first N data rows from entering the compiled API.
+              </p>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <input 
+                type="number" 
+                min="0"
+                className="w-16 border border-gray-300 rounded p-1 text-xs font-mono text-center bg-white"
+                value={tab.skipFirstRows ?? 0}
+                onChange={(e) => {
+                  const val = parseInt(e.target.value);
+                  if (val > 0) {
+                    onChange({...tab, skipFirstRows: val});
+                  } else {
+                    const newTab = { ...tab };
+                    delete newTab.skipFirstRows;
+                    onChange(newTab);
+                  }
+                }}
+              />
+              <span className="text-xs text-gray-500 font-medium">rows</span>
+            </div>
+          </div>
+        </div>
+
         {/* Exclude Columns */}
         {renderMultiSelect('Exclude Columns', 'Column headers to completely hide from the public API (e.g. internal_notes, pricing)', tab.excludeColumns, (v) => onChange({...tab, excludeColumns: v}), 'exclude-cols')}
 

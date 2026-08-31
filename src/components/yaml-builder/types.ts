@@ -20,8 +20,11 @@ export interface MergeSourceConfig {
   spreadsheetId: string;
   gid: number;
   hierarchical_rows?: boolean;
+  skipFirstRows?: number;
+  onlyIncludeMapped?: boolean;
   excludeColumns?: string[];
   excludeRowsWhere?: ExcludeRowCondition[];
+  splitColumns?: SplitColumnConfig[];
   columnMapping?: Record<string, string>;
   defaults?: Record<string, string>;
   autoGenerateId?: AutoGenerateIdConfig;
@@ -32,6 +35,7 @@ export interface TabConfig {
   name: string;
   gid: number;
   hierarchical_rows?: boolean;
+  skipFirstRows?: number;
   excludeColumns?: string[];
   excludeRowsWhere?: ExcludeRowCondition[];
   splitColumns?: SplitColumnConfig[];
