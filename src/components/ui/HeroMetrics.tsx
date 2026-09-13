@@ -12,22 +12,32 @@ export default function HeroMetrics({
   totalInstruments,
   totalCategories,
   totalInstitutions,
+  totalStartups,
   totalDistricts = 14,
   context,
 }: {
   totalInstruments: number;
   totalCategories: number;
   totalInstitutions: number;
+  totalStartups?: number;
   totalDistricts?: number;
   context?: 'instruments' | 'services';
 }) {
   const isServices = context === 'services';
-  const metrics: Metric[] = [
-    { target: totalInstitutions, suffix: '+', label: isServices ? 'Startups & Providers' : 'Research Institutions' },
-    { target: totalInstruments, suffix: '+', label: isServices ? 'Available Services' : 'Available Instruments' },
-    // { target: totalCategories, suffix: '+', label: isServices ? 'Service Categories' : 'Equipment Categories' },
-    { target: totalDistricts, suffix: '+', label: 'Districts Covered' }
-  ];
+  const metrics: Metric[] = isServices
+    ? [
+        { target: totalInstitutions, suffix: '+', label: 'Startups & Providers' },
+        { target: totalInstruments, suffix: '+', label: 'Available Services' },
+        { target: totalDistricts, suffix: '+', label: 'Districts Covered' }
+      ]
+    : [
+        { target: totalInstitutions, suffix: '+', label: 'Research Institutions' },
+        ...(totalStartups !== undefined && totalStartups > 0
+          ? [{ target: totalStartups, suffix: '+', label: 'Startups' }]
+          : []),
+        { target: totalInstruments, suffix: '+', label: 'Available Instruments' },
+        { target: totalDistricts, suffix: '+', label: 'Districts Covered' }
+      ];
 
 
 function easeOutCubic(t: number): number {
@@ -94,7 +104,11 @@ function MetricCard({ target, suffix, label, run, delay }: Metric & { run: boole
       ref={ref}
       className="bg-white py-16 md:py-20 border-b border-slate-100"
     >
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 grid grid-cols-1 sm:grid-cols-3 gap-6">
+      <div className={`max-w-6xl mx-auto px-4 sm:px-6 grid gap-4 sm:gap-6 ${
+        metrics.length === 4
+          ? 'grid-cols-2 lg:grid-cols-4'
+          : 'grid-cols-1 sm:grid-cols-3'
+      }`}>
         {metrics.map((m, i) => (
           <MetricCard key={m.label} {...m} run={inView} delay={i * 150} />
         ))}

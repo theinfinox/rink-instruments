@@ -196,6 +196,7 @@ export default function PortalManager({
         totalItems: instruments.length,
         totalCategories: sectorMap.size,
         totalInstitutions: institutions.length,
+        totalStartups: startups.length,
         title: "Discover Research Instruments from Kerala's Leading Institutions",
         subtitle: "RESEARCH INNOVATION NETWORK KERALA . INSTRUMENTATION PORTAL",
         context: 'instruments' as const,
@@ -338,6 +339,7 @@ export default function PortalManager({
         totalInstruments={data.totalItems} 
         totalCategories={data.totalCategories} 
         totalInstitutions={data.totalInstitutions} 
+        totalStartups={data.totalStartups}
         totalDistricts={data.districts.length}
         context={data.context}
       />
