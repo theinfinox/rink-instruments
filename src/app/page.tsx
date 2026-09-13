@@ -24,12 +24,16 @@ export default async function HomePage() {
   );
 
   const instrumentViewModels = instrumentBundle.main_data.map(inst => toInstrumentViewModel(inst, repo));
+  const researchInstitutions = repo.getResearchInstitutions();
+  const startupInstitutions = repo.getStartupInstitutions();
 
   return (
     <PortalManager 
       instruments={instrumentViewModels} 
       institutionList={instrumentBundle.instituitiion_list}
       mouList={instrumentBundle.mou_list}
+      researchInstitutions={researchInstitutions}
+      startupInstitutions={startupInstitutions}
       services={services} 
       initialView="instruments" 
     />

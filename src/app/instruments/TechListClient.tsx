@@ -6,11 +6,10 @@ import Link from 'next/link';
 import { Sector, Institution } from '@/types';
 import TechnologyCard from '@/components/ui/TechnologyCard';
 import SmartPagination from '@/components/ui/SmartPagination';
-import { Instrument } from '@/types/instrument';
 import { InstrumentViewModel } from '@/domain/instrument/view-model';
 import SearchBar from '@/components/ui/SearchBar';
 import {
-  Filter, X, ChevronLeft, ChevronRight, SlidersHorizontal,
+  Filter, X, ChevronRight, SlidersHorizontal,
   LayoutGrid, List, Loader2
 } from 'lucide-react';
 
@@ -87,6 +86,11 @@ export default function TechListClient({
 
   const activeFilterCount = Object.values(filters).filter(v => v !== '').length;
 
+  const currentInstitution = institutions.find(
+    inst => inst.slug === filters.institution || inst.name.toLowerCase() === filters.institution.toLowerCase()
+  );
+  const institutionDisplayName = currentInstitution ? currentInstitution.name : filters.institution;
+
   return (
     <div className="min-h-screen bg-background">
 
@@ -97,6 +101,12 @@ export default function TechListClient({
             <Link href="/" className="hover:text-accent transition-colors">Home</Link>
             <ChevronRight className="w-3 h-3 text-slate-300" />
             <span className="text-text-primary font-medium">Instruments</span>
+            {filters.institution && (
+              <>
+                <ChevronRight className="w-3 h-3 text-slate-300" />
+                <span className="text-accent font-semibold">{institutionDisplayName}</span>
+              </>
+            )}
             {filters.district && (
               <>
                 <ChevronRight className="w-3 h-3 text-slate-300" />
@@ -116,10 +126,10 @@ export default function TechListClient({
           <div className="flex flex-col md:flex-row md:items-center gap-4">
             <div className="flex-1">
               <h1 className="text-xl md:text-3xl font-heading font-bold text-heading">
-                All Instruments
+                {filters.institution ? `Instruments at ${institutionDisplayName}` : 'All Instruments'}
               </h1>
               <p className="text-sm text-text-secondary mt-1">
-                Showing {total} {total === 1 ? 'instrument' : 'instruments'} from Kerala research institutions.
+                Showing {total} {total === 1 ? 'instrument' : 'instruments'} {filters.institution ? `at ${institutionDisplayName}` : 'from Kerala research institutions'}.
                 {filters.q && <span> matching &ldquo;<strong>{filters.q}</strong>&rdquo;</span>}
               </p>
             </div>

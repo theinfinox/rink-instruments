@@ -77,6 +77,12 @@ export interface Institution {
   correct_provider_key?: string;
   reason_classification?: string;
   has_verified_mou?: boolean;
+  is_partner_institute?: boolean;
+  entity_type?: 'research' | 'startup';
+  is_startup?: boolean;
+  mou_details?: string;
+  ksum_uid?: string;
+  district?: string;
 }
 
 // ── Search & Filter Types ───────────────────────────────────

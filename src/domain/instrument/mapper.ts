@@ -159,6 +159,13 @@ export function toInstrumentViewModel(
     displayTitle,
     institution: institutionName,
     institution_id: instrument.institution_id || instEntity?.institution_id,
+    institution_name: instrument.institution_name || instEntity?.name,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    institution_type: instrument.institution_type || (instEntity?.is_startup ? 'Startup' : (instrument as any).are_you_an_institution_startup),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    source_type: (instrument as any).source_type,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ksum_uid: instrument.ksum_uid || (instrument as any).ksum_uid || instEntity?.ksum_uid,
     institution_entity: instEntity || undefined,
     hasVerifiedMou,
     facility,

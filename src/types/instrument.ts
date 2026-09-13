@@ -22,4 +22,7 @@ export interface Instrument {
   tag: string | string[];
   provider_key: string;
   warnings?: string;
+  institution_type?: string;
+  ksum_uid?: string;
+  source_type?: string;
 }

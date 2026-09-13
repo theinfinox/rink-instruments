@@ -71,7 +71,7 @@ export default async function InstitutionDetailPage({ params }: Props) {
     if (institution.institution_id && inst.institution_id) {
       return inst.institution_id === institution.institution_id;
     }
-    return inst.institution_name?.toLowerCase().replace(/[^a-z0-9]+/g, '-') === slug;
+    return repo.getInstitution(inst).slug === slug;
   });
 
   const institutionViewModels = institutionInstruments.map(inst => toInstrumentViewModel(inst, repo));
@@ -104,7 +104,14 @@ export default async function InstitutionDetailPage({ params }: Props) {
               </div>
             )}
             <div>
-              <h1 className="text-lg md:text-xl font-heading font-bold text-heading leading-tight">{institution.name}</h1>
+              <div className="flex items-center gap-2">
+                <h1 className="text-lg md:text-xl font-heading font-bold text-heading leading-tight">{institution.name}</h1>
+                {institution.is_startup && (
+                  <span className="text-[10px] font-semibold px-2 py-0.5 bg-amber-50 text-amber-800 border border-amber-200 rounded">
+                    Startup
+                  </span>
+                )}
+              </div>
               <p className="text-xs text-text-secondary mt-0.5">
                 {institution.tech_count} {institution.tech_count === 1 ? 'instrument' : 'instruments'} available
               </p>

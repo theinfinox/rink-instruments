@@ -14,7 +14,12 @@ export class InstitutionRepository {
         this.byId.set(inst.institution_id, inst);
       }
       if (inst.slug) {
-        this.bySlug.set(inst.slug.toLowerCase(), inst);
+        const cleanSlug = inst.slug.toLowerCase().trim();
+        this.bySlug.set(cleanSlug, inst);
+        const strippedSlug = cleanSlug.replace(/^-+|-+$/g, '');
+        if (strippedSlug && strippedSlug !== cleanSlug) {
+          this.bySlug.set(strippedSlug, inst);
+        }
       }
       if (inst.name) {
         this.byName.set(inst.name.toLowerCase().trim(), inst);
@@ -42,7 +47,7 @@ export class InstitutionRepository {
   getBySlug(slug?: string | null): Institution | undefined {
     if (!slug) return undefined;
     const cleanSlug = slug.toLowerCase().trim();
-    return this.bySlug.get(cleanSlug);
+    return this.bySlug.get(cleanSlug) || this.bySlug.get(cleanSlug.replace(/^-+|-+$/g, ''));
   }
 
   getByName(name?: string | null): Institution | undefined {
@@ -63,7 +68,10 @@ export class InstitutionRepository {
     }
 
     const name = this.resolveDisplayName(instrument);
-    const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    const slug = name.toLowerCase().replace(/['’]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    const existing = this.getBySlug(slug) || this.getByName(name);
+    if (existing) return existing;
+
     return {
       institution_id: instrument.institution_id || `fallback-${slug}`,
       slug,
@@ -90,7 +98,9 @@ export class InstitutionRepository {
       console.warn(`[InstitutionRepository] Fallback activated for unmapped institution_id: "${instrument.institution_id}"`);
     }
 
-    return instrument.institution_name || instrument.matched_institution || 'Research Institution';
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const rawInst = instrument as any;
+    return instrument.institution_name || instrument.matched_institution || rawInst.institution || 'Research Institution';
   }
 
   getCoordinates(id?: string | null) {
@@ -133,12 +143,15 @@ export class InstitutionRepository {
       });
     }
 
+    const generateSlug = (rawName: string) =>
+      rawName.toLowerCase().replace(/['’]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+
     // 1. First populate from official institution_list array (authoritative metadata source)
     institutionList.forEach(raw => {
       const id = raw.institution_id;
-      const name = raw.institution_name || raw.matched_institution || '';
-      const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-      if (id) {
+      const name = (raw.institution_name || raw.matched_institution || '').trim();
+      const slug = generateSlug(name);
+      if (id && name) {
         institutionMap.set(id, {
           institution_id: id,
           slug,
@@ -153,45 +166,101 @@ export class InstitutionRepository {
           reason_classification: raw.reason_classification,
           logo_link: raw.logo_link,
           original_logo_link: raw.original_logo_link,
+          is_partner_institute: true,
+          entity_type: 'research',
+          is_startup: false,
         });
       }
     });
 
+    // Helper map for fast deduplication by normalized slug
+    const findExistingBySlugOrName = (slug: string, name: string) => {
+      const cleanName = name.toLowerCase().trim();
+      for (const inst of institutionMap.values()) {
+        if (inst.slug === slug || inst.name.toLowerCase().trim() === cleanName) {
+          return inst;
+        }
+      }
+      return undefined;
+    };
+
     // 2. Count instruments and add any fallback institutions present in main_data
     mainData.forEach(inst => {
       const id = inst.institution_id;
-      const name = inst.institution_name || inst.matched_institution || '';
-      const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const rawInst = inst as any;
+      const name = (inst.institution_name || inst.matched_institution || rawInst.institution || '').trim();
+      const slug = generateSlug(name);
+
+      const isStartup =
+        (inst.institution_type || rawInst.institution_type || '').toLowerCase() === 'startup' ||
+        (rawInst.are_you_an_institution_startup || '').toLowerCase() === 'startup' ||
+        (inst.source_type === 'intake_form' && (!id || !id.startsWith('INSTITUTE-')));
+      const entityType: 'research' | 'startup' = isStartup ? 'startup' : 'research';
 
       if (id) {
         if (!institutionMap.has(id)) {
-          institutionMap.set(id, {
-            institution_id: id,
-            slug,
-            name,
-            tech_count: 0,
-            has_verified_mou: mouMap.get(id) === true,
-            address: inst.address !== 'None' ? inst.address : undefined,
-            contact_email: inst.enquiry_mail !== 'None' ? inst.enquiry_mail : undefined,
-            contact_phone: inst.enquiry_contact_number !== 'None' ? inst.enquiry_contact_number : undefined,
-            website: inst.website_booking_link !== 'None' ? inst.website_booking_link : undefined,
-          });
+          if (name) {
+            institutionMap.set(id, {
+              institution_id: id,
+              slug: slug || id.toLowerCase(),
+              name,
+              tech_count: 0,
+              has_verified_mou: mouMap.get(id) === true,
+              address: inst.address !== 'None' ? inst.address : undefined,
+              contact_email: inst.enquiry_mail !== 'None' ? inst.enquiry_mail : undefined,
+              contact_phone: inst.enquiry_contact_number !== 'None' ? inst.enquiry_contact_number : undefined,
+              website: inst.website_booking_link !== 'None' ? inst.website_booking_link : undefined,
+              is_partner_institute: id.startsWith('INSTITUTE-'),
+              entity_type: entityType,
+              is_startup: isStartup,
+              ksum_uid: inst.ksum_uid,
+              district: inst.district,
+            });
+          }
         }
-        institutionMap.get(id)!.tech_count++;
+        if (institutionMap.has(id)) {
+          institutionMap.get(id)!.tech_count++;
+        }
       } else if (name) {
-        // Fallback for unassigned institution_id
-        const fallbackId = `fallback-${slug}`;
-        if (!institutionMap.has(fallbackId)) {
-          institutionMap.set(fallbackId, {
-            institution_id: fallbackId,
-            slug,
-            name,
-            tech_count: 0,
-            has_verified_mou: false,
-            address: inst.address !== 'None' ? inst.address : undefined,
-          });
+        // Check if an existing institution matches by slug or name
+        const existing = findExistingBySlugOrName(slug, name);
+        if (existing) {
+          existing.tech_count++;
+          if (isStartup) {
+            existing.entity_type = 'startup';
+            existing.is_startup = true;
+          }
+          if (inst.ksum_uid && !existing.ksum_uid) existing.ksum_uid = inst.ksum_uid;
+          if (inst.district && !existing.district) existing.district = inst.district;
+          if (inst.address && !existing.address && inst.address !== 'None') existing.address = inst.address;
+          if (inst.enquiry_mail && !existing.contact_email && inst.enquiry_mail !== 'None') existing.contact_email = inst.enquiry_mail;
+          if (inst.enquiry_contact_number && !existing.contact_phone && inst.enquiry_contact_number !== 'None') existing.contact_phone = inst.enquiry_contact_number;
+          if (inst.website_booking_link && !existing.website && inst.website_booking_link !== 'None') existing.website = inst.website_booking_link;
+        } else {
+          // Fallback for unassigned institution_id (e.g. intake form submissions)
+          const fallbackId = `fallback-${slug}`;
+          if (!institutionMap.has(fallbackId)) {
+            institutionMap.set(fallbackId, {
+              institution_id: fallbackId,
+              slug,
+              name,
+              tech_count: 0,
+              has_verified_mou: false,
+              address: inst.address !== 'None' ? inst.address : undefined,
+              is_partner_institute: false,
+              entity_type: entityType,
+              is_startup: isStartup,
+              ksum_uid: inst.ksum_uid,
+              district: inst.district,
+              contact_email: inst.enquiry_mail !== 'None' ? inst.enquiry_mail : undefined,
+              contact_phone: inst.enquiry_contact_number !== 'None' ? inst.enquiry_contact_number : undefined,
+              website: inst.website_booking_link !== 'None' ? inst.website_booking_link : undefined,
+              logo_link: rawInst.logo_link || inst.image_link,
+            });
+          }
+          institutionMap.get(fallbackId)!.tech_count++;
         }
-        institutionMap.get(fallbackId)!.tech_count++;
       }
     });
 
@@ -201,6 +270,23 @@ export class InstitutionRepository {
   }
 
   getAll(): Institution[] {
-    return Array.from(this.byId.values()).sort((a, b) => b.tech_count - a.tech_count);
+    return Array.from(this.byId.values())
+      .filter(inst => inst.name && inst.name.trim() !== '' && inst.slug && inst.slug.trim() !== '')
+      .sort((a, b) => b.tech_count - a.tech_count);
+  }
+
+  getPartnerInstitutions(): Institution[] {
+    return this.getAll()
+      .filter(inst => inst.is_partner_institute === true);
+  }
+
+  getResearchInstitutions(): Institution[] {
+    return this.getAll()
+      .filter(inst => !inst.is_startup && (inst.entity_type === 'research' || inst.is_partner_institute === true));
+  }
+
+  getStartupInstitutions(): Institution[] {
+    return this.getAll()
+      .filter(inst => inst.entity_type === 'startup' || inst.is_startup === true);
   }
 }

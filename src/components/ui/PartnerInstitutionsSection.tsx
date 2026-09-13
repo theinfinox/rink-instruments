@@ -250,7 +250,7 @@ export default function PartnerInstitutionsSection({ institutions }: Props) {
             </p>
           </div>
           <Link
-            href="/institutions"
+            href="#institutions"
             className="flex-shrink-0 flex items-center gap-1.5 text-sm font-semibold text-[#0A2164] hover:text-[#081A52] transition-colors font-sans"
             id="all-partner-institutes-link"
           >

@@ -22,6 +22,8 @@ interface PortalManagerProps {
   institutionList?: any[];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   mouList?: any[];
+  researchInstitutions?: Institution[];
+  startupInstitutions?: Institution[];
   services: Service[];
   initialView: PortalView;
 }
@@ -67,7 +69,15 @@ const SERVICE_SEARCH_CONFIG: SearchConfig = {
   ariaLabel: 'Search services',
 };
 
-export default function PortalManager({ instruments, institutionList = [], mouList = [], services, initialView }: PortalManagerProps) {
+export default function PortalManager({
+  instruments,
+  institutionList = [],
+  mouList = [],
+  researchInstitutions,
+  startupInstitutions,
+  services,
+  initialView,
+}: PortalManagerProps) {
   const [view, setView] = useState<PortalView>(initialView);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const router = useRouter();
@@ -75,7 +85,7 @@ export default function PortalManager({ instruments, institutionList = [], mouLi
 
   // Load canonical InstitutionRepository instances with official instituitiion_list dataset
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const repo = useMemo(() => InstitutionRepository.fromInstrumentData(instruments as any[], institutionList), [instruments, institutionList]);
+  const repo = useMemo(() => InstitutionRepository.fromInstrumentData(instruments as any[], institutionList, mouList), [instruments, institutionList, mouList]);
 
   // Keep view synchronized with initialView on props update / Back-Forward navigation
   useEffect(() => {
@@ -137,24 +147,43 @@ export default function PortalManager({ instruments, institutionList = [], mouLi
         }
       });
 
-      // Build MoU lookup map ONCE for the page lifecycle: O(1) lookups using institution_id
+      // Build MoU details lookup map
       const mouMap = new Map<string, boolean>();
+      const mouDetailMap = new Map<string, string>();
       if (Array.isArray(mouList)) {
         mouList.forEach((item) => {
           if (item?.institution_id && item?.verification_status === 'Verified') {
             mouMap.set(item.institution_id, true);
+            const benefit = item.ksum_benefit_type || item.ksum_discount_or_rate || item.ksum_mou_details || '';
+            if (benefit) mouDetailMap.set(item.institution_id, benefit);
           }
         });
       }
 
-      // Use Institution base objects strictly from InstitutionRepository
-      const institutions: Institution[] = repo.getAll()
+      // Use official partner institutions strictly from InstitutionRepository
+      const institutions: Institution[] = (researchInstitutions || repo.getPartnerInstitutions())
         .map(inst => ({
           ...inst,
-          tech_count: instCountMap.get(inst.institution_id || '') || 0,
-          has_verified_mou: inst.institution_id ? (mouMap.get(inst.institution_id) === true) : false,
+          entity_type: 'research' as const,
+          is_startup: false,
+          tech_count: instCountMap.get(inst.institution_id || '') || inst.tech_count || 0,
+          has_verified_mou: inst.institution_id ? (mouMap.get(inst.institution_id) === true) : (inst.has_verified_mou ?? false),
+          mou_details: inst.institution_id ? mouDetailMap.get(inst.institution_id) : undefined,
         }))
-        .filter(inst => inst.tech_count > 0)
+        .filter(inst => inst.tech_count > 0 && inst.name && inst.name.trim() !== '' && inst.slug && inst.slug.trim() !== '')
+        .sort((a, b) => b.tech_count - a.tech_count);
+
+      // Startups offering instruments natively from InstitutionRepository
+      const startups: Institution[] = (startupInstitutions || repo.getStartupInstitutions())
+        .map(inst => ({
+          ...inst,
+          entity_type: 'startup' as const,
+          is_startup: true,
+          tech_count: inst.tech_count || 0,
+          has_verified_mou: inst.institution_id ? (mouMap.get(inst.institution_id) === true) : (inst.has_verified_mou ?? false),
+          mou_details: inst.institution_id ? mouDetailMap.get(inst.institution_id) : undefined,
+        }))
+        .filter(inst => inst.tech_count > 0 && inst.name && inst.name.trim() !== '' && inst.slug && inst.slug.trim() !== '')
         .sort((a, b) => b.tech_count - a.tech_count);
 
       const districts = Array.from(districtMap.values()).filter(d => d.tech_count > 0);
@@ -162,6 +191,7 @@ export default function PortalManager({ instruments, institutionList = [], mouLi
       return {
         featured,
         institutions,
+        startups,
         districts,
         totalItems: instruments.length,
         totalCategories: sectorMap.size,
@@ -217,7 +247,7 @@ export default function PortalManager({ instruments, institutionList = [], mouLi
         itemName: "Service",
       };
     }
-  }, [view, instruments, services, repo]);
+  }, [view, instruments, services, repo, researchInstitutions, startupInstitutions]);
 
   const getSpans = (total: number, cols: number) => {
     if (total === 0) return [];
@@ -322,7 +352,7 @@ export default function PortalManager({ instruments, institutionList = [], mouLi
         itemType={data.context === 'instruments' ? 'instrument' : 'service'}
       />
 
-      <BrowseByInstitution institutions={data.institutions} context={data.context} />
+      <BrowseByInstitution institutions={data.institutions} startups={data.startups} context={data.context} />
 
       <section id="districts" className="relative py-20 bg-[#F6F8FC] overflow-hidden border-b border-slate-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">

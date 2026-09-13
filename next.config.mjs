@@ -12,6 +12,11 @@ const nextConfig = {
         destination: '/instruments/:path*',
         permanent: true,
       },
+      {
+        source: '/institutions',
+        destination: '/#institutions',
+        permanent: false,
+      },
     ];
   },
   output: 'standalone',

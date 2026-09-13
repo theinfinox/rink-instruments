@@ -3,10 +3,11 @@ import InstitutionSearchGrid from './InstitutionSearchGrid';
 
 interface Props {
   institutions: Institution[];
+  startups?: Institution[];
   context?: 'instruments' | 'services';
 }
 
-export default function BrowseByInstitution({ institutions, context }: Props) {
+export default function BrowseByInstitution({ institutions, startups = [], context }: Props) {
   const isServices = context === 'services';
   return (
     <section 
@@ -25,7 +26,7 @@ export default function BrowseByInstitution({ institutions, context }: Props) {
         </div>
 
         {/* ── Search + Filtered Grid ── */}
-        <InstitutionSearchGrid institutions={institutions} context={context} />
+        <InstitutionSearchGrid institutions={institutions} startups={startups} context={context} />
 
       </div>
     </section>

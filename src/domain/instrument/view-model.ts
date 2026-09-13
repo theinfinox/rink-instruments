@@ -28,6 +28,11 @@ export interface InstrumentViewModel {
   /** Complete institution entity if available */
   institution_entity?: Institution;
 
+  institution_name?: string;
+  institution_type?: string;
+  source_type?: string;
+  ksum_uid?: string;
+
   /** Inherited MoU verification status from parent institution */
   hasVerifiedMou: boolean;
 
