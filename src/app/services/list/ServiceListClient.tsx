@@ -120,10 +120,10 @@ export default function ServiceListClient({
             </p>
           </div>
 
-          {/* Unified Horizontal Control Toolbar */}
-          <div className="mt-5 bg-card-secondary/60 border border-border rounded-xl p-3 sm:p-4">
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-              {/* Search Bar */}
+          {/* Scalable Two-Tier Control Deck */}
+          <div className="mt-5 bg-card-secondary/60 border border-border rounded-xl p-3.5 sm:p-4 space-y-3">
+            {/* Tier 1: Search Bar (prominent) + View Mode Toggle */}
+            <div className="flex items-center gap-3">
               <div className="flex-1 min-w-0">
                 <SearchBar 
                   defaultValue={filters.q} 
@@ -135,62 +135,63 @@ export default function ServiceListClient({
                 />
               </div>
 
-              {/* District Dropdown & View Toggle */}
-              <div className="flex items-center gap-2.5">
-                <div className="relative min-w-[180px] flex-1 sm:flex-none">
-                  <select
-                    id="filter-district"
-                    value={filters.district ? districtDisplayName : ''}
-                    onChange={e => applyFilter('district', e.target.value)}
-                    className="w-full text-xs font-semibold border border-border rounded-lg px-3 py-2.5 bg-card text-text-primary focus:outline-none focus:border-accent hover:border-accent/40 transition-colors cursor-pointer appearance-none pr-8"
-                    aria-label="Filter by district"
-                  >
-                    <option value="">All Districts ({districts.length})</option>
-                    {districts.map(opt => (
-                      <option key={opt} value={opt}>{opt}</option>
-                    ))}
-                  </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-text-secondary">
-                    <ChevronDown className="w-3.5 h-3.5" />
-                  </div>
-                </div>
+              {/* View Mode Toggle */}
+              <div className="flex items-center border border-border rounded-lg overflow-hidden flex-shrink-0 bg-card shadow-2xs">
+                <button
+                  id="grid-view-btn"
+                  onClick={() => setViewMode('grid')}
+                  className={`p-2 transition-colors cursor-pointer ${viewMode === 'grid' ? 'bg-accent-secondary text-white' : 'text-text-secondary/60 hover:bg-card-secondary'}`}
+                  title="Grid view"
+                  aria-label="Grid view"
+                >
+                  <LayoutGrid className="w-4 h-4" />
+                </button>
+                <button
+                  id="list-view-btn"
+                  onClick={() => setViewMode('list')}
+                  className={`p-2 transition-colors cursor-pointer ${viewMode === 'list' ? 'bg-accent-secondary text-white' : 'text-text-secondary/60 hover:bg-card-secondary'}`}
+                  title="List view"
+                  aria-label="List view"
+                >
+                  <List className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
 
-                {/* View Mode Toggle */}
-                <div className="flex items-center border border-border rounded-lg overflow-hidden flex-shrink-0 bg-card">
-                  <button
-                    id="grid-view-btn"
-                    onClick={() => setViewMode('grid')}
-                    className={`p-2 transition-colors ${viewMode === 'grid' ? 'bg-accent-secondary text-white' : 'text-text-secondary/60 hover:bg-card-secondary'}`}
-                    title="Grid view"
-                    aria-label="Grid view"
-                  >
-                    <LayoutGrid className="w-4 h-4" />
-                  </button>
-                  <button
-                    id="list-view-btn"
-                    onClick={() => setViewMode('list')}
-                    className={`p-2 transition-colors ${viewMode === 'list' ? 'bg-accent-secondary text-white' : 'text-text-secondary/60 hover:bg-card-secondary'}`}
-                    title="List view"
-                    aria-label="List view"
-                  >
-                    <List className="w-4 h-4" />
-                  </button>
+            {/* Tier 2: Extensible Filter Facets Row */}
+            <div className="flex flex-wrap items-center gap-2.5 pt-1">
+              {/* District Dropdown */}
+              <div className="relative min-w-[180px] flex-1 sm:flex-none">
+                <select
+                  id="filter-district"
+                  value={filters.district ? districtDisplayName : ''}
+                  onChange={e => applyFilter('district', e.target.value)}
+                  className="w-full text-xs font-semibold border border-border rounded-lg px-3 py-2.5 bg-card text-text-primary focus:outline-none focus:border-accent hover:border-accent/40 transition-colors cursor-pointer appearance-none pr-8 shadow-2xs"
+                  aria-label="Filter by district"
+                >
+                  <option value="">All Districts ({districts.length})</option>
+                  {districts.map(opt => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-text-secondary">
+                  <ChevronDown className="w-3.5 h-3.5" />
                 </div>
               </div>
             </div>
 
-            {/* Active Filter Chips */}
+            {/* Tier 3: Active Filter Chips */}
             {hasActiveFilters && (
-              <div className="mt-3 pt-3 border-t border-border flex flex-wrap items-center gap-2" id="active-filter-chips">
+              <div className="pt-2.5 border-t border-border/80 flex flex-wrap items-center gap-2" id="active-filter-chips">
                 <span className="text-xs font-semibold text-text-secondary uppercase tracking-wider mr-1">
-                  Active Filter:
+                  Active Filters:
                 </span>
 
                 {filters.district && (
                   <button
                     type="button"
                     onClick={() => applyFilter('district', '')}
-                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 text-[#1B4D9B] border border-blue-200 hover:bg-blue-100 hover:border-blue-300 transition-colors group"
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 text-[#1B4D9B] border border-blue-200 hover:bg-blue-100 hover:border-blue-300 transition-colors group cursor-pointer shadow-2xs"
                     title="Remove district filter"
                   >
                     <span>District: <strong>{districtDisplayName}</strong></span>
@@ -202,7 +203,7 @@ export default function ServiceListClient({
                   <button
                     type="button"
                     onClick={() => applyFilter('q', '')}
-                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-700 border border-slate-300 hover:bg-slate-200 transition-colors group"
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-700 border border-slate-300 hover:bg-slate-200 transition-colors group cursor-pointer shadow-2xs"
                     title="Clear search query"
                   >
                     <span>Query: &ldquo;<strong>{filters.q}</strong>&rdquo;</span>
@@ -213,7 +214,7 @@ export default function ServiceListClient({
                 <button
                   type="button"
                   onClick={clearFilters}
-                  className="text-xs text-red-600 hover:text-red-700 hover:underline font-semibold ml-1 py-1"
+                  className="text-xs text-red-600 hover:text-red-700 hover:underline font-semibold ml-1 py-1 cursor-pointer"
                 >
                   Clear all
                 </button>

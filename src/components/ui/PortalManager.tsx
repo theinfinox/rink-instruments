@@ -208,7 +208,7 @@ export default function PortalManager({
         featuredTitle: "Available Instruments",
         featuredCtaText: "Browse All",
         featuredCtaLink: "/instruments",
-        featuredCtaMessage: "Browse through available instruments across Kerala",
+        featuredCtaMessage: "Browse through instruments from research institutes and startups in Kerala",
         districtLinkPrefix: "/instruments?district=",
         itemName: "Instrument",
       };

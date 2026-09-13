@@ -172,26 +172,18 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
               )}
             </div>
             
-            <div className="mt-8 flex flex-wrap gap-4">
-              <a
-                href={service.bookingUrl || `mailto:${service.email}`}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center justify-center px-6 py-3 bg-[#0A2164] text-white font-semibold rounded-lg hover:bg-blue-900 transition-colors shadow-sm"
-              >
-                {service.bookingType || 'Inquire Now'}
-              </a>
-              {service.bookingUrl && (
+            {service.bookingUrl && (
+              <div className="mt-8 flex flex-wrap gap-4">
                 <a
-                  href={service.bookingUrl}
+                  href={service.bookingUrl.startsWith('http://') || service.bookingUrl.startsWith('https://') ? service.bookingUrl : `https://${service.bookingUrl}`}
                   target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center justify-center px-6 py-3 bg-white text-slate-700 border border-slate-200 font-semibold rounded-lg hover:bg-slate-50 transition-colors shadow-2xs"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center px-6 py-3 bg-[#0A2164] text-white font-semibold rounded-lg hover:bg-blue-900 transition-colors shadow-sm"
                 >
                   Visit Website <ExternalLink className="w-4 h-4 ml-2" />
                 </a>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

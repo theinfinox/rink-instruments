@@ -19,6 +19,7 @@ interface Props {
     district?: string;
     patent?: string;
     potential?: string;
+    mou?: string;
     page?: string;
   }>;
 }
@@ -135,6 +136,14 @@ export default async function TechnologiesPage({ searchParams }: Props) {
     filtered = filtered.filter(i => i.warnings === patentQuery);
   }
 
+  const isMouOnly = params.mou === 'true' || params.mou === '1';
+  if (isMouOnly) {
+    filtered = filtered.filter(i => {
+      const instEntity = repo.getInstitution(i);
+      return instEntity.has_verified_mou === true;
+    });
+  }
+
   const perPage = 12;
   const paginatedInstruments = filtered.slice((page - 1) * perPage, page * perPage);
 
@@ -148,7 +157,7 @@ export default async function TechnologiesPage({ searchParams }: Props) {
     per_page: perPage
   };
 
-  const clientKey = `instruments-${params.q ?? ''}-${canonicalDistrict}-${params.institution ?? ''}-${params.sector ?? ''}-${page}`;
+  const clientKey = `instruments-${params.q ?? ''}-${canonicalDistrict}-${params.institution ?? ''}-${params.sector ?? ''}-${isMouOnly ? 'mou' : ''}-${page}`;
 
   return (
     <TechListClient
@@ -166,6 +175,7 @@ export default async function TechnologiesPage({ searchParams }: Props) {
         district: canonicalDistrict,
         patent: params.patent ?? '',
         potential: params.potential ?? '',
+        mou: isMouOnly ? 'true' : '',
       }}
     />
   );

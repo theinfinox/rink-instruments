@@ -23,7 +23,7 @@ export default function BrowseByInstitution({ institutions, startups = [], conte
             Browse by
           </div> */}
           <h2 className="text-2xl sm:text-3xl font-heading font-bold text-[#0F172A]">
-            {isServices ? 'Browse by Startups' : 'Browse by Research and Technology Institutes'}
+            {isServices ? 'Browse by Startups' : 'Browse by Research Institutes and Startups'}
           </h2>
         </div>
 
