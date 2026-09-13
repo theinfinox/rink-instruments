@@ -131,24 +131,6 @@ export default function FloatingResearchAssets() {
 
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden z-0 select-none">
-      <style>{`
-        @keyframes float-innovation {
-          0%, 100% {
-            transform: translateY(0px) translateX(0px) rotate(0deg);
-          }
-          50% {
-            transform: translateY(-20px) translateX(10px) rotate(2deg);
-          }
-        }
-        .animate-float-asset {
-          animation: float-innovation 30s ease-in-out infinite;
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .animate-float-asset {
-            animation: none !important;
-          }
-        }
-      `}</style>
       {assets.map((asset) => (
         <div
           key={asset.id}

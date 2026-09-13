@@ -109,14 +109,7 @@ export default function ServiceCard({ service, compact = false }: Props) {
                     backgroundSize: '200% 100%',
                     animation: 'shimmer 1.4s ease-in-out infinite',
                   }}
-                >
-                  <style>{`
-                    @keyframes shimmer {
-                      0%   { background-position: 200% 0; }
-                      100% { background-position: -200% 0; }
-                    }
-                  `}</style>
-                </div>
+                />
               )}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img

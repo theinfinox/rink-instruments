@@ -88,18 +88,6 @@ export default function ResearchParticles() {
           {el.svg}
         </div>
       ))}
-
-      <style>{`
-        @keyframes research-float {
-          0%, 100% { transform: translateY(0) translateX(0) rotate(0deg); }
-          33% { transform: translateY(-18px) translateX(8px) rotate(4deg); }
-          66% { transform: translateY(10px) translateX(-6px) rotate(-3deg); }
-        }
-        .research-particle { animation: research-float 14s ease-in-out infinite; will-change: transform; }
-        @media (prefers-reduced-motion: reduce) {
-          .research-particle { animation: none; }
-        }
-      `}</style>
     </div>
   );
 }

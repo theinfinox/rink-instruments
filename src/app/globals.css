@@ -769,3 +769,293 @@ input::placeholder, textarea::placeholder { color: var(--text-secondary) !import
   filter: none !important;
   mix-blend-mode: normal !important;
 }
+
+/* ============================================================
+   Component Animations & Keyframes (Consolidated to eliminate
+   inline <style> hydration mismatches from browser extensions)
+   ============================================================ */
+
+/* ── Research Particles Animation ── */
+@keyframes research-float {
+  0%, 100% { transform: translateY(0) translateX(0) rotate(0deg); }
+  33% { transform: translateY(-18px) translateX(8px) rotate(4deg); }
+  66% { transform: translateY(10px) translateX(-6px) rotate(-3deg); }
+}
+.research-particle {
+  animation: research-float 14s ease-in-out infinite;
+  will-change: transform;
+}
+@media (prefers-reduced-motion: reduce) {
+  .research-particle { animation: none; }
+}
+
+/* ── VisionOS Glass Search Styles ── */
+@keyframes vision-enter {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.vision-search-wrap {
+  animation: vision-enter 500ms cubic-bezier(.22,1,.36,1) both;
+}
+
+@keyframes vision-breathe {
+  0%,100% { box-shadow: 0 18px 45px rgba(0,0,0,.18), 0 0 28px rgba(244,180,0,.10); }
+  50%      { box-shadow: 0 18px 45px rgba(0,0,0,.18), 0 0 36px rgba(244,180,0,.20); }
+}
+.vision-bar {
+  animation: vision-breathe 8s ease-in-out infinite;
+  transition:
+    border-color 200ms ease,
+    box-shadow 200ms ease,
+    transform 250ms ease;
+}
+.vision-bar:hover:not(:focus-within) {
+  transform: translateY(-2px);
+}
+.vision-bar.is-focused {
+  animation: none;
+  border-color: #F4B400 !important;
+  box-shadow:
+    0 18px 45px rgba(0,0,0,.18),
+    0 0 0 5px rgba(244,180,0,.18) !important;
+}
+
+.vision-input {
+  caret-color: #F4B400;
+  color: #111827;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  background: transparent;
+}
+.vision-input::placeholder {
+  color: #6B7280;
+  font-weight: 500;
+  transition: opacity 300ms;
+}
+.vision-input:focus::placeholder { opacity: 0.45; }
+.vision-input:focus { outline: none; }
+
+.vision-icon-idle    { color: #B45309; transition: color 200ms, transform 200ms; }
+.vision-icon-focused { color: #E8A400; transform: rotate(8deg); transition: color 200ms, transform 200ms; }
+
+.vision-clear {
+  color: #94A3B8;
+  transition: color 200ms, background 200ms;
+  border-radius: 50%;
+  padding: 6px;
+}
+.vision-clear:hover { color: #92400E; background: rgba(244,180,0,.12); }
+
+.vision-btn {
+  cursor: pointer;
+  background: #F4B400;
+  color: #082B63;
+  font-weight: 700;
+  border-radius: 28px;
+  transition: background 250ms ease, transform 250ms ease, box-shadow 250ms ease;
+  box-shadow: 0 8px 20px rgba(244,180,0,.30);
+}
+.vision-btn:hover:not(:disabled) {
+  background: #E8A400;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(244,180,0,.38);
+}
+.vision-btn:active:not(:disabled) {
+  background: #D89A00;
+  transform: translateY(0);
+  transition-duration: 150ms;
+}
+.vision-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(244,180,0,.35) !important;
+}
+.vision-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+@keyframes drop-in {
+  from { opacity: 0; transform: translateY(-8px) scale(.99); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.vision-drop { animation: drop-in 160ms cubic-bezier(.22,1,.36,1) both; }
+.vision-drop::-webkit-scrollbar { width: 4px; }
+.vision-drop::-webkit-scrollbar-track { background: transparent; }
+.vision-drop::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 4px; }
+
+/* ── Hero Metrics Card Floating ── */
+@keyframes hero-metric-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.hero-metric-card { animation: hero-metric-float 6s ease-in-out infinite; }
+.hero-metric-card:hover { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  .hero-metric-card { animation: none; }
+}
+
+/* ── Institution Search Grid Animation ── */
+@keyframes inst-fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Featured Carousel Scrollbar Hide ── */
+.featured-scroller::-webkit-scrollbar { display: none; }
+
+/* ── Image Skeleton Shimmer ── */
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Tech Transfer Pathway Scan ── */
+@keyframes pathway-scan {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+.pathway-scan {
+  animation: pathway-scan 3s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .pathway-scan { animation: none; }
+}
+
+/* ── Partner Institutions Marquee ── */
+@keyframes inst-marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-33.333%); }
+}
+.inst-marquee-track {
+  animation: inst-marquee 50s linear infinite;
+  will-change: transform;
+}
+.inst-marquee-track.paused {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .inst-marquee-track {
+    animation: none;
+  }
+}
+
+/* ── Innovation Ambient Floating ── */
+@keyframes float-ambient-asset {
+  0%, 100% {
+    transform: translateY(0px) translateX(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-15px) translateX(8px) rotate(2deg);
+  }
+}
+.animate-float-ambient {
+  animation: float-ambient-asset 30s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-float-ambient {
+    animation: none !important;
+  }
+}
+
+/* ── Floating Research Assets ── */
+@keyframes float-innovation {
+  0%, 100% {
+    transform: translateY(0px) translateX(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-20px) translateX(10px) rotate(2deg);
+  }
+}
+
+/* ── Hero AI Search (Mobile) ── */
+@media (max-width: 767px) {
+  .hero-search-container {
+    width: calc(100% - 32px) !important;
+    max-width: none !important;
+    height: 68px !important;
+    border-radius: 24px !important;
+    background: rgba(255,255,255,0.08) !important;
+    backdrop-filter: blur(22px) !important;
+    -webkit-backdrop-filter: blur(22px) !important;
+    border: 1px solid rgba(255,255,255,0.15) !important;
+    box-shadow: 0 10px 40px rgba(15,23,42,0.18) !important;
+    margin-top: 28px;
+    animation: hero-search-entrance 700ms ease-out both;
+  }
+  .hero-search-container.focused {
+    border-color: #E9C46A !important;
+    box-shadow: 0 0 35px rgba(233,196,106,0.25) !important;
+  }
+  .hero-search-icon { width: 26px !important; height: 26px !important; color: #9CA3AF !important; }
+  .hero-search-input {
+    font-size: 18px !important;
+    font-weight: 500 !important;
+  }
+  .hero-search-input::placeholder {
+    color: rgba(255,255,255,0.72) !important;
+  }
+  .hero-search-btn {
+    height: 52px !important;
+    width: 82px !important;
+    border-radius: 18px !important;
+    padding: 0 !important;
+    margin-right: 8px !important;
+    background: linear-gradient(180deg, #E9C46A 0%, #D4A017 100%) !important;
+    font-weight: 700 !important;
+    font-size: 14px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  .hero-search-btn:active {
+    transform: scale(0.96) !important;
+    box-shadow: 0 0 20px rgba(233,196,106,0.30) !important;
+  }
+  @keyframes hero-mobile-breathe {
+    0%, 100% { box-shadow: 0 10px 40px rgba(15,23,42,0.18); }
+    50% { box-shadow: 0 10px 40px rgba(15,23,42,0.18), 0 0 20px rgba(233,196,106,0.12); }
+  }
+  .hero-search-container:not(.focused) {
+    animation: hero-search-entrance 700ms ease-out both, hero-mobile-breathe 5s ease-in-out infinite 1s;
+  }
+  .hero-search-container::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 24px;
+    pointer-events: none;
+    opacity: 0;
+  }
+  .hero-search-container.focused::after {
+    animation: hero-mobile-ripple 700ms ease-out forwards;
+  }
+  @keyframes hero-mobile-ripple {
+    0% { box-shadow: inset 0 0 0 0 rgba(233,196,106,0.25); opacity: 1; }
+    100% { box-shadow: inset 0 0 0 40px rgba(233,196,106,0); opacity: 0; }
+  }
+  @keyframes hero-search-entrance {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+}
+@media (min-width: 768px) {
+  .hero-search-container { animation: none !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-search-container { animation: none !important; }
+}
+
+/* ── RINK AI Assistant ── */
+@keyframes rinkBounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+  30% { transform: translateY(-6px); opacity: 1; }
+}
+@keyframes rinkSlideUp {
+  from { opacity: 0; transform: translateY(24px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes rinkPulseGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0,63,138,0.3), 0 8px 32px rgba(0,63,138,0.35); }
+  50% { box-shadow: 0 0 0 8px rgba(0,63,138,0.08), 0 8px 32px rgba(0,63,138,0.35); }
+}
+.rink-ai-panel { animation: rinkSlideUp 0.3s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+.rink-ai-fab { animation: rinkPulseGlow 2.5s ease-in-out infinite; }
+.rink-chip:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,63,138,0.15); }
+

@@ -180,25 +180,6 @@ function InstitutionMarquee({ institutions }: { institutions: Institution[] }) {
       <div className="absolute left-0 top-0 bottom-0 w-20 z-10 pointer-events-none bg-gradient-to-r from-[#F8FAFF] to-transparent" />
       <div className="absolute right-0 top-0 bottom-0 w-20 z-10 pointer-events-none bg-gradient-to-l from-[#F8FAFF] to-transparent" />
 
-      <style>{`
-        @keyframes inst-marquee {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-33.333%); }
-        }
-        .inst-marquee-track {
-          animation: inst-marquee 50s linear infinite;
-          will-change: transform;
-        }
-        .inst-marquee-track.paused {
-          animation-play-state: paused;
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .inst-marquee-track {
-            animation: none;
-          }
-        }
-      `}</style>
-
       <div className={`inst-marquee-track flex items-center py-3 ${paused ? 'paused' : ''}`}>
         {items.map((inst, i) => (
           <LogoPill key={`${inst.slug}-${i}`} inst={inst} />

@@ -200,27 +200,6 @@ export default function InnovationAmbientLayer() {
 
   return (
     <div className="fixed inset-0 pointer-events-none overflow-hidden z-0 select-none">
-      
-      {/* Dynamic Keyframes for exact requested transform offsets and reduced-motion fallback */}
-      <style>{`
-        @keyframes float-ambient-asset {
-          0%, 100% {
-            transform: translateY(0px) translateX(0px) rotate(0deg);
-          }
-          50% {
-            transform: translateY(-15px) translateX(8px) rotate(2deg);
-          }
-        }
-        .animate-float-ambient {
-          animation: float-ambient-asset 30s ease-in-out infinite;
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .animate-float-ambient {
-            animation: none !important;
-          }
-        }
-      `}</style>
-
       {elements.map((el) => (
         <div
           key={el.id}

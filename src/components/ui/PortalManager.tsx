@@ -171,7 +171,7 @@ export default function PortalManager({
           mou_details: inst.institution_id ? mouDetailMap.get(inst.institution_id) : undefined,
         }))
         .filter(inst => inst.tech_count > 0 && inst.name && inst.name.trim() !== '' && inst.slug && inst.slug.trim() !== '')
-        .sort((a, b) => b.tech_count - a.tech_count);
+        .sort((a, b) => (a.name || '').trim().localeCompare((b.name || '').trim(), undefined, { sensitivity: 'base' }));
 
       // Startups offering instruments natively from InstitutionRepository
       const startups: Institution[] = (startupInstitutions || repo.getStartupInstitutions())
@@ -184,7 +184,7 @@ export default function PortalManager({
           mou_details: inst.institution_id ? mouDetailMap.get(inst.institution_id) : undefined,
         }))
         .filter(inst => inst.tech_count > 0 && inst.name && inst.name.trim() !== '' && inst.slug && inst.slug.trim() !== '')
-        .sort((a, b) => b.tech_count - a.tech_count);
+        .sort((a, b) => (a.name || '').trim().localeCompare((b.name || '').trim(), undefined, { sensitivity: 'base' }));
 
       const districts = Array.from(districtMap.values()).filter(d => d.tech_count > 0);
 
@@ -227,7 +227,9 @@ export default function PortalManager({
         }
       });
 
-      const institutions = Array.from(startupMap.values()).sort((a, b) => b.tech_count - a.tech_count);
+      const institutions = Array.from(startupMap.values()).sort((a, b) =>
+        (a.name || '').trim().localeCompare((b.name || '').trim(), undefined, { sensitivity: 'base' })
+      );
       const districts = Array.from(districtMap.values()).filter(d => d.tech_count > 0);
 
       return {

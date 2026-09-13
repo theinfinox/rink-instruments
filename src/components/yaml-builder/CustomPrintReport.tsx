@@ -41,7 +41,7 @@ export default function CustomPrintReport({
   return (
     <div className="bg-white text-gray-900 font-sans p-8 max-w-5xl mx-auto space-y-8">
       {/* ── Global Print Stylesheet ─────────────────────────────────── */}
-      <style jsx global>{`
+      <style jsx global suppressHydrationWarning>{`
         @media print {
           @page {
             size: A4 portrait;

@@ -120,14 +120,7 @@ export default function TechnologyCard({ instrument, compact = false }: Props) {
                     backgroundSize: '200% 100%',
                     animation: 'shimmer 1.4s ease-in-out infinite',
                   }}
-                >
-                  <style>{`
-                    @keyframes shimmer {
-                      0%   { background-position: 200% 0; }
-                      100% { background-position: -200% 0; }
-                    }
-                  `}</style>
-                </div>
+                />
               )}
 
               {/* Actual technology image */}

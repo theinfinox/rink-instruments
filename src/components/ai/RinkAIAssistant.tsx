@@ -249,25 +249,6 @@ export default function RinkAIAssistant() {
 
   return (
     <>
-      {/* ── Keyframe Styles ── */}
-      <style>{`
-        @keyframes rinkBounce {
-          0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
-          30% { transform: translateY(-6px); opacity: 1; }
-        }
-        @keyframes rinkSlideUp {
-          from { opacity: 0; transform: translateY(24px) scale(0.97); }
-          to   { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        @keyframes rinkPulseGlow {
-          0%, 100% { box-shadow: 0 0 0 0 rgba(0,63,138,0.3), 0 8px 32px rgba(0,63,138,0.35); }
-          50% { box-shadow: 0 0 0 8px rgba(0,63,138,0.08), 0 8px 32px rgba(0,63,138,0.35); }
-        }
-        .rink-ai-panel { animation: rinkSlideUp 0.3s cubic-bezier(0.34,1.56,0.64,1) forwards; }
-        .rink-ai-fab { animation: rinkPulseGlow 2.5s ease-in-out infinite; }
-        .rink-chip:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,63,138,0.15); }
-      `}</style>
-
       {/* ── Floating Action Button ── */}
       {!open && (
         <button

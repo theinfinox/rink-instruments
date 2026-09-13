@@ -123,18 +123,6 @@ export default function TechTransferPathway({ compact = false }: Props) {
           {/* Desktop: horizontal line connector */}
           <div className="hidden md:block absolute top-[52px] left-[calc(8.33%+20px)] right-[calc(8.33%+20px)] h-[2px] z-0">
             <div className="w-full h-full bg-gradient-to-r from-blue-200 via-[#0A2164] to-blue-200 opacity-40 rounded-full" />
-            <style>{`
-              @keyframes pathway-scan {
-                0% { transform: translateX(-100%); }
-                100% { transform: translateX(200%); }
-              }
-              .pathway-scan {
-                animation: pathway-scan 3s ease-in-out infinite;
-              }
-              @media (prefers-reduced-motion: reduce) {
-                .pathway-scan { animation: none; }
-              }
-            `}</style>
             <div className="absolute inset-0 overflow-hidden rounded-full">
               <div className="pathway-scan absolute top-0 bottom-0 w-1/4 bg-gradient-to-r from-transparent via-[#0A2164] to-transparent opacity-60 rounded-full" />
             </div>

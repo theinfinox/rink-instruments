@@ -272,7 +272,7 @@ export class InstitutionRepository {
   getAll(): Institution[] {
     return Array.from(this.byId.values())
       .filter(inst => inst.name && inst.name.trim() !== '' && inst.slug && inst.slug.trim() !== '')
-      .sort((a, b) => b.tech_count - a.tech_count);
+      .sort((a, b) => (a.name || '').trim().localeCompare((b.name || '').trim(), undefined, { sensitivity: 'base' }));
   }
 
   getPartnerInstitutions(): Institution[] {

@@ -139,10 +139,6 @@ export default function FeaturedCarousel<T>({
             msOverflowStyle: 'none',
           }}
         >
-          <style>{`
-            .featured-scroller::-webkit-scrollbar { display: none; }
-          `}</style>
-
           {tripled.map((item, idx) => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const itemKey = (item as any).provider_key || (item as any).id || (item as any).ksumUid || `fallback-${idx}`;

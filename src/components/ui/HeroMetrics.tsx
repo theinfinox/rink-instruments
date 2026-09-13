@@ -113,18 +113,6 @@ function MetricCard({ target, suffix, label, run, delay }: Metric & { run: boole
           <MetricCard key={m.label} {...m} run={inView} delay={i * 150} />
         ))}
       </div>
-
-      <style>{`
-        @keyframes hero-metric-float {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-6px); }
-        }
-        .hero-metric-card { animation: hero-metric-float 6s ease-in-out infinite; }
-        .hero-metric-card:hover { animation-play-state: paused; }
-        @media (prefers-reduced-motion: reduce) {
-          .hero-metric-card { animation: none; }
-        }
-      `}</style>
     </section>
   );
 }

@@ -306,7 +306,9 @@ export default function InstitutionSearchGrid({ institutions, startups = [], con
   // Derive the active pool of providers based on active filter checkboxes
   const currentPool: Institution[] = useMemo<Institution[]>(() => {
     if (isServices) {
-      return [...institutions].sort((a, b) => b.tech_count - a.tech_count);
+      return [...institutions].sort((a, b) =>
+        (a.name || '').trim().localeCompare((b.name || '').trim(), undefined, { sensitivity: 'base' })
+      );
     }
 
     let pool: Institution[] = [];
@@ -326,7 +328,9 @@ export default function InstitutionSearchGrid({ institutions, startups = [], con
       pool = pool.filter((inst: Institution) => inst.has_verified_mou === true);
     }
 
-    return [...pool].sort((a, b) => b.tech_count - a.tech_count);
+    return [...pool].sort((a, b) =>
+      (a.name || '').trim().localeCompare((b.name || '').trim(), undefined, { sensitivity: 'base' })
+    );
   }, [isServices, institutions, startups, filterResearch, filterStartups, filterPartnered]);
 
   // Filtered cards by search query
@@ -441,14 +445,6 @@ export default function InstitutionSearchGrid({ institutions, startups = [], con
 
   return (
     <>
-      {/* ── CSS animation ── */}
-      <style>{`
-        @keyframes inst-fadeIn {
-          from { opacity: 0; transform: translateY(8px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
-
       {/* ── Search Bar & Filter Controls ── */}
       <div className="mb-6" ref={containerRef}>
         <div className="relative" style={{ maxWidth: 460 }}>
