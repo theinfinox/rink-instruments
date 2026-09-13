@@ -281,9 +281,9 @@ export default function InstitutionSearchGrid({ institutions, startups = [], con
   const router = useRouter();
   const isServices = context === 'services';
 
-  // Active filters (checkbox state)
+  // Active filters (checkbox state) - default: all institutions including startups listed
   const [filterResearch, setFilterResearch] = useState(true);
-  const [filterStartups, setFilterStartups] = useState(false);
+  const [filterStartups, setFilterStartups] = useState(true);
   const [filterPartnered, setFilterPartnered] = useState(false);
 
   const [query, setQuery] = useState('');
@@ -411,6 +411,44 @@ export default function InstitutionSearchGrid({ institutions, startups = [], con
     return () => document.removeEventListener('mousedown', onClickOutside);
   }, []);
 
+  // Listen for hash navigation from Navbar (#institutions vs #startups)
+  useEffect(() => {
+    const handleHash = (rawHash: string) => {
+      const h = rawHash.replace(/^#/, '');
+      if (h === 'startups') {
+        setFilterResearch(false);
+        setFilterStartups(true);
+        setFilterPartnered(false);
+      } else if (h === 'institutions') {
+        setFilterResearch(true);
+        setFilterStartups(true);
+        setFilterPartnered(false);
+      }
+    };
+
+    if (typeof window !== 'undefined' && window.location.hash) {
+      handleHash(window.location.hash);
+    }
+
+    const onHashChange = () => {
+      handleHash(window.location.hash);
+    };
+    window.addEventListener('hashchange', onHashChange);
+
+    const onNavFilter = (e: Event) => {
+      const customEvent = e as CustomEvent<string>;
+      if (customEvent.detail) {
+        handleHash(customEvent.detail);
+      }
+    };
+    window.addEventListener('rink-hash-navigate', onNavFilter);
+
+    return () => {
+      window.removeEventListener('hashchange', onHashChange);
+      window.removeEventListener('rink-hash-navigate', onNavFilter);
+    };
+  }, []);
+
   // Compute dynamic, descriptive counter label
   const countLabel = useMemo(() => {
     if (isServices) {
@@ -480,7 +518,7 @@ export default function InstitutionSearchGrid({ institutions, startups = [], con
               aria-autocomplete="list"
               autoComplete="off"
               spellCheck={false}
-              className="flex-1 bg-transparent outline-none border-0 text-sm"
+              className="flex-1 bg-transparent outline-none border-0 text-base sm:text-sm"
               style={{
                 color: query ? '#111827' : undefined,
                 caretColor: '#2563EB',

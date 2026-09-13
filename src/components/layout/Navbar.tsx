@@ -11,7 +11,7 @@ const INSTRUMENTS_NAV_LINKS = [
   { label: 'Home',          href: '/',               icon: House },
   { label: 'Services',      href: '/services',       icon: Layers },
   { label: 'Institutions',  href: '/#institutions',  icon: Building2 },
-  { label: 'Districts',     href: '/#districts',     icon: MapPin },
+  { label: 'Startups',      href: '/#startups',      icon: Rocket },
   { label: 'Contact',       href: '/contact',        icon: Phone },
 ];
 
@@ -38,6 +38,21 @@ export default function Navbar() {
     setHash(window.location.hash);
     const hashChangeHandler = () => setHash(window.location.hash);
     window.addEventListener('hashchange', hashChangeHandler);
+
+    // If arriving directly with a hash, ensure proper offset scroll beneath navbar
+    if (window.location.hash) {
+      const target = document.getElementById(window.location.hash.replace(/^#/, ''));
+      if (target) {
+        setTimeout(() => {
+          const navHeight = typeof window !== 'undefined' && window.innerWidth < 640 ? 88 : 104; // 64px navbar + 24px mobile / 40px desktop margin
+          const elementPosition = target.getBoundingClientRect().top + window.pageYOffset;
+          window.scrollTo({
+            top: Math.max(0, elementPosition - navHeight),
+            behavior: 'smooth',
+          });
+        }, 150);
+      }
+    }
     
     return () => {
       window.removeEventListener('scroll', scrollHandler);
@@ -86,12 +101,21 @@ export default function Navbar() {
         e.preventDefault();
         const element = document.getElementById(targetHash);
         if (element) {
-          element.scrollIntoView({ behavior: 'smooth' });
+          const navHeight = typeof window !== 'undefined' && window.innerWidth < 640 ? 88 : 104; // 64px navbar + 24px mobile / 40px desktop margin
+          const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+          const offsetPosition = Math.max(0, elementPosition - navHeight);
+
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth',
+          });
+
           // Update URL without a full jump to maintain URL as source of truth
           if (window.location.pathname + window.location.hash !== href) {
             window.history.pushState(null, '', href);
           }
           setHash(`#${targetHash}`);
+          window.dispatchEvent(new CustomEvent('rink-hash-navigate', { detail: targetHash }));
         }
       }
     }

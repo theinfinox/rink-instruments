@@ -197,7 +197,7 @@ export default function PortalManager({
         totalCategories: sectorMap.size,
         totalInstitutions: institutions.length,
         totalStartups: startups.length,
-        title: "Discover Research Instruments from Kerala's Leading Institutions",
+        title: "Discover Scientific Instruments from Kerala's Leading Research Institutions & Startups.",
         subtitle: "RESEARCH INNOVATION NETWORK KERALA . INSTRUMENTATION PORTAL",
         context: 'instruments' as const,
         featuredTitle: "Available Instrumentation Facilities",
@@ -358,7 +358,7 @@ export default function PortalManager({
 
       <BrowseByInstitution institutions={data.institutions} startups={data.startups} context={data.context} />
 
-      <section id="districts" className="relative py-20 bg-[#F6F8FC] overflow-hidden border-b border-slate-100">
+      <section id="districts" className="relative py-20 bg-[#F6F8FC] overflow-hidden border-b border-slate-100 scroll-mt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="max-w-xl mb-12">
             <div className="text-xs font-bold text-[#1B4D9B] uppercase tracking-widest mb-3">Explore by District</div>
