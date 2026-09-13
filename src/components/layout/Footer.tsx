@@ -103,10 +103,18 @@ export default function Footer() {
 
       {/* ── Bottom Copyright Strip ── */}
       <div className="border-t border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5">
-          <p className="text-xs text-slate-500 text-center font-sans">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 font-sans">
+          <p className="text-center sm:text-left">
             © 2026 Research Innovation Network Kerala (RINK). An initiative of Kerala Startup Mission.
           </p>
+          <div className="flex items-center gap-4 flex-shrink-0">
+            <Link
+              href="/privacy"
+              className="text-slate-500 hover:text-[#0A2164] transition-colors underline-offset-4 hover:underline font-medium"
+            >
+              Privacy Policy
+            </Link>
+          </div>
         </div>
       </div>
     </footer>
