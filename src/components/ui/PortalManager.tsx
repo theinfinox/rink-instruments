@@ -9,12 +9,17 @@ import FeaturedCarousel from '@/components/ui/FeaturedCarousel';
 import HeroSearch, { SearchConfig } from '@/components/ui/HeroSearch';
 import HeroMetrics from '@/components/ui/HeroMetrics';
 import BrowseByInstitution from '@/components/ui/BrowseByInstitution';
+import ExclusivePartnershipsSection from '@/components/ui/ExclusivePartnershipsSection';
 import ResearchParticles from '@/components/ui/ResearchParticles';
 import DatasetToggle, { PortalView } from '@/components/ui/DatasetToggle';
 import { Institution } from '@/types';
 import { InstitutionRepository } from '@/repositories/InstitutionRepository';
 
 import { InstrumentViewModel } from '@/domain/instrument/view-model';
+
+// Feature Flag: Set to false (or remove component) if committee does not approve
+const SHOW_EXCLUSIVE_MOU_SECTION = true;
+
 
 interface PortalManagerProps {
   instruments: InstrumentViewModel[];
@@ -200,10 +205,10 @@ export default function PortalManager({
         title: "Discover Scientific Instruments from Kerala's Leading Research Institutions & Startups.",
         subtitle: "RESEARCH INNOVATION NETWORK KERALA . INSTRUMENTATION PORTAL",
         context: 'instruments' as const,
-        featuredTitle: "Available Instrumentation Facilities",
+        featuredTitle: "Available Instruments",
         featuredCtaText: "Browse All",
         featuredCtaLink: "/instruments",
-        featuredCtaMessage: "Browse through available instrumentation facilities across Kerala",
+        featuredCtaMessage: "Browse through available instruments across Kerala",
         districtLinkPrefix: "/instruments?district=",
         itemName: "Instrument",
       };
@@ -357,6 +362,13 @@ export default function PortalManager({
       />
 
       <BrowseByInstitution institutions={data.institutions} startups={data.startups} context={data.context} />
+      
+      {SHOW_EXCLUSIVE_MOU_SECTION && view === 'instruments' && (
+        <ExclusivePartnershipsSection 
+          mouList={mouList} 
+          institutionList={institutionList} 
+        />
+      )}
 
       <section id="districts" className="relative py-20 bg-[#F6F8FC] overflow-hidden border-b border-slate-100 scroll-mt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">

@@ -1,10 +1,10 @@
-import { fetchDataset } from '@/lib/dataFetcher';
+import { fetchDataset, fetchDistrictTaxonomy } from '@/lib/dataFetcher';
 import { Service } from '@/types/service';
 import ServiceListClient from './ServiceListClient';
 
 export const metadata = {
   title: 'All Services — RINK Services Portal',
-  description: 'Browse all services from Kerala startups. Filter by category, startup, district, and more.',
+  description: 'Browse all services from Kerala startups. Filter by district and search capabilities.',
 };
 
 interface Props {
@@ -22,70 +22,55 @@ export default async function ServicesPage({ searchParams }: Props) {
   const params = await searchParams;
   const page = parseInt(params.page ?? '1', 10);
 
-  const services: Service[] = await fetchDataset('services');
-  
-  const categoryMap = new Map<string, { slug: string, name: string }>();
-  const startupMap = new Map<string, { slug: string, name: string }>();
-  const districtSet = new Set<string>();
-  const certificationSet = new Set<string>();
+  // Concurrently fetch services and backend district taxonomy (governed by sheets.yaml)
+  const [services, backendDistricts] = await Promise.all([
+    fetchDataset('services') as Promise<Service[]>,
+    fetchDistrictTaxonomy(),
+  ]);
 
+  // Combine backend taxonomy districts with any districts present in the dataset
+  const districtSet = new Set<string>(backendDistricts);
   services.forEach(svc => {
-    if (svc.startupName) {
-      const name = svc.startupName;
-      const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-      if (!startupMap.has(slug)) {
-        startupMap.set(slug, { slug, name });
-      }
-    }
-
-    if (svc.category) {
-      const name = svc.category.trim();
-      const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-      if (!categoryMap.has(slug)) {
-        categoryMap.set(slug, { slug, name });
-      }
-    }
-
     if (svc.district) districtSet.add(svc.district.trim());
-    if (svc.certifications) certificationSet.add(svc.certifications.trim());
   });
+  const districts = Array.from(districtSet).filter(Boolean);
 
-  const startups = Array.from(startupMap.values()).sort((a, b) => a.name.localeCompare(b.name));
-  const categories = Array.from(categoryMap.values()).sort((a, b) => a.name.localeCompare(b.name));
-  const districts = Array.from(districtSet).filter(Boolean).sort();
-  const certifications = Array.from(certificationSet).filter(Boolean).sort();
+  // Case-insensitive canonical district resolution
+  const districtParam = params.district?.trim();
+  const canonicalDistrict = districtParam 
+    ? districts.find(d => d.toLowerCase() === districtParam.toLowerCase()) || districtParam
+    : '';
 
   let filtered = services;
   
   if (params.q) {
-    const q = params.q.toLowerCase();
+    const q = params.q.toLowerCase().trim();
     filtered = filtered.filter(s => 
       (s.serviceName && s.serviceName.toLowerCase().includes(q)) || 
       (s.startupName && s.startupName.toLowerCase().includes(q)) ||
       (s.keywords && s.keywords.some(k => k.toLowerCase().includes(q)))
     );
   }
-  if (params.category) {
-    const categoryQuery = params.category;
+
+  if (canonicalDistrict) {
+    const districtLower = canonicalDistrict.toLowerCase();
     filtered = filtered.filter(s => 
-      s.category && s.category.toLowerCase().replace(/[^a-z0-9]+/g, '-') === categoryQuery
+      s.district && s.district.toLowerCase() === districtLower
+    );
+  }
+
+  // Preserve compatibility if category or startup is passed via legacy URL
+  if (params.category) {
+    const catQuery = params.category.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    filtered = filtered.filter(s => 
+      s.category && s.category.toLowerCase().replace(/[^a-z0-9]+/g, '-') === catQuery
     );
   }
   if (params.startup) {
-    const startupQuery = params.startup;
+    const startupQuery = params.startup.toLowerCase().replace(/[^a-z0-9]+/g, '-');
     filtered = filtered.filter(s => 
       s.startupName && s.startupName.toLowerCase().replace(/[^a-z0-9]+/g, '-') === startupQuery
     );
-  }
-  if (params.district) {
-    const districtQuery = params.district.toLowerCase();
-    filtered = filtered.filter(s => 
-      s.district && s.district.toLowerCase() === districtQuery
-    );
-  }
-  if (params.certification) {
-    const certQuery = params.certification;
-    filtered = filtered.filter(s => s.certifications === certQuery);
   }
 
   const perPage = 12;
@@ -98,20 +83,17 @@ export default async function ServicesPage({ searchParams }: Props) {
     per_page: perPage
   };
 
+  const filterKey = `${canonicalDistrict}_${params.q ?? ''}_${page}`;
+
   return (
     <ServiceListClient
+      key={filterKey}
       initialResult={result}
-      categories={categories}
-      startups={startups}
-      certifications={certifications}
       districts={districts}
       totalCount={services.length}
       initialFilters={{
-        q: params.q ?? '',
-        category: params.category ?? '',
-        startup: params.startup ?? '',
-        district: params.district ?? '',
-        certification: params.certification ?? '',
+        q: params.q?.trim() ?? '',
+        district: canonicalDistrict,
       }}
     />
   );

@@ -44,3 +44,45 @@ export async function fetchDataset(type: DatasetType): Promise<any[]> {
   }
   return [];
 }
+
+export async function fetchDistrictTaxonomy(): Promise<string[]> {
+  try {
+    // 1. Try services filters.json if available
+    const svcRes = await fetch(`${CDN_HOST}/api/services/filters.json`).catch(() => null);
+    if (svcRes && svcRes.ok) {
+      const data = await svcRes.json();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const districtCat = data.find((c: any) => c.id === 'district' || c.id === 'standardized_district');
+      if (districtCat?.groups) {
+        const districts = Object.values(districtCat.groups).flat() as string[];
+        if (districts.length > 0) {
+          return Array.from(new Set(districts)).filter(Boolean);
+        }
+      }
+    }
+
+    // 2. Fallback to instrument filters.json (maintained in sheets.yaml filterTaxonomy)
+    const instRes = await fetch(`${CDN_HOST}/api/instrument/filters.json`).catch(() => null);
+    if (instRes && instRes.ok) {
+      const data = await instRes.json();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const districtCat = data.find((c: any) => c.id === 'standardized_district' || c.id === 'district');
+      if (districtCat?.groups) {
+        const districts = Object.values(districtCat.groups).flat() as string[];
+        if (districts.length > 0) {
+          return Array.from(new Set(districts)).filter(Boolean);
+        }
+      }
+    }
+  } catch (error) {
+    console.error("Failed to fetch district taxonomy from backend:", error);
+  }
+
+  // 3. Resilient fallback to 14 Kerala districts if offline
+  return [
+    'Thiruvananthapuram', 'Kollam', 'Pathanamthitta', 'Alappuzha',
+    'Kottayam', 'Idukki', 'Ernakulam', 'Thrissur',
+    'Palakkad', 'Malappuram', 'Kozhikode', 'Wayanad',
+    'Kannur', 'Kasaragod'
+  ];
+}

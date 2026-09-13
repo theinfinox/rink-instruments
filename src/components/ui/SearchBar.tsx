@@ -12,6 +12,7 @@ interface Props {
   defaultValue?: string;
   autoFocus?: boolean;
   searchRoute?: string;
+  itemRoute?: string;
   placeholder?: string;
   ariaLabel?: string;
   dataset?: 'instruments' | 'services';
@@ -37,11 +38,13 @@ export default function SearchBar({
   defaultValue = '', 
   autoFocus = false, 
   searchRoute = '/instruments',
+  itemRoute,
   placeholder = 'Search instruments, sectors, institutions, applications...',
   ariaLabel = 'Search instruments',
   dataset = 'instruments'
 }: Props) {
   const router = useRouter();
+  const detailRoute = itemRoute ?? (dataset === 'services' || searchRoute.startsWith('/services') ? '/services' : searchRoute);
   const [query, setQuery] = useState(defaultValue);
   const [suggestions, setSuggestions] = useState<SearchIndexItem[]>([]);
   const [allItems, setAllItems] = useState<SearchIndexItem[]>([]);
@@ -100,7 +103,7 @@ export default function SearchBar({
 
   function handleSelect(item: SearchIndexItem) {
     setOpen(false);
-    router.push(`${searchRoute}/${item.id}`);
+    router.push(`${detailRoute}/${item.id}`);
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {

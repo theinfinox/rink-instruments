@@ -1,4 +1,4 @@
-import { fetchInstrumentBundle } from '@/lib/dataFetcher';
+import { fetchInstrumentBundle, fetchDistrictTaxonomy } from '@/lib/dataFetcher';
 import TechListClient from './TechListClient';
 import { InstitutionRepository } from '@/repositories/InstitutionRepository';
 import { precisionSearch } from '@/lib/searchEngine';
@@ -27,17 +27,21 @@ export default async function TechnologiesPage({ searchParams }: Props) {
   const params = await searchParams;
   const page = parseInt(params.page ?? '1', 10);
 
-  // Fetch Instrumentation Bundle (main_data + instituitiion_list)
-  const bundle = await fetchInstrumentBundle();
+  // Fetch Instrumentation Bundle and Backend District Taxonomy concurrently
+  const [bundle, backendDistricts] = await Promise.all([
+    fetchInstrumentBundle(),
+    fetchDistrictTaxonomy(),
+  ]);
+
   const instruments = bundle.main_data;
   const rawInstitutions = bundle.instituitiion_list;
   
   const repo = InstitutionRepository.fromInstrumentData(instruments, rawInstitutions, bundle.mou_list);
   const institutions = repo.getAll();
 
-  // Extract Categories (Tags), Districts, and Verification Statuses
+  // Extract Categories (Tags), Districts, and Verification Statuses as fallback
   const sectorMap = new Map<string, { slug: string, name: string, tech_count: number, icon: string, color: string }>();
-  const districtSet = new Set<string>();
+  const datasetDistrictSet = new Set<string>();
   const statusSet = new Set<string>();
 
   instruments.forEach(inst => {
@@ -52,13 +56,21 @@ export default async function TechnologiesPage({ searchParams }: Props) {
       sectorMap.get(slug)!.tech_count++;
     });
 
-    if (inst.standardized_district) districtSet.add(inst.standardized_district.trim());
+    if (inst.standardized_district) datasetDistrictSet.add(inst.standardized_district.trim());
     if (inst.warnings) statusSet.add(inst.warnings.trim());
   });
 
   const sectors = Array.from(sectorMap.values()).sort((a, b) => b.tech_count - a.tech_count);
-  const districts = Array.from(districtSet).filter(Boolean).sort();
+  // Prioritize official 14 Kerala districts from sheets.yaml, fallback to dataset
+  const districts = backendDistricts && backendDistricts.length > 0
+    ? backendDistricts
+    : Array.from(datasetDistrictSet).filter(Boolean).sort();
   const statuses = Array.from(statusSet).filter(Boolean).sort();
+
+  // Canonical case resolution for district parameter (e.g. "thiruvananthapuram" -> "Thiruvananthapuram")
+  const canonicalDistrict = params.district
+    ? (districts.find(d => d.toLowerCase() === params.district?.toLowerCase()) || params.district)
+    : '';
 
   // Build SearchIndex for precision search engine
   const searchIndex: SearchIndexItem[] = instruments.map(inst => {
@@ -113,8 +125,8 @@ export default async function TechnologiesPage({ searchParams }: Props) {
     });
   }
 
-  if (params.district) {
-    const districtQuery = params.district.toLowerCase();
+  if (canonicalDistrict) {
+    const districtQuery = canonicalDistrict.toLowerCase();
     filtered = filtered.filter(i => i.standardized_district && i.standardized_district.toLowerCase() === districtQuery);
   }
 
@@ -136,8 +148,11 @@ export default async function TechnologiesPage({ searchParams }: Props) {
     per_page: perPage
   };
 
+  const clientKey = `instruments-${params.q ?? ''}-${canonicalDistrict}-${params.institution ?? ''}-${params.sector ?? ''}-${page}`;
+
   return (
     <TechListClient
+      key={clientKey}
       initialResult={result}
       sectors={sectors}
       institutions={institutions}
@@ -148,7 +163,7 @@ export default async function TechnologiesPage({ searchParams }: Props) {
         q: params.q ?? '',
         sector: params.sector ?? '',
         institution: params.institution ?? '',
-        district: params.district ?? '',
+        district: canonicalDistrict,
         patent: params.patent ?? '',
         potential: params.potential ?? '',
       }}

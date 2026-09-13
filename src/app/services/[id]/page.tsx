@@ -46,21 +46,12 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
       <div className="max-w-4xl mx-auto px-4 py-12">
-        <nav className="flex items-center gap-1.5 text-xs text-slate-500 flex-wrap mb-4">
+        <nav className="flex items-center gap-1.5 text-xs text-slate-500 flex-wrap mb-4" aria-label="Breadcrumb">
           <Link href="/" className="hover:text-[#0A2164] transition-colors">Home</Link>
           <ChevronRight className="w-3 h-3 text-slate-300" />
-          <Link href="/services/list" className="hover:text-[#0A2164] transition-colors">Services</Link>
-          {service.category && (
-            <>
-              <ChevronRight className="w-3 h-3 text-slate-300" />
-              <Link 
-                href={`/services/list?category=${encodeURIComponent(service.category)}`}
-                className="hover:text-[#0A2164] transition-colors"
-              >
-                {service.category}
-              </Link>
-            </>
-          )}
+          <Link href="/services" className="hover:text-[#0A2164] transition-colors">Services</Link>
+          <ChevronRight className="w-3 h-3 text-slate-300" />
+          <Link href="/services/list" className="hover:text-[#0A2164] transition-colors">All Services</Link>
           <ChevronRight className="w-3 h-3 text-slate-300" />
           <span className="text-slate-900 font-medium truncate max-w-[200px] sm:max-w-sm">{service.serviceName}</span>
         </nav>

@@ -1,16 +1,22 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, MapPin, Globe } from 'lucide-react';
 import InstitutionFilterView from './InstitutionFilterView';
 import InstitutionEcosystemBackground from '@/components/ui/InstitutionEcosystemBackground';
-import { getSectorIcon } from '@/components/ui/SectorIcons';
+import InstitutionHeaderLogo from '@/components/ui/InstitutionHeaderLogo';
+import MouBadge from '@/components/ui/MouBadge';
 import { fetchInstrumentBundle } from '@/lib/dataFetcher';
 import { InstitutionRepository } from '@/repositories/InstitutionRepository';
 import { toInstrumentViewModel } from '@/domain/instrument/mapper';
+import { getImageUrl } from '@/lib/utils';
 
 async function getRepo() {
   const bundle = await fetchInstrumentBundle();
-  const repo = InstitutionRepository.fromInstrumentData(bundle.main_data, bundle.instituitiion_list, bundle.mou_list);
+  const repo = InstitutionRepository.fromInstrumentData(
+    bundle.main_data,
+    bundle.instituitiion_list,
+    bundle.mou_list
+  );
   return { repo, instruments: bundle.main_data };
 }
 
@@ -28,9 +34,9 @@ export async function generateMetadata({ params }: Props) {
   const { repo } = await getRepo();
   const inst = repo.getBySlug(slug);
   if (!inst) return { title: 'Institution Not Found — RINK' };
-  
-  const metaDescription = `Explore ${inst.tech_count} instruments from ${inst.name}. Partner with top Kerala research institutions through the RINK Instruments and Services Portal.`;
-  
+
+  const metaDescription = `Explore ${inst.tech_count} scientific instruments and testing facilities from ${inst.name}. Partner with top Kerala research institutions through the RINK Instruments and Services Portal.`;
+
   return {
     title: `${inst.name} Instruments | RINK Kerala`,
     description: metaDescription,
@@ -42,22 +48,50 @@ export async function generateMetadata({ params }: Props) {
   };
 }
 
-const CUSTOM_LOGOS: Record<string, string> = {
+const LOCAL_LOGOS: Record<string, string> = {
+  'cochin-university-of-science-and-technology-cusat': '/images/institutions/cusat.webp',
+  'cusat': '/images/institutions/cusat.webp',
   'icar-cpcri': '/images/institutions/cpcri.png',
   'cpcri': '/images/institutions/cpcri.png',
   'icar-ctcri': '/images/institutions/ctcri.png',
   'ctcri': '/images/institutions/ctcri.png',
-  'kufos': '/images/institutions/kufos.png',
+  'kufos': '/images/institutions/kufos-kochi.jpg',
+  'kerala-university-of-fisheries-and-ocean-studies-kufos': '/images/institutions/kufos-kochi.jpg',
+  'iit-palakkad': '/images/institutions/iit-palakkad.jpg',
+  'indian-institute-of-technology-palakkad-iit-palakkad': '/images/institutions/iit-palakkad.jpg',
+  'iiser-thiruvananthapuram': '/images/institutions/iiser-thiruvananthapuram.jpg',
+  'indian-institute-of-science-education-and-research-thiruvananthapuram-iiser-tvm': '/images/institutions/iiser-thiruvananthapuram.jpg',
+  'kscste-jntbgri': '/images/institutions/kscste-jntbgri.jpg',
+  'jawaharlal-nehru-tropical-botanic-garden-research-institute-jntbgri': '/images/institutions/kscste-jntbgri.jpg',
+  'centre-for-water-resources-development-and-management-cwrdm': '/images/institutions/cwrdm.jpg',
+  'cwrdm': '/images/institutions/cwrdm.jpg',
+  'csir-niist': '/images/institutions/csir-niist.png',
+  'c-dac': '/images/institutions/cdac.png',
+  'cdac': '/images/institutions/cdac.png',
+  'c-met': '/images/institutions/c-met.png',
+  'iisr': '/images/institutions/iisr.png',
+  'kau': '/images/institutions/kau.png',
+  'sctimst': '/images/institutions/sctimst.jpg',
+  'rgcb': '/images/institutions/rgcb.jpg',
+  'iav': '/images/institutions/iav.jpg',
 };
 
-const getPrimarySectorSlug = (slug: string): string => {
-  const s = slug.toLowerCase();
-  if (s.includes('cpcri') || s.includes('ctcri') || s.includes('kau')) return 'agriculture';
-  if (s.includes('kufos') || s.includes('cwrdm')) return 'water-environment-waste-management';
-  if (s.includes('niist')) return 'advanced-materials-chemicals';
-  if (s.includes('cdac') || s.includes('c-dac')) return 'digital-technologies-ai-software';
-  return 'default';
-};
+function getAcronym(name: string): string {
+  const match = name.match(/\(([^)]+)\)/);
+  if (match && match[1]) return match[1].trim();
+  const upper = name.toUpperCase();
+  if (upper.includes('CUSAT')) return 'CUSAT';
+  if (upper.includes('IIT')) return 'IIT';
+  if (upper.includes('IISER')) return 'IISER';
+  if (upper.includes('NIT')) return 'NIT';
+  if (upper.includes('KFRI')) return 'KFRI';
+  if (upper.includes('JNTBGRI')) return 'JNTBGRI';
+  if (upper.includes('CWRDM')) return 'CWRDM';
+  if (upper.includes('CPCRI')) return 'CPCRI';
+  if (upper.includes('CTCRI')) return 'CTCRI';
+  if (upper.includes('KUFOS')) return 'KUFOS';
+  return name.slice(0, 4).toUpperCase();
+}
 
 export default async function InstitutionDetailPage({ params }: Props) {
   const { slug } = await params;
@@ -74,54 +108,109 @@ export default async function InstitutionDetailPage({ params }: Props) {
     return repo.getInstitution(inst).slug === slug;
   });
 
-  const institutionViewModels = institutionInstruments.map(inst => toInstrumentViewModel(inst, repo));
+  const institutionViewModels = institutionInstruments.map(inst =>
+    toInstrumentViewModel(inst, repo)
+  );
 
-  const logoSrc = CUSTOM_LOGOS[slug.toLowerCase()];
-  const primarySectorSlug = getPrimarySectorSlug(slug);
+  // Authoritative Logo Resolution:
+  // 1. Check official database logo_link (primary authoritative crest)
+  // 2. Check local static logos
+  // 3. Check original_logo_link
+  const normalizedSlug = slug.toLowerCase();
+  const rawLogoLink = institution.logo_link || institution.original_logo_link;
+  const logoSrc =
+    (rawLogoLink ? getImageUrl(rawLogoLink) : null) ||
+    LOCAL_LOGOS[normalizedSlug] ||
+    null;
+
+  const acronym = getAcronym(institution.name);
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="relative overflow-hidden bg-card border-b border-border py-4">
-        {/* Research Ecosystem Background SVG */}
+    <div className="min-h-screen bg-[#F6F8FC]">
+      {/* ── Institution Header ── */}
+      <div className="relative overflow-hidden bg-white border-b border-slate-200 py-8 sm:py-10">
+        {/* Ambient Ecosystem Background SVG */}
         <InstitutionEcosystemBackground />
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6">
-          <Link href="/#institutions" className="flex items-center gap-1.5 text-xs text-text-secondary hover:text-accent transition-colors mb-2">
+          <Link
+            href="/#institutions"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-[#0A2164] transition-colors mb-4 font-sans"
+          >
             <ArrowLeft className="w-3.5 h-3.5" />
-            All Institutions
+            <span>All Institutions</span>
           </Link>
-          <div className="flex items-center gap-3">
-            {/* Visual Identity logo or fallback sector icon */}
-            {logoSrc ? (
-              <div className="w-12 h-12 rounded-md bg-white flex items-center justify-center flex-shrink-0 overflow-hidden border border-border shadow-sm p-1.5">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={logoSrc} alt={institution.name} className="w-full h-full object-contain" />
-              </div>
-            ) : (
-              <div className="w-12 h-12 rounded-md bg-accent/10 flex items-center justify-center flex-shrink-0 border border-accent/20">
-                {getSectorIcon(primarySectorSlug, 'var(--accent)', 26)}
-              </div>
-            )}
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-lg md:text-xl font-heading font-bold text-heading leading-tight">{institution.name}</h1>
+
+          <div className="flex flex-col sm:flex-row sm:items-center gap-5">
+            {/* Institution Brand Logo */}
+            <InstitutionHeaderLogo
+              src={logoSrc}
+              alt={institution.name}
+              acronym={acronym}
+            />
+
+            {/* Title & Metadata */}
+            <div className="flex-1 min-w-0">
+              <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-bold bg-blue-50 text-[#0A2164] border border-blue-200/80">
+                  {acronym}
+                </span>
+
+                {institution.has_verified_mou && (
+                  <MouBadge
+                    hasVerifiedMou={true}
+                    variant="detailed"
+                    details={institution.mou_details}
+                  />
+                )}
+
                 {institution.is_startup && (
-                  <span className="text-[10px] font-semibold px-2 py-0.5 bg-amber-50 text-amber-800 border border-amber-200 rounded">
-                    Startup
+                  <span className="text-xs font-semibold px-2 py-0.5 bg-amber-50 text-amber-800 border border-amber-200 rounded-md">
+                    Startup Facility
                   </span>
                 )}
               </div>
-              <p className="text-xs text-text-secondary mt-0.5">
-                {institution.tech_count} {institution.tech_count === 1 ? 'instrument' : 'instruments'} available
-              </p>
+
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-heading font-bold text-slate-900 leading-tight mb-2">
+                {institution.name}
+              </h1>
+
+              <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500 font-sans">
+                <span>
+                  <strong className="text-slate-800 font-semibold">{institution.tech_count}</strong>{' '}
+                  {institution.tech_count === 1 ? 'instrument' : 'instruments'} available
+                </span>
+
+                {institution.district && (
+                  <span className="inline-flex items-center gap-1">
+                    <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                    <span>{institution.district}</span>
+                  </span>
+                )}
+
+                {institution.website && (
+                  <a
+                    href={institution.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-[#0A2164] hover:underline font-medium"
+                  >
+                    <Globe className="w-3.5 h-3.5 text-slate-400" />
+                    <span>Official Portal</span>
+                  </a>
+                )}
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
-        <InstitutionFilterView initialInstruments={institutionViewModels} />
+      {/* ── Main Content Area ── */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+        <InstitutionFilterView
+          initialInstruments={institutionViewModels}
+          institutionName={institution.name}
+        />
       </div>
     </div>
   );
