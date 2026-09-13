@@ -29,20 +29,20 @@ interface PortalManagerProps {
 }
 
 const baseDistricts: District[] = [
-  { slug: 'thiruvananthapuram', name: 'Thiruvananthapuram', tech_count: 0, image: '/images/districts/thiruvananthapuram.jpg' },
-  { slug: 'kollam', name: 'Kollam', tech_count: 0, image: '/images/districts/kollam.png' },
-  { slug: 'pathanamthitta', name: 'Pathanamthitta', tech_count: 0, image: '/images/districts/pathanamthitta.jpg' },
-  { slug: 'alappuzha', name: 'Alappuzha', tech_count: 0, image: '/images/districts/alappuzha.jpg' },
-  { slug: 'kottayam', name: 'Kottayam', tech_count: 0, image: '/images/districts/kottayam.jpg' },
-  { slug: 'idukki', name: 'Idukki', tech_count: 0, image: '/images/districts/idukki.jpg' },
-  { slug: 'ernakulam', name: 'Ernakulam', tech_count: 0, image: '/images/districts/ernakulam.jpg' },
-  { slug: 'thrissur', name: 'Thrissur', tech_count: 0, image: '/images/districts/thrissur.jpg' },
-  { slug: 'palakkad', name: 'Palakkad', tech_count: 0, image: '/images/districts/palakkad.jpg' },
-  { slug: 'malappuram', name: 'Malappuram', tech_count: 0, image: '/images/districts/malappuram.jpg' },
-  { slug: 'kozhikode', name: 'Kozhikode', tech_count: 0, image: '/images/districts/kozhikode.jpg' },
-  { slug: 'wayanad', name: 'Wayanad', tech_count: 0, image: '/images/districts/wayanad.jpg' },
-  { slug: 'kannur', name: 'Kannur', tech_count: 0, image: '/images/districts/kannur.jpg' },
-  { slug: 'kasaragod', name: 'Kasaragod', tech_count: 0, image: '/images/districts/kasaragod.jpg' },
+  { slug: 'thiruvananthapuram', name: 'Thiruvananthapuram', tech_count: 0, image: '/images/districts/thiruvananthapuram.webp' },
+  { slug: 'kollam',             name: 'Kollam',             tech_count: 0, image: '/images/districts/kollam.webp' },
+  { slug: 'pathanamthitta',     name: 'Pathanamthitta',     tech_count: 0, image: '/images/districts/pathanamthitta.webp' },
+  { slug: 'alappuzha',          name: 'Alappuzha',          tech_count: 0, image: '/images/districts/alappuzha.webp' },
+  { slug: 'kottayam',           name: 'Kottayam',           tech_count: 0, image: '/images/districts/kottayam.webp' },
+  { slug: 'idukki',             name: 'Idukki',             tech_count: 0, image: '/images/districts/idukki.webp' },
+  { slug: 'ernakulam',          name: 'Ernakulam',          tech_count: 0, image: '/images/districts/ernakulam.webp' },
+  { slug: 'thrissur',           name: 'Thrissur',           tech_count: 0, image: '/images/districts/thrissur.webp' },
+  { slug: 'palakkad',           name: 'Palakkad',           tech_count: 0, image: '/images/districts/palakkad.webp' },
+  { slug: 'malappuram',         name: 'Malappuram',         tech_count: 0, image: '/images/districts/malappuram.webp' },
+  { slug: 'kozhikode',          name: 'Kozhikode',          tech_count: 0, image: '/images/districts/kozhikode.webp' },
+  { slug: 'wayanad',            name: 'Wayanad',            tech_count: 0, image: '/images/districts/wayanad.webp' },
+  { slug: 'kannur',             name: 'Kannur',             tech_count: 0, image: '/images/districts/kannur.webp' },
+  { slug: 'kasaragod',          name: 'Kasaragod',          tech_count: 0, image: '/images/districts/kasaragod.webp' },
 ];
 
 const INSTRUMENT_SEARCH_CONFIG: SearchConfig = {
