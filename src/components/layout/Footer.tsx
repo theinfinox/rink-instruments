@@ -1,12 +1,16 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { Mail, MapPin } from 'lucide-react';
+import { Mail, MapPin, ExternalLink } from 'lucide-react';
 
-const NAV_LINKS = [
+const EXPLORE_LINKS = [
   { label: 'Home', href: '/' },
   { label: 'Instruments', href: '/instruments' },
   { label: 'Services', href: '/services' },
-  { label: 'Contact', href: '/contact' },
+  { label: 'Institutions', href: '/#institutions' },
+  { label: 'Startups', href: '/#startups' },
+  { label: 'Districts', href: '/services#districts' },
+  { label: 'About RINK', href: '/about' },
+  { label: 'Contact Us', href: '/contact' },
 ];
 
 export default function Footer() {
@@ -15,15 +19,29 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-8">
 
-          {/* ── Left: Logo ── */}
-          <div className="flex items-center">
-            <div className="relative h-12 w-48 sm:w-60 flex-shrink-0">
+          {/* ── Left: Logo & Overview ── */}
+          <div className="flex flex-col justify-start">
+            <Link href="/" className="relative h-12 w-48 sm:w-56 flex-shrink-0 mb-3.5 block" aria-label="RINK Home">
               <Image
                 src="/images/rink_logo.png"
                 alt="Research Innovation Network Kerala"
                 fill
                 className="object-contain object-left"
               />
+            </Link>
+            <p className="text-xs text-slate-500 leading-relaxed font-sans mb-4">
+              Research Innovation Network Kerala (RINK) is an initiative by Kerala Startup Mission connecting research institutions with startups to commercialize deep-tech innovation.
+            </p>
+            <div>
+              <a
+                href="https://rink.startupmission.in/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-blue-50/80 text-xs font-semibold text-[#0A2164] hover:bg-blue-100/80 transition-colors border border-blue-200/60 font-sans group"
+              >
+                <span>Visit Official RINK Portal</span>
+                <ExternalLink className="w-3.5 h-3.5 flex-shrink-0 text-[#0A2164] transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              </a>
             </div>
           </div>
 
@@ -33,16 +51,27 @@ export default function Footer() {
               Explore
             </h4>
             <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2.5">
-              {NAV_LINKS.map((link) => (
+              {EXPLORE_LINKS.map((link) => (
                 <li key={link.label}>
                   <Link
                     href={link.href}
-                    className="text-sm text-slate-600 hover:text-[#0A2164] transition-colors font-sans"
+                    className="text-sm text-slate-600 hover:text-[#0A2164] transition-colors font-sans block"
                   >
                     {link.label}
                   </Link>
                 </li>
               ))}
+              <li className="sm:col-span-2 pt-2.5 mt-1 border-t border-slate-100">
+                <a
+                  href="https://rink.startupmission.in/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#0A2164] hover:underline transition-colors font-sans group"
+                >
+                  <span>Official Page of RINK</span>
+                  <ExternalLink className="w-3.5 h-3.5 flex-shrink-0 text-[#0A2164] transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                </a>
+              </li>
             </ul>
           </div>
 
@@ -83,3 +112,4 @@ export default function Footer() {
     </footer>
   );
 }
+
