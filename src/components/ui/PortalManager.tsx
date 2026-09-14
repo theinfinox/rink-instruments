@@ -248,7 +248,7 @@ export default function PortalManager({
         title: "Discover Startup Services from Kerala's Innovation Ecosystem",
         subtitle: "RESEARCH INNOVATION NETWORK KERALA . SERVICES PORTAL",
         context: 'services' as const,
-        featuredTitle: "Featured Startup Services",
+        featuredTitle: "Available Startup Services",
         featuredEyebrow: "Startup Services",
         featuredCtaText: "Browse All Services",
         featuredCtaLink: "/services/list",

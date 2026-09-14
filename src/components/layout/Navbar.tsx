@@ -16,11 +16,11 @@ const INSTRUMENTS_NAV_LINKS = [
 ];
 
 const SERVICES_NAV_LINKS = [
-  { label: 'Home',          href: '/',                  icon: House },
-  { label: 'Services',      href: '/services/list',     icon: Layers },
-  { label: 'Startups',      href: '/services#startups',  icon: Rocket },
-  { label: 'Districts',     href: '/services#districts', icon: MapPin },
-  { label: 'Contact',       href: '/contact',           icon: Phone },
+  { label: 'Home',         href: '/services',          icon: House },
+  { label: 'Instruments',  href: '/',                  icon: Microscope },
+  { label: 'Startups',     href: '/services#startups',  icon: Rocket },
+  { label: 'Districts',    href: '/services#districts', icon: MapPin },
+  { label: 'Contact',      href: '/contact',           icon: Phone },
 ];
 
 export default function Navbar() {
@@ -74,28 +74,24 @@ export default function Navbar() {
     // 1. Exact match with current path + hash
     if (currentPathWithHash === href) return true;
 
-    // 2. Special case for '/' (Instruments home)
-    if (href === '/' && !isServicesContext) return currentPathWithHash === '/';
-    
-    // 3. Special case for '/' in services context
-    if (href === '/' && isServicesContext) return false;
-
-    // 4. Special case for '/services' root or '/services/list'
-    if (href === '/services' || href === '/services/list') {
-      return pathname.startsWith('/services') && (hash === '' || !hash.includes('startups') && !hash.includes('districts'));
+    // 2. Instruments Home ('/')
+    if (href === '/') {
+      return !isServicesContext && pathname === '/' && (hash === '' || hash === '#');
     }
 
-    // 5. Special case for startups anchor
-    if (href === '/services#startups' || href === '/#startups') {
-      return hash === '#startups';
+    // 3. Services Home ('/services')
+    if (href === '/services') {
+      return isServicesContext && pathname === '/services' && (hash === '' || hash === '#');
     }
 
-    // 6. Subpath matching (fallback for links without hash)
-    if (!href.includes('#')) {
-      return pathname === href || pathname.startsWith(href);
+    // 4. Anchor links matching active hash
+    if (href.includes('#')) {
+      const [targetPath, targetHash] = href.split('#');
+      return pathname === (targetPath || '/') && hash === `#${targetHash}`;
     }
-    
-    return false;
+
+    // 5. Subpath matching (for links without hash, e.g. /contact)
+    return pathname === href || (href !== '/' && href !== '/services' && pathname.startsWith(href));
   };
 
   const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
@@ -140,7 +136,11 @@ export default function Navbar() {
           <div className="flex items-center justify-between h-16">
 
             {/* ── Logo ── */}
-            <Link href="/" className="flex items-center flex-shrink-0 select-none" id="navbar-logo">
+            <Link 
+              href={isServicesContext ? "/services" : "/"} 
+              className="flex items-center flex-shrink-0 select-none" 
+              id="navbar-logo"
+            >
               <div className="relative h-9 sm:h-12 w-44 sm:w-60">
                 <Image
                   src="/images/rink_logo.png"
