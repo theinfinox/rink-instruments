@@ -223,22 +223,26 @@ export default function HeroSearch({ config = DEFAULT_CONFIG }: { config?: Searc
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
   }, [query, runSearch]);
 
-  /* ── Click-outside to close — unchanged ── */
   useEffect(() => {
-    function onClickOutside(e: MouseEvent) {
+    function onClickOutside(e: Event) {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         setShowDrop(false);
         setFocused(false);
       }
     }
+    document.addEventListener('pointerdown', onClickOutside);
     document.addEventListener('mousedown', onClickOutside);
-    return () => document.removeEventListener('mousedown', onClickOutside);
+    return () => {
+      document.removeEventListener('pointerdown', onClickOutside);
+      document.removeEventListener('mousedown', onClickOutside);
+    };
   }, []);
 
   /* ── Keyboard navigation — unchanged ── */
   function handleKeyDown(e: React.KeyboardEvent) {
     if (!showDrop) {
       if (e.key === 'Enter' && query.trim()) {
+        inputRef.current?.blur();
         window.location.href = `${config.searchRoute}?q=${encodeURIComponent(query.trim())}`;
       }
       return;
@@ -251,13 +255,17 @@ export default function HeroSearch({ config = DEFAULT_CONFIG }: { config?: Searc
       setActiveIdx(i => Math.max(i - 1, -1));
     } else if (e.key === 'Enter') {
       e.preventDefault();
+      inputRef.current?.blur();
+      setShowDrop(false);
+      setFocused(false);
       if (activeIdx >= 0 && suggestions[activeIdx]) {
         window.location.href = `/instruments/${suggestions[activeIdx].id}`;
       } else if (query.trim()) {
-        window.location.href = `/instruments?q=${encodeURIComponent(query.trim())}`;
+        window.location.href = `${config.searchRoute}?q=${encodeURIComponent(query.trim())}`;
       }
     } else if (e.key === 'Escape') {
       setShowDrop(false);
+      setFocused(false);
       setActiveIdx(-1);
       inputRef.current?.blur();
     }
@@ -350,7 +358,12 @@ export default function HeroSearch({ config = DEFAULT_CONFIG }: { config?: Searc
             <button
               type="button"
               onClick={() => {
-                if (query.trim()) window.location.href = `${config.searchRoute}?q=${encodeURIComponent(query.trim())}`;
+                if (query.trim()) {
+                  inputRef.current?.blur();
+                  setShowDrop(false);
+                  setFocused(false);
+                  window.location.href = `${config.searchRoute}?q=${encodeURIComponent(query.trim())}`;
+                }
               }}
               disabled={!query.trim()}
               aria-label="Search"
@@ -381,9 +394,35 @@ export default function HeroSearch({ config = DEFAULT_CONFIG }: { config?: Searc
                 border: '1px solid rgba(244,180,0,0.12)',
                 boxShadow: '0 20px 50px rgba(0,0,0,0.18)',
                 zIndex: 50,
-                maxHeight: 520,
+                maxHeight: 'min(70vh, 520px)',
               }}
             >
+              {/* Header / mobile dismiss bar */}
+              <div
+                className="flex items-center justify-between px-4 sm:px-5 py-2.5 sm:py-2 bg-slate-50/90 border-b border-slate-100"
+              >
+                <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
+                  Suggestions
+                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] text-slate-400">
+                    {suggestions.length} result{suggestions.length !== 1 ? 's' : ''}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowDrop(false);
+                      setFocused(false);
+                    }}
+                    className="sm:hidden text-xs font-semibold text-slate-600 hover:text-slate-900 px-2 py-0.5 rounded bg-white border border-slate-200 shadow-2xs active:scale-95 transition-all flex items-center gap-1 cursor-pointer"
+                    aria-label="Close suggestions"
+                  >
+                    <span>Close</span>
+                    <X style={{ width: 12, height: 12 }} className="text-slate-400" />
+                  </button>
+                </div>
+              </div>
+
               {/* Loading skeletons */}
               {isLoading && [1, 2, 3].map(i => <SkeletonRow key={i} />)}
 

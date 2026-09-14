@@ -52,6 +52,8 @@ export default function SearchBar({
   const [activeIdx, setActiveIdx] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const isUserTypingRef = useRef(false);
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Fetch search index once
   useEffect(() => {
@@ -62,10 +64,14 @@ export default function SearchBar({
   }, [dataset]);
 
   useEffect(() => {
+    isUserTypingRef.current = false;
     setQuery(defaultValue);
+    setOpen(false);
   }, [defaultValue]);
 
   const clearQuery = useCallback(() => {
+    isUserTypingRef.current = false;
+    if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
     setQuery('');
     setSuggestions([]);
     setOpen(false);
@@ -77,7 +83,7 @@ export default function SearchBar({
   }, [defaultValue, router, searchRoute]);
 
   // Debounced search — delegates to unified precisionSearch engine
-  const doSearch = useCallback(async (q: string) => {
+  const doSearch = useCallback(async (q: string, forceOpen?: boolean) => {
     if (!q.trim() || q.length < 2) {
       setSuggestions([]);
       setOpen(false);
@@ -88,35 +94,53 @@ export default function SearchBar({
     const top7 = results.slice(0, 7);
 
     setSuggestions(top7);
-    setOpen(top7.length > 0);
+    // Only open if explicitly requested OR user is actively typing
+    if (forceOpen || isUserTypingRef.current) {
+      setOpen(top7.length > 0);
+    }
     setActiveIdx(-1);
   }, [allItems]);
 
   useEffect(() => {
-    const timer = setTimeout(() => doSearch(query), 180);
-    return () => clearTimeout(timer);
+    if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+    debounceTimerRef.current = setTimeout(() => {
+      doSearch(query);
+    }, 180);
+    return () => {
+      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+    };
   }, [query, doSearch]);
 
-  // Close on outside click
+  // Close on outside click or mobile touch
   useEffect(() => {
-    function handleClick(e: MouseEvent) {
+    function handleOutside(e: Event) {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        isUserTypingRef.current = false;
         setOpen(false);
       }
     }
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
+    document.addEventListener('pointerdown', handleOutside);
+    document.addEventListener('mousedown', handleOutside);
+    return () => {
+      document.removeEventListener('pointerdown', handleOutside);
+      document.removeEventListener('mousedown', handleOutside);
+    };
   }, []);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    isUserTypingRef.current = false;
+    if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+    setOpen(false);
+    inputRef.current?.blur();
     if (query.trim()) {
-      setOpen(false);
       router.push(`${searchRoute}?q=${encodeURIComponent(query.trim())}`);
     }
   }
 
   function handleSelect(item: SearchIndexItem) {
+    isUserTypingRef.current = false;
+    if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
     setOpen(false);
     router.push(`${detailRoute}/${item.id}`);
   }
@@ -133,6 +157,7 @@ export default function SearchBar({
       e.preventDefault();
       handleSelect(suggestions[activeIdx]);
     } else if (e.key === 'Escape') {
+      isUserTypingRef.current = false;
       setOpen(false);
     }
   }
@@ -154,9 +179,16 @@ export default function SearchBar({
           id="rink-search-input"
           type="text"
           value={query}
-          onChange={e => setQuery(e.target.value)}
+          onChange={e => {
+            isUserTypingRef.current = true;
+            setQuery(e.target.value);
+          }}
           onKeyDown={handleKeyDown}
-          onFocus={() => { if (suggestions.length > 0) setOpen(true); }}
+          onFocus={() => { 
+            if (query.trim().length >= 2 && suggestions.length > 0) {
+              setOpen(true);
+            }
+          }}
           placeholder={placeholder}
           autoFocus={autoFocus}
           className={`search-input ${inputPadding} pr-9 sm:pr-24 w-full rounded-xl sm:rounded-lg`}
@@ -195,7 +227,21 @@ export default function SearchBar({
             <span className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
               Suggestions
             </span>
-            <span className="text-xs text-text-secondary">{suggestions.length} results</span>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-text-secondary">{suggestions.length} results</span>
+              <button
+                type="button"
+                onClick={() => {
+                  isUserTypingRef.current = false;
+                  setOpen(false);
+                }}
+                className="sm:hidden text-xs font-semibold text-slate-500 hover:text-slate-900 px-2 py-0.5 rounded bg-slate-100/90 border border-slate-200/80 active:scale-95 transition-all flex items-center gap-1 cursor-pointer"
+                aria-label="Close suggestions"
+              >
+                <span>Close</span>
+                <X className="w-3 h-3 text-slate-400" />
+              </button>
+            </div>
           </div>
           {suggestions.map((item, idx) => (
             <button
