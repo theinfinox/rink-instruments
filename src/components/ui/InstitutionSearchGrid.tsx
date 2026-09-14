@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Building2, Search, X, Check, Rocket, ShieldCheck } from 'lucide-react';
+import { ArrowRight, Building2, Search, X, Check, Rocket, ShieldCheck, ChevronDown, ChevronUp } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import type { Institution } from '@/types';
 
@@ -177,7 +177,15 @@ function SuggestionItem({
 }
 
 // ── Institution Grid Card ────────────────────────────────────────
-function InstitutionGridCard({ inst, context }: { inst: Institution, context?: 'instruments' | 'services' }) {
+function InstitutionGridCard({ 
+  inst, 
+  context,
+  hiddenOnMobile,
+}: { 
+  inst: Institution; 
+  context?: 'instruments' | 'services';
+  hiddenOnMobile?: boolean;
+}) {
   if (!inst.name || !inst.slug) return null;
   const isServices = context === 'services';
   const isStartup = inst.is_startup || inst.entity_type === 'startup';
@@ -193,7 +201,9 @@ function InstitutionGridCard({ inst, context }: { inst: Institution, context?: '
     <Link
       key={inst.slug}
       href={linkHref}
-      className="group flex items-center gap-3 sm:gap-[18px] bg-white border border-[rgba(15,23,42,0.08)] rounded-xl sm:rounded-md p-3 sm:p-4 transition-all duration-250 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(15,23,42,0.10)] hover:border-[#1B4D9B]/25"
+      className={`group items-center gap-3 sm:gap-[18px] bg-white border border-[rgba(15,23,42,0.08)] rounded-xl sm:rounded-md p-3 sm:p-4 transition-all duration-250 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(15,23,42,0.10)] hover:border-[#1B4D9B]/25 ${
+        hiddenOnMobile ? 'hidden sm:flex' : 'flex'
+      }`}
       id={`browse-inst-${inst.slug}`}
       style={{
         animation: 'inst-fadeIn 200ms ease both',
@@ -275,6 +285,10 @@ export default function InstitutionSearchGrid({ institutions, startups = [], con
   // Active filter tab: 'all' | 'startups' | 'partnered' (single-select mutually exclusive)
   const [filterTab, setFilterTab] = useState<'all' | 'startups' | 'partnered'>('all');
 
+  // Mobile progressive disclosure (initially shows 6 on mobile)
+  const [isMobileExpanded, setIsMobileExpanded] = useState(false);
+  const MOBILE_THRESHOLD = 6;
+
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
@@ -321,6 +335,18 @@ export default function InstitutionSearchGrid({ institutions, startups = [], con
     if (!query.trim()) return currentPool;
     return currentPool.filter((inst: Institution) => matches(inst.name, query));
   }, [currentPool, query]);
+
+  // Reset mobile expansion when query or tab changes
+  useEffect(() => {
+    setIsMobileExpanded(false);
+  }, [query, filterTab]);
+
+  const mobileToggleLabel = useMemo(() => {
+    if (isServices) return 'Startups';
+    if (filterTab === 'partnered') return 'Partnered Institutions';
+    if (filterTab === 'startups') return 'Startups';
+    return 'Institutions & Startups';
+  }, [isServices, filterTab]);
 
   const clearSearch = useCallback(() => {
     setQuery('');
@@ -635,11 +661,50 @@ export default function InstitutionSearchGrid({ institutions, startups = [], con
 
       {/* ── Institution Grid ── */}
       {filteredInstitutions.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredInstitutions.map((inst: Institution) => (
-            <InstitutionGridCard key={inst.slug} inst={inst} context={context} />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredInstitutions.map((inst: Institution, index: number) => (
+              <InstitutionGridCard 
+                key={inst.slug} 
+                inst={inst} 
+                context={context} 
+                hiddenOnMobile={!isMobileExpanded && index >= MOBILE_THRESHOLD}
+              />
+            ))}
+          </div>
+
+          {/* ── Mobile Progressive Disclosure: View All / Show Less ── */}
+          {filteredInstitutions.length > MOBILE_THRESHOLD && (
+            <div className="sm:hidden flex justify-center mt-4">
+              <button
+                type="button"
+                onClick={() => {
+                  if (isMobileExpanded) {
+                    setIsMobileExpanded(false);
+                    const el = document.getElementById('institutions') || containerRef.current;
+                    if (el) {
+                      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                  } else {
+                    setIsMobileExpanded(true);
+                  }
+                }}
+                className="w-full flex items-center justify-center gap-2 h-11 px-4 rounded-xl font-semibold text-xs text-[#1B4D9B] bg-slate-50 hover:bg-slate-100 border border-slate-200/90 shadow-2xs active:scale-[0.98] transition-all cursor-pointer select-none"
+              >
+                <span>
+                  {isMobileExpanded 
+                    ? `Show Fewer ${mobileToggleLabel}` 
+                    : `View All ${filteredInstitutions.length} ${mobileToggleLabel} (${filteredInstitutions.length - MOBILE_THRESHOLD} More)`}
+                </span>
+                {isMobileExpanded ? (
+                  <ChevronUp className="w-4 h-4 text-[#1B4D9B]/70" />
+                ) : (
+                  <ChevronDown className="w-4 h-4 text-[#1B4D9B]/70" />
+                )}
+              </button>
+            </div>
+          )}
+        </>
       ) : (
         /* ── Empty State ── */
         <div className="flex flex-col items-center justify-center py-16 text-center bg-slate-50/50 rounded-2xl border border-dashed border-slate-200 p-8">

@@ -10,7 +10,9 @@ import {
   Building2, 
   CheckCircle2, 
   ChevronLeft, 
-  ChevronRight 
+  ChevronRight,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import { getImageUrl } from '@/lib/utils';
 
@@ -137,12 +139,20 @@ function extractShortName(name: string): string {
   return name.length > 28 ? name.slice(0, 26) + '...' : name;
 }
 
-function PartnerCard({ partner }: { partner: MouPartner }) {
+function PartnerCard({ 
+  partner, 
+  hiddenOnMobile 
+}: { 
+  partner: MouPartner; 
+  hiddenOnMobile?: boolean; 
+}) {
   const [imageError, setImageError] = useState(false);
   const logoSrc = (partner.cdnLogo ? getImageUrl(partner.cdnLogo) : null) || partner.localLogo;
 
   return (
-    <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-slate-200/90 shadow-sm hover:shadow-md hover:border-blue-300 hover:-translate-y-1 transition-all duration-200 flex flex-col justify-between group">
+    <div className={`bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-slate-200/90 shadow-sm hover:shadow-md hover:border-blue-300 hover:-translate-y-1 transition-all duration-200 flex-col justify-between group ${
+      hiddenOnMobile ? 'hidden sm:flex' : 'flex'
+    }`}>
       <div>
         {/* Top Bar: Logo/Avatar + Verified Badge */}
         <div className="flex items-start justify-between gap-3 mb-3 sm:mb-4">
@@ -281,6 +291,10 @@ export default function ExclusivePartnershipsSection({
     });
   }, [mouList, institutionList]);
 
+  // Mobile progressive disclosure (initially shows 3 on mobile)
+  const [isMobileExpanded, setIsMobileExpanded] = useState(false);
+  const MOBILE_MOU_THRESHOLD = 3;
+
   // Pagination calculation
   const totalPages = Math.ceil(partners.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -288,6 +302,7 @@ export default function ExclusivePartnershipsSection({
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
+    setIsMobileExpanded(false);
     // Smoothly scroll back to section header on page change
     const el = document.getElementById('exclusive-partnerships');
     if (el) {
@@ -348,10 +363,47 @@ export default function ExclusivePartnershipsSection({
 
         {/* Responsive Grid of Cards (Max 8 per page) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 mb-8">
-          {currentPartners.map((partner) => (
-            <PartnerCard key={partner.id} partner={partner} />
+          {currentPartners.map((partner, index) => (
+            <PartnerCard 
+              key={partner.id} 
+              partner={partner} 
+              hiddenOnMobile={!isMobileExpanded && index >= MOBILE_MOU_THRESHOLD}
+            />
           ))}
         </div>
+
+        {/* Mobile Progressive Disclosure: View All / Show Less */}
+        {currentPartners.length > MOBILE_MOU_THRESHOLD && (
+          <div className="sm:hidden flex justify-center -mt-4 mb-8">
+            <button
+              type="button"
+              onClick={() => {
+                if (isMobileExpanded) {
+                  setIsMobileExpanded(false);
+                  const el = document.getElementById('exclusive-partnerships');
+                  if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }
+                } else {
+                  setIsMobileExpanded(true);
+                }
+              }}
+              className="w-full flex items-center justify-center gap-2 h-11 px-4 rounded-xl font-semibold text-xs text-emerald-900 bg-white hover:bg-emerald-50/50 border border-emerald-200/90 shadow-2xs active:scale-[0.98] transition-all cursor-pointer select-none"
+            >
+              <ShieldCheck className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+              <span>
+                {isMobileExpanded 
+                  ? 'Show Fewer Partner Institutions' 
+                  : `View All ${currentPartners.length} Partner Institutions (${currentPartners.length - MOBILE_MOU_THRESHOLD} More)`}
+              </span>
+              {isMobileExpanded ? (
+                <ChevronUp className="w-4 h-4 text-emerald-600/70" />
+              ) : (
+                <ChevronDown className="w-4 h-4 text-emerald-600/70" />
+              )}
+            </button>
+          </div>
+        )}
 
         {/* Pagination Controls (renders only if total partner count exceeds 8) */}
         {totalPages > 1 && (
