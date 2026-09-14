@@ -10,6 +10,7 @@ interface Props<T> {
   items: T[];
   itemType: 'instrument' | 'service';
   title?: string;
+  eyebrow?: string;
   ctaText?: string;
   ctaLink?: string;
   ctaMessage?: string;
@@ -19,10 +20,12 @@ export default function FeaturedCarousel<T>({
   items, 
   itemType, 
   title = "Featured Innovation Opportunities", 
+  eyebrow,
   ctaText = "Browse All Instruments", 
   ctaLink = "/instruments",
   ctaMessage = "Ready to Discover Commercially Viable Technologies?"
 }: Props<T>) {
+  const eyebrowText = eyebrow ?? (itemType === 'service' ? 'Startup Services' : 'Instruments');
   const containerRef   = useRef<HTMLDivElement>(null);
   const isInteracting  = useRef(false);
   const isVisible      = useRef(false);
@@ -106,7 +109,7 @@ export default function FeaturedCarousel<T>({
       >
         <div className="text-center px-4">
           <span className="block text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.2em] text-[#1b60bb]/70 mb-1 sm:mb-2">
-            Instrument Showcase
+            {eyebrowText}
           </span>
           <h2 className="font-serif font-black text-2xl sm:text-3xl md:text-[46px] text-[#1b60bb] tracking-wide leading-tight">
             {title}

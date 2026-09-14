@@ -206,9 +206,10 @@ export default function PortalManager({
         subtitle: "RESEARCH INNOVATION NETWORK KERALA . INSTRUMENTATION PORTAL",
         context: 'instruments' as const,
         featuredTitle: "Available Instruments",
+        featuredEyebrow: "Instruments",
         featuredCtaText: "Browse All",
         featuredCtaLink: "/instruments",
-        featuredCtaMessage: "Browse through instruments from research institutes and startups in Kerala",
+        featuredCtaMessage: "Browse through instruments available across Kerala",
         districtLinkPrefix: "/instruments?district=",
         itemName: "Instrument",
       };
@@ -248,6 +249,7 @@ export default function PortalManager({
         subtitle: "RESEARCH INNOVATION NETWORK KERALA . SERVICES PORTAL",
         context: 'services' as const,
         featuredTitle: "Featured Startup Services",
+        featuredEyebrow: "Startup Services",
         featuredCtaText: "Browse All Services",
         featuredCtaLink: "/services/list",
         featuredCtaMessage: "Ready to Scale Your Startup with Premium Ecosystem Services?",
@@ -353,6 +355,7 @@ export default function PortalManager({
 
       <FeaturedCarousel 
         title={data.featuredTitle}
+        eyebrow={data.featuredEyebrow}
         ctaText={data.featuredCtaText}
         ctaLink={data.featuredCtaLink}
         ctaMessage={data.featuredCtaMessage}

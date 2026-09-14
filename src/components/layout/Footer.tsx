@@ -105,7 +105,8 @@ export default function Footer() {
       <div className="border-t border-slate-200 bg-slate-50/50 pb-24 md:pb-5 pt-4 sm:pt-5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col-reverse sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 font-sans text-center sm:text-left">
           <p className="leading-relaxed">
-            © 2026 Research Innovation Network Kerala (RINK). An initiative of Kerala Startup Mission.
+            <span className="block sm:inline">© 2026 Research Innovation Network Kerala (RINK).</span>{' '}
+            <span className="block sm:inline mt-0.5 sm:mt-0 text-slate-400 sm:text-inherit">An initiative of Kerala Startup Mission.</span>
           </p>
           <div className="flex items-center gap-4 flex-shrink-0">
             <Link
