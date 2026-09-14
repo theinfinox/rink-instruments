@@ -316,16 +316,16 @@ export default function PortalManager({
         />
         <ResearchParticles />
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-20 md:py-28 lg:py-32 flex flex-col items-center text-center">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-20 md:py-28 lg:py-32 flex flex-col items-center text-center">
           <div
-            className="text-[11px] sm:text-xs md:text-sm font-bold uppercase tracking-[0.25em] mb-8"
+            className="text-[11px] sm:text-xs md:text-sm font-bold uppercase tracking-[0.25em] mb-4 sm:mb-8"
             style={{ color: 'rgba(255,255,255,0.75)' }}
           >
             {data.subtitle}
           </div>
 
           <h1
-            className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-[1.12] tracking-tight max-w-5xl mb-10"
+            className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-[1.12] tracking-tight max-w-5xl mb-6 sm:mb-10"
             style={{ color: '#FFFFFF', textShadow: '0 2px 12px rgba(0,0,0,0.35)' }}
           >
             {data.title}
@@ -370,9 +370,9 @@ export default function PortalManager({
         />
       )}
 
-      <section id="districts" className="relative py-20 bg-[#F6F8FC] overflow-hidden border-b border-slate-100 scroll-mt-20">
+      <section id="districts" className="relative py-10 sm:py-16 md:py-20 bg-[#F6F8FC] overflow-hidden border-b border-slate-100 scroll-mt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="max-w-xl mb-12">
+          <div className="max-w-xl mb-6 sm:mb-12">
             <div className="text-xs font-bold text-[#1B4D9B] uppercase tracking-widest mb-3">Explore by District</div>
             <h2 className="text-3xl font-heading font-bold text-[#0F172A] mb-3">
               Browse {view === 'services' ? 'Services' : 'Instruments'} by Region
