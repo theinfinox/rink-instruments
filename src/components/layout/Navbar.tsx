@@ -16,11 +16,11 @@ const INSTRUMENTS_NAV_LINKS = [
 ];
 
 const SERVICES_NAV_LINKS = [
-  { label: 'Home',          href: '/',               icon: House },
-  { label: 'Instruments',   href: '/',               icon: Microscope },
-  { label: 'Startups',      href: '/services#startups', icon: Rocket },
+  { label: 'Home',          href: '/',                  icon: House },
+  { label: 'Services',      href: '/services/list',     icon: Layers },
+  { label: 'Startups',      href: '/services#startups',  icon: Rocket },
   { label: 'Districts',     href: '/services#districts', icon: MapPin },
-  { label: 'Contact',       href: '/contact',        icon: Phone },
+  { label: 'Contact',       href: '/contact',           icon: Phone },
 ];
 
 export default function Navbar() {
@@ -29,6 +29,10 @@ export default function Navbar() {
   const pathname = usePathname();
   const isServicesContext = pathname.startsWith('/services');
   const navLinks = isServicesContext ? SERVICES_NAV_LINKS : INSTRUMENTS_NAV_LINKS;
+
+  const isDetailPage = 
+    (pathname.startsWith('/instruments/') && pathname !== '/instruments') || 
+    (pathname.startsWith('/services/') && pathname !== '/services/list' && pathname !== '/services');
 
   useEffect(() => {
     const scrollHandler = () => setScrolled(window.scrollY > 10);
@@ -76,12 +80,14 @@ export default function Navbar() {
     // 3. Special case for '/' in services context
     if (href === '/' && isServicesContext) return false;
 
-    // 4. Special case for '/services' root link
-    if (href === '/services') return currentPathWithHash === '/services' || (pathname.startsWith('/services') && hash === '');
+    // 4. Special case for '/services' root or '/services/list'
+    if (href === '/services' || href === '/services/list') {
+      return pathname.startsWith('/services') && (hash === '' || !hash.includes('startups') && !hash.includes('districts'));
+    }
 
-    // 5. Hardcoded exception for startups list
-    if (href === '/services#startups') {
-      return currentPathWithHash === '/services#startups' || pathname === '/services/list';
+    // 5. Special case for startups anchor
+    if (href === '/services#startups' || href === '/#startups') {
+      return hash === '#startups';
     }
 
     // 6. Subpath matching (fallback for links without hash)
@@ -135,7 +141,7 @@ export default function Navbar() {
 
             {/* ── Logo ── */}
             <Link href="/" className="flex items-center flex-shrink-0 select-none" id="navbar-logo">
-              <div className="relative h-10 sm:h-12 w-48 sm:w-60">
+              <div className="relative h-9 sm:h-12 w-44 sm:w-60">
                 <Image
                   src="/images/rink_logo.png"
                   alt="Research Innovation Network Kerala"
@@ -180,7 +186,7 @@ export default function Navbar() {
             <div className="flex items-center gap-2 md:hidden">
               <Link
                 href={isServicesContext ? "/services/list" : "/instruments"}
-                className="px-3 py-2 text-xs font-bold rounded-lg bg-[#0A2164] text-white hover:bg-[#081A52] transition-colors font-heading"
+                className="px-3 py-1.5 text-xs font-bold rounded-lg bg-[#0A2164] text-white hover:bg-[#081A52] transition-colors font-heading shadow-2xs"
               >
                 Browse
               </Link>
@@ -189,50 +195,52 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* ── MOBILE BOTTOM NAVIGATION BAR ── */}
-      <nav
-        aria-label="Mobile navigation"
-        className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-white border-t border-gray-100 shadow-[0_-4px_20px_rgba(0,0,0,0.06)]"
-        style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
-      >
-        <div className="flex items-stretch">
-          {navLinks.map((link, idx) => {
-            const Icon = link.icon;
-            const active = isLinkActive(link.href);
-            return (
-              <Link
-                key={`${link.label}-${idx}`}
-                href={link.href}
-                aria-label={link.label}
-                onClick={(e) => handleLinkClick(e, link.href)}
-                className={clsx(
-                  'flex flex-col items-center justify-center flex-1 gap-1 py-3 min-h-[64px] transition-all duration-200 select-none relative',
-                  active
-                    ? 'text-[#0A2164]'
-                    : 'text-gray-500 hover:text-[#0A2164]'
-                )}
-              >
-                {active && (
-                  <span className="absolute top-0 inset-x-3 h-1 bg-[#0A2164] rounded-b-md shadow-[0_2px_8px_rgba(10,33,100,0.4)]" />
-                )}
-                <Icon
+      {/* ── MOBILE BOTTOM NAVIGATION BAR (Option A: Hidden on Detail Pages) ── */}
+      {!isDetailPage && (
+        <nav
+          aria-label="Mobile navigation"
+          className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-gray-100 shadow-[0_-4px_20px_rgba(0,0,0,0.06)]"
+          style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+        >
+          <div className="flex items-stretch">
+            {navLinks.map((link, idx) => {
+              const Icon = link.icon;
+              const active = isLinkActive(link.href);
+              return (
+                <Link
+                  key={`${link.label}-${idx}`}
+                  href={link.href}
+                  aria-label={link.label}
+                  onClick={(e) => handleLinkClick(e, link.href)}
                   className={clsx(
-                    'w-5 h-5 transition-all duration-200 mt-1',
-                    active && 'scale-110'
+                    'flex flex-col items-center justify-center flex-1 gap-1 py-3 min-h-[64px] transition-all duration-200 select-none relative',
+                    active
+                      ? 'text-[#0A2164]'
+                      : 'text-gray-500 hover:text-[#0A2164]'
                   )}
-                  strokeWidth={active ? 2.5 : 2}
-                />
-                <span className={clsx(
-                  'text-[10px] font-bold tracking-wide transition-colors truncate px-0.5',
-                  active ? 'text-[#0A2164]' : 'text-gray-500'
-                )}>
-                  {link.label}
-                </span>
-              </Link>
-            );
-          })}
-        </div>
-      </nav>
+                >
+                  {active && (
+                    <span className="absolute top-0 inset-x-3 h-1 bg-[#0A2164] rounded-b-md shadow-[0_2px_8px_rgba(10,33,100,0.4)]" />
+                  )}
+                  <Icon
+                    className={clsx(
+                      'w-5 h-5 transition-all duration-200 mt-1',
+                      active && 'scale-110'
+                    )}
+                    strokeWidth={active ? 2.5 : 2}
+                  />
+                  <span className={clsx(
+                    'text-[10px] font-bold tracking-wide transition-colors truncate px-0.5',
+                    active ? 'text-[#0A2164]' : 'text-gray-500'
+                  )}>
+                    {link.label}
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
+        </nav>
+      )}
     </>
   );
 }

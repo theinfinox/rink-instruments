@@ -102,20 +102,13 @@ export default function FeaturedCarousel<T>({
     >
       {/* ── TOP WHITE CURVED PANEL (Hero Cap / Mask) ── */}
       <div
-        className="relative z-20 flex items-center justify-center w-full"
-        style={{
-          height: 160,
-          background: '#F6F8FC',
-          borderBottomLeftRadius: '3rem',
-          borderBottomRightRadius: '3rem',
-          boxShadow: '0 6px 32px rgba(0,0,0,0.10)',
-        }}
+        className="relative z-20 flex items-center justify-center w-full h-24 sm:h-32 md:h-40 bg-[#F6F8FC] rounded-b-[1.5rem] sm:rounded-b-[3rem] shadow-[0_6px_32px_rgba(0,0,0,0.10)]"
       >
         <div className="text-center px-4">
-          <span className="block text-[11px] font-bold uppercase tracking-[0.2em] text-[#1b60bb]/70 mb-2">
+          <span className="block text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.2em] text-[#1b60bb]/70 mb-1 sm:mb-2">
             Instrument Showcase
           </span>
-          <h2 className="font-serif font-black text-[28px] sm:text-[38px] md:text-[46px] text-[#1b60bb] tracking-wide leading-tight">
+          <h2 className="font-serif font-black text-2xl sm:text-3xl md:text-[46px] text-[#1b60bb] tracking-wide leading-tight">
             {title}
           </h2>
         </div>
@@ -123,7 +116,7 @@ export default function FeaturedCarousel<T>({
 
       {/* ── CAROUSEL CONTENT ── */}
       <div
-        className="w-full relative z-10 py-12 lg:py-16"
+        className="w-full relative z-10 py-8 sm:py-12 lg:py-16"
         onMouseEnter={pause}
         onMouseLeave={resume}
         onTouchStart={pause}
@@ -132,7 +125,7 @@ export default function FeaturedCarousel<T>({
         {/* Scrolling Container */}
         <div
           ref={containerRef}
-          className="flex gap-5 overflow-hidden px-[10vw] py-4 featured-scroller"
+          className="flex gap-4 sm:gap-5 overflow-hidden px-4 sm:px-[5vw] md:px-[10vw] py-2 sm:py-4 featured-scroller"
           style={{
             WebkitOverflowScrolling: 'touch',
             scrollbarWidth: 'none',
@@ -145,7 +138,7 @@ export default function FeaturedCarousel<T>({
             return (
             <div
               key={`${itemKey}-${idx}`}
-              className="flex-shrink-0 w-[240px] xs:w-[260px] sm:w-[280px] md:w-[320px] relative h-[360px] sm:h-[380px] md:h-[420px]"
+              className="flex-shrink-0 w-[275px] xs:w-[290px] sm:w-[280px] md:w-[320px] relative h-[415px] sm:h-[415px] md:h-[420px]"
               onMouseEnter={pause}
               onMouseLeave={resume}
             >
@@ -164,26 +157,19 @@ export default function FeaturedCarousel<T>({
 
       {/* ── BOTTOM WHITE CURVED PANEL (Browse Cap / Mask) ── */}
       <div
-        className="relative z-20 flex flex-col items-center justify-center px-4 w-full"
-        style={{
-          height: 160,
-          background: '#ffffff',
-          borderTopLeftRadius: '3rem',
-          borderTopRightRadius: '3rem',
-          boxShadow: '0 -6px 32px rgba(0,0,0,0.10)',
-        }}
+        className="relative z-20 flex flex-col items-center justify-center px-4 w-full h-20 sm:h-36 md:h-40 bg-white rounded-t-[1.5rem] sm:rounded-t-[3rem] shadow-[0_-6px_32px_rgba(0,0,0,0.10)]"
       >
-        <p className="text-[#1b60bb] text-[16px] md:text-[20px] font-medium text-center mb-4 leading-snug">
+        <p className="hidden sm:block text-[#1b60bb] text-sm sm:text-[16px] md:text-[20px] font-medium text-center mb-3 sm:mb-4 leading-snug max-w-xl">
           {ctaMessage}
         </p>
         <Link
           href={ctaLink}
           id="browse-all-featured-cta"
-          className="group/btn inline-flex items-center gap-2 bg-[#1b60bb] hover:bg-[#0d4a9a] text-white px-6 py-2.5 rounded-full font-semibold text-sm shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
+          className="group/btn inline-flex items-center gap-2 bg-[#1b60bb] hover:bg-[#0d4a9a] text-white px-5 sm:px-6 py-2 sm:py-2.5 rounded-full font-semibold text-xs sm:text-sm shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
         >
           {ctaText}
           <ArrowUpRight
-            size={16}
+            size={15}
             strokeWidth={2.5}
             className="transition-transform duration-300 group-hover/btn:translate-x-[2px] group-hover/btn:-translate-y-[2px]"
           />

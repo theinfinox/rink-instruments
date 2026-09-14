@@ -68,14 +68,14 @@ function MetricCard({ target, suffix, label, run, delay }: Metric & { run: boole
 
   return (
     <div
-      className="hero-metric-card bg-white border border-[rgba(15,23,42,0.08)] rounded-md p-7 text-center transition-all duration-300 hover:border-[#1B4D9B]/30 hover:shadow-md hover:-translate-y-1"
+      className="hero-metric-card bg-white border border-[rgba(15,23,42,0.08)] rounded-xl sm:rounded-md p-3.5 sm:p-7 text-center transition-all duration-300 hover:border-[#1B4D9B]/30 hover:shadow-md hover:-translate-y-1 shadow-2xs sm:shadow-none"
       style={{ animationDelay: `${delay}ms` }}
     >
-      <div className="font-heading text-4xl md:text-5xl font-bold text-[#1B4D9B] leading-none">
+      <div className="font-heading text-2xl sm:text-4xl md:text-5xl font-bold text-[#1B4D9B] leading-none">
         {val}
         <span className="text-[#F5B301]">{suffix}</span>
       </div>
-      <div className="text-sm text-[#475569] font-sans mt-3 tracking-wide">{label}</div>
+      <div className="text-xs sm:text-sm text-[#475569] font-sans mt-1.5 sm:mt-3 tracking-wide leading-tight line-clamp-2">{label}</div>
     </div>
   );
 }
@@ -102,9 +102,9 @@ function MetricCard({ target, suffix, label, run, delay }: Metric & { run: boole
   return (
     <section
       ref={ref}
-      className="bg-white py-16 md:py-20 border-b border-slate-100"
+      className="bg-white py-10 sm:py-16 md:py-20 border-b border-slate-100"
     >
-      <div className={`max-w-6xl mx-auto px-4 sm:px-6 grid gap-4 sm:gap-6 ${
+      <div className={`max-w-6xl mx-auto px-4 sm:px-6 grid gap-3 sm:gap-6 ${
         metrics.length === 4
           ? 'grid-cols-2 lg:grid-cols-4'
           : 'grid-cols-1 sm:grid-cols-3'

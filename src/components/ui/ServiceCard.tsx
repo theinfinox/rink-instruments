@@ -77,12 +77,12 @@ export default function ServiceCard({ service, compact = false }: Props) {
   return (
     <Link
       href={`/services/${encodeURIComponent(serviceId)}`}
-      className="block group h-full focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-2xl"
+      className="block group h-full focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-xl sm:rounded-2xl"
       id={`service-card-${serviceId}`}
       aria-label={`View ${service.serviceName} by ${service.startupName}`}
     >
       <motion.div
-        className="h-full flex flex-col rounded-2xl overflow-hidden border transition-all duration-300 ease-out"
+        className="h-full flex flex-col rounded-xl sm:rounded-2xl overflow-hidden border transition-all duration-300 ease-out"
         style={{
           background: '#FCFDFF',
           borderColor: 'rgba(37,99,235,0.08)',
@@ -155,8 +155,8 @@ export default function ServiceCard({ service, compact = false }: Props) {
           )}
         </div>
 
-        <div className="flex flex-col flex-1 px-5 py-4 gap-0">
-          <div className="flex items-center gap-1.5 mb-2 min-w-0">
+        <div className="flex flex-col flex-1 px-4 py-3.5 sm:px-5 sm:py-4 gap-0">
+          <div className="flex items-center gap-1.5 mb-1.5 sm:mb-2 min-w-0">
             <Building2 className="w-3 h-3 flex-shrink-0" style={{ color: '#94a3b8' }} />
             <span className="text-[11px] font-medium uppercase tracking-wide truncate" style={{ color: '#64748b' }}>
               {service.startupName}
@@ -164,14 +164,15 @@ export default function ServiceCard({ service, compact = false }: Props) {
           </div>
 
           <h3
-            className="font-heading font-bold leading-snug transition-colors duration-200 group-hover:text-[#1b60bb] mb-2"
+            title={service.serviceName}
+            className="font-heading font-bold leading-snug transition-colors duration-200 group-hover:text-[#1b60bb] mb-1.5 sm:mb-2 line-clamp-2"
             style={{ fontSize: 15, color: '#0f172a' }}
           >
             {service.serviceName}
           </h3>
 
           <div className="mt-auto flex flex-col gap-0">
-            <div className="flex flex-wrap items-center gap-2 mb-3">
+            <div className="flex flex-wrap items-center gap-1 sm:gap-1.5 mb-2.5 sm:mb-3">
               <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-[#f8fafc] border border-[#e2e8f0]">
                 <Layers className="w-3 h-3 text-[#64748b]" />
                 <span className="text-[10px] font-semibold text-[#475569] truncate max-w-[120px]">
@@ -181,10 +182,10 @@ export default function ServiceCard({ service, compact = false }: Props) {
             </div>
 
             {service.certifications && (
-              <div className="pt-3 border-t border-slate-100/60">
+              <div className="pt-2.5 sm:pt-3 border-t border-slate-100/60">
                 <div className="flex items-center gap-1.5 text-[11px] text-[#64748b]">
                   <CheckCircle className="w-3 h-3 text-[#10b981]" />
-                  <span className="font-medium text-[#334155]">{service.certifications}</span>
+                  <span className="font-medium text-[#334155] line-clamp-1">{service.certifications}</span>
                 </div>
               </div>
             )}

@@ -382,7 +382,7 @@ export default function PortalManager({
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 mb-10">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6 mb-8 sm:mb-10">
             {data.districts.map((district, i) => {
               const smClass = smSpans[i] === 2 ? 'sm:col-span-2' : 'sm:col-span-1';
               const mdClass = mdSpans[i] === 2 ? 'md:col-span-2' : 'md:col-span-1';

@@ -206,7 +206,7 @@ export default async function InstitutionDetailPage({ params }: Props) {
       </div>
 
       {/* ── Main Content Area ── */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 pb-24 md:pb-8">
         <InstitutionFilterView
           initialInstruments={institutionViewModels}
           institutionName={institution.name}

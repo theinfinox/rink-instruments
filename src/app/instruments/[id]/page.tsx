@@ -93,18 +93,16 @@ export default async function TechnologyDetailPage({ params }: { params: Promise
     <div className="min-h-screen bg-white text-gray-900 font-sans">
 
       {/* ── MOBILE STICKY BOTTOM CTA ───────────────────────── */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden">
-        <div className="bg-white border-t border-gray-200 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] px-4 pt-3 pb-5">
-          <a
-            href={finalBookingLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 w-full py-3.5 rounded-md bg-[#0A2164] text-white font-semibold text-sm"
-          >
-            <FileText className="w-4 h-4" />
-            Booking link
-          </a>
-        </div>
+      <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white/95 backdrop-blur-md border-t border-slate-200 px-4 pt-3 pb-[calc(env(safe-area-inset-bottom,16px)+8px)] shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
+        <a
+          href={finalBookingLink}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl bg-[#0A2164] text-white font-semibold text-sm shadow-md active:scale-[0.98] transition-all"
+        >
+          <FileText className="w-4 h-4" />
+          <span>Booking link</span>
+        </a>
       </div>
 
       <div className="pb-28 md:pb-0">
@@ -113,7 +111,7 @@ export default async function TechnologyDetailPage({ params }: { params: Promise
             SECTION 1 — HERO
         ══════════════════════════════════════════════════════ */}
         <section className="border-b border-slate-200 bg-white">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-8 pb-12">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-5 sm:pt-8 pb-8 sm:pb-12">
 
             {/* Breadcrumb */}
             <nav className="flex items-center gap-1.5 text-xs text-slate-500 flex-wrap mb-8">
@@ -182,7 +180,7 @@ export default async function TechnologyDetailPage({ params }: { params: Promise
         {/* ══════════════════════════════════════════════════════
             MAIN CONTENT — TWO-COLUMN GRID
         ══════════════════════════════════════════════════════ */}
-        <section className="py-12 md:py-16">
+        <section className="py-8 md:py-16">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
 
@@ -199,7 +197,7 @@ export default async function TechnologyDetailPage({ params }: { params: Promise
                     {/* Soft glow */}
                     <div className="absolute -inset-1 bg-blue-500/10 blur-2xl rounded-2xl" />
                     {/* Card body */}
-                    <div className="relative rounded-xl border border-blue-200/60 bg-gradient-to-br from-blue-50 to-indigo-50/60 p-6 shadow-sm">
+                    <div className="relative rounded-xl border border-blue-200/60 bg-gradient-to-br from-blue-50 to-indigo-50/60 p-4 sm:p-6 shadow-sm">
                       <div className="flex items-center gap-3 mb-4">
                         <div className="flex-shrink-0 w-9 h-9 rounded-lg bg-blue-600/10 flex items-center justify-center border border-blue-200/50">
                           <Building2 className="w-5 h-5 text-blue-600" />

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, ArrowRight, Building2, Layers } from 'lucide-react';
+import { Search, ArrowRight, Building2, Layers, X } from 'lucide-react';
 
 import { type SearchIndexItem } from '@/types';
 import { precisionSearch } from '@/lib/searchEngine';
@@ -60,6 +60,21 @@ export default function SearchBar({
       .then(data => setAllItems(data))
       .catch(() => {/* silent */});
   }, [dataset]);
+
+  useEffect(() => {
+    setQuery(defaultValue);
+  }, [defaultValue]);
+
+  const clearQuery = useCallback(() => {
+    setQuery('');
+    setSuggestions([]);
+    setOpen(false);
+    setActiveIdx(-1);
+    inputRef.current?.focus();
+    if (defaultValue) {
+      router.push(searchRoute);
+    }
+  }, [defaultValue, router, searchRoute]);
 
   // Debounced search — delegates to unified precisionSearch engine
   const doSearch = useCallback(async (q: string) => {
@@ -123,10 +138,10 @@ export default function SearchBar({
   }
 
   const inputPadding = size === 'lg'
-    ? 'py-4 px-5 pl-14 text-base'
-    : 'py-3 px-4 pl-12 text-sm';
-  const iconSize = size === 'lg' ? 'w-5 h-5' : 'w-4 h-4';
-  const iconPos = size === 'lg' ? 'left-4 top-4' : 'left-3.5 top-3.5';
+    ? 'py-3.5 sm:py-4 px-4 sm:px-5 pl-10 sm:pl-14 text-sm sm:text-base'
+    : 'py-2 sm:py-2.5 px-3 sm:px-4 pl-9 sm:pl-10 text-xs sm:text-sm';
+  const iconSize = size === 'lg' ? 'w-4 h-4 sm:w-5 sm:h-5' : 'w-4 h-4';
+  const iconPos = size === 'lg' ? 'left-3 sm:left-4 top-1/2 -translate-y-1/2' : 'left-3 top-1/2 -translate-y-1/2';
 
   return (
     <div ref={containerRef} className="relative w-full">
@@ -144,17 +159,30 @@ export default function SearchBar({
           onFocus={() => { if (suggestions.length > 0) setOpen(true); }}
           placeholder={placeholder}
           autoFocus={autoFocus}
-          className={`search-input ${inputPadding} pr-24`}
+          className={`search-input ${inputPadding} pr-9 sm:pr-24 w-full rounded-xl sm:rounded-lg`}
           autoComplete="off"
           aria-label={ariaLabel}
           aria-autocomplete="list"
         />
-        <button
-          type="submit"
-          className="absolute right-2 top-1/2 -translate-y-1/2 btn-primary py-2 px-4 text-sm"
-        >
-          Search
-        </button>
+        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1.5 z-10">
+          {query && (
+            <button
+              type="button"
+              onClick={clearQuery}
+              aria-label="Clear search"
+              className="p-1 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors cursor-pointer"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
+          <button
+            type="submit"
+            className="hidden sm:inline-flex items-center justify-center bg-[#1B4D9B] hover:bg-[#143B77] text-white py-1.5 px-3.5 text-xs font-semibold rounded-md shadow-xs transition-colors cursor-pointer"
+            aria-label="Search"
+          >
+            Search
+          </button>
+        </div>
       </form>
 
       {/* Dropdown */}

@@ -43,9 +43,28 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
     notFound();
   }
 
+  const formattedBookingUrl = service.bookingUrl 
+    ? (service.bookingUrl.startsWith('http://') || service.bookingUrl.startsWith('https://') ? service.bookingUrl : `https://${service.bookingUrl}`)
+    : null;
+
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
-      <div className="max-w-4xl mx-auto px-4 py-12">
+      {/* ── MOBILE STICKY BOTTOM CTA ───────────────────────── */}
+      {formattedBookingUrl && (
+        <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white/95 backdrop-blur-md border-t border-slate-200 px-4 pt-3 pb-[calc(env(safe-area-inset-bottom,16px)+8px)] shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
+          <a
+            href={formattedBookingUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl bg-[#0A2164] text-white font-semibold text-sm shadow-md active:scale-[0.98] transition-all"
+          >
+            <span>Visit Website</span>
+            <ExternalLink className="w-4 h-4" />
+          </a>
+        </div>
+      )}
+
+      <div className="max-w-4xl mx-auto px-4 py-6 sm:py-12 pb-28 md:pb-12">
         <nav className="flex items-center gap-1.5 text-xs text-slate-500 flex-wrap mb-4" aria-label="Breadcrumb">
           <Link href="/" className="hover:text-[#0A2164] transition-colors">Home</Link>
           <ChevronRight className="w-3 h-3 text-slate-300" />
@@ -61,9 +80,9 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
           Back to Services
         </Link>
         
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
-          <div className="flex flex-wrap items-center gap-2 mb-6">
-            <span className="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-bold uppercase tracking-wider rounded-full">
+        <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-8">
+          <div className="flex flex-wrap items-center gap-2 mb-4 sm:mb-6">
+            <span className="px-2.5 sm:px-3 py-1 bg-blue-50 text-blue-700 text-xs font-bold uppercase tracking-wider rounded-full">
               {service.category}
             </span>
             {service.sector && service.sector !== service.category && (

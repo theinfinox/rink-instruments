@@ -120,11 +120,11 @@ export default function InstitutionFilterView({ initialInstruments, institutionN
                 Filter by Facility:
               </span>
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div className="-mx-4 px-4 sm:mx-0 sm:px-0 flex items-center gap-2 overflow-x-auto pb-1.5 scrollbar-none sm:flex-wrap">
               <button
                 type="button"
                 onClick={() => setSelectedFacility('all')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+                className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
                   selectedFacility === 'all'
                     ? 'bg-[#0A2164] text-white shadow-2xs'
                     : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200/80'
@@ -139,7 +139,7 @@ export default function InstitutionFilterView({ initialInstruments, institutionN
                     key={fac.name}
                     type="button"
                     onClick={() => setSelectedFacility(fac.name)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+                    className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
                       isSelected
                         ? 'bg-[#0A2164] text-white shadow-2xs'
                         : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200/80'

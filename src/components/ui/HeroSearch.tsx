@@ -289,10 +289,8 @@ export default function HeroSearch({ config = DEFAULT_CONFIG }: { config?: Searc
 
           {/* ── VisionOS Floating Glass Search Bar ── */}
           <div
-            className={`vision-bar relative flex items-center w-full ${focused ? 'is-focused' : ''}`}
+            className={`vision-bar relative flex items-center w-full h-14 sm:h-[68px] md:h-[74px] rounded-full md:rounded-[32px] ${focused ? 'is-focused' : ''}`}
             style={{
-              height: 74,
-              borderRadius: 32,
               background: '#ffffff',
               border: focused ? '1px solid #F4B400' : '1px solid rgba(255,255,255,0.55)',
               zIndex: 10,
@@ -300,10 +298,10 @@ export default function HeroSearch({ config = DEFAULT_CONFIG }: { config?: Searc
             }}
           >
             {/* Search icon */}
-            <span className="pl-5 md:pl-6 flex-shrink-0" aria-hidden>
+            <span className="pl-3.5 sm:pl-5 md:pl-6 flex-shrink-0" aria-hidden>
               <Search
                 className={focused ? 'vision-icon-focused' : 'vision-icon-idle'}
-                style={{ width: 22, height: 22 }}
+                style={{ width: 19, height: 19 }}
               />
             </span>
 
@@ -324,7 +322,7 @@ export default function HeroSearch({ config = DEFAULT_CONFIG }: { config?: Searc
               aria-expanded={dropVisible}
               aria-controls="hero-search-listbox"
               role="combobox"
-              className="vision-input w-full h-full py-4 px-4 text-base md:text-[17px] min-w-0 font-sans bg-transparent"
+              className="vision-input w-full h-full py-2 sm:py-4 px-2.5 sm:px-4 text-xs sm:text-base md:text-[17px] min-w-0 font-sans bg-transparent truncate"
             />
 
             {/* Clear button */}
@@ -335,7 +333,7 @@ export default function HeroSearch({ config = DEFAULT_CONFIG }: { config?: Searc
                 aria-label="Clear search"
                 className="vision-clear flex-shrink-0 mr-1"
               >
-                <X style={{ width: 15, height: 15 }} />
+                <X style={{ width: 14, height: 14 }} />
               </button>
             )}
 
@@ -343,7 +341,7 @@ export default function HeroSearch({ config = DEFAULT_CONFIG }: { config?: Searc
             <div
               className="flex-shrink-0 self-stretch"
               style={{
-                width: 1, background: 'rgba(244,180,0,0.25)', margin: '14px 0'
+                width: 1, background: 'rgba(244,180,0,0.25)', margin: '10px 0'
               }}
               aria-hidden
             />
@@ -356,15 +354,14 @@ export default function HeroSearch({ config = DEFAULT_CONFIG }: { config?: Searc
               }}
               disabled={!query.trim()}
               aria-label="Search"
-              className="vision-btn flex-shrink-0 flex items-center justify-center gap-2.5 mx-2 sm:mx-[10px] px-4 sm:px-6 min-w-[50px] sm:min-w-[120px]"
+              className="vision-btn flex-shrink-0 flex items-center justify-center gap-2 mx-1.5 sm:mx-[10px] px-3 sm:px-6 h-9 sm:h-[50px] min-w-[38px] sm:min-w-[120px] rounded-full"
               style={{
-                height: 50,
                 fontSize: 15,
                 letterSpacing: '0.3px',
               }}
             >
               <Search
-                style={{ width: 17, height: 17, flexShrink: 0, color: '#082B63' }}
+                style={{ width: 16, height: 16, flexShrink: 0, color: '#082B63' }}
                 aria-hidden
               />
               <span className="hidden sm:inline">Search</span>

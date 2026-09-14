@@ -142,11 +142,11 @@ function PartnerCard({ partner }: { partner: MouPartner }) {
   const logoSrc = (partner.cdnLogo ? getImageUrl(partner.cdnLogo) : null) || partner.localLogo;
 
   return (
-    <div className="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-sm hover:shadow-md hover:border-blue-300 hover:-translate-y-1 transition-all duration-200 flex flex-col justify-between group">
+    <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-slate-200/90 shadow-sm hover:shadow-md hover:border-blue-300 hover:-translate-y-1 transition-all duration-200 flex flex-col justify-between group">
       <div>
         {/* Top Bar: Logo/Avatar + Verified Badge */}
-        <div className="flex items-start justify-between gap-3 mb-4">
-          <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center overflow-hidden flex-shrink-0 p-1">
+        <div className="flex items-start justify-between gap-3 mb-3 sm:mb-4">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center overflow-hidden flex-shrink-0 p-1">
             {logoSrc && !imageError ? (
               <Image
                 src={logoSrc}
@@ -157,55 +157,55 @@ function PartnerCard({ partner }: { partner: MouPartner }) {
                 onError={() => setImageError(true)}
               />
             ) : (
-              <Building2 className="w-6 h-6 text-[#0A2164]" />
+              <Building2 className="w-5 h-5 sm:w-6 sm:h-6 text-[#0A2164]" />
             )}
           </div>
 
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/80 leading-none">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
+          <span className="inline-flex items-center gap-1 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[11px] sm:text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/80 leading-none">
+            <ShieldCheck className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-emerald-600 flex-shrink-0" />
             <span>Verified MoU</span>
           </span>
         </div>
 
         {/* Institution Name */}
         <div className="mb-2">
-          <span className="text-[11px] font-bold text-[#0A2164] uppercase tracking-wider block mb-1">
+          <span className="text-[10px] sm:text-[11px] font-bold text-[#0A2164] uppercase tracking-wider block mb-0.5 sm:mb-1">
             {partner.shortName}
           </span>
-          <h3 className="font-heading font-bold text-slate-900 text-base leading-snug group-hover:text-[#0A2164] transition-colors line-clamp-2">
+          <h3 className="font-heading font-bold text-slate-900 text-sm sm:text-base leading-snug group-hover:text-[#0A2164] transition-colors line-clamp-2">
             {partner.name}
           </h3>
         </div>
 
         {/* Benefit Badge */}
-        <div className="mb-4">
-          <span className="inline-block px-2.5 py-1 rounded-md text-xs font-semibold bg-blue-50 text-[#0A2164] border border-blue-100">
+        <div className="mb-3 sm:mb-4">
+          <span className="inline-block px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-md text-[11px] sm:text-xs font-semibold bg-blue-50 text-[#0A2164] border border-blue-100">
             {partner.benefitBadge}
           </span>
         </div>
 
         {/* Minimal Explanation & Key Details */}
-        <p className="text-xs text-slate-600 leading-relaxed font-sans mb-4">
+        <p className="text-xs text-slate-600 leading-relaxed font-sans mb-3 sm:mb-4 line-clamp-3 sm:line-clamp-none">
           {partner.summary}
         </p>
 
-        <div className="space-y-2 pt-3 border-t border-slate-100 text-xs font-sans text-slate-500">
+        <div className="space-y-1.5 sm:space-y-2 pt-2.5 sm:pt-3 border-t border-slate-100 text-xs font-sans text-slate-500">
           <div className="flex items-start gap-1.5">
             <CheckCircle2 className="w-3.5 h-3.5 text-blue-600 mt-0.5 flex-shrink-0" />
-            <span><strong className="text-slate-700">Facility:</strong> {partner.facility}</span>
+            <span className="line-clamp-1 sm:line-clamp-none"><strong className="text-slate-700">Facility:</strong> {partner.facility}</span>
           </div>
           <div className="flex items-start gap-1.5">
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
-            <span><strong className="text-slate-700">Concession:</strong> {partner.concessionRate}</span>
+            <span className="line-clamp-1 sm:line-clamp-none"><strong className="text-slate-700">Concession:</strong> {partner.concessionRate}</span>
           </div>
         </div>
       </div>
 
       {/* Action Link */}
-      <div className="mt-5 pt-3 border-t border-slate-100">
+      <div className="mt-4 sm:mt-5 pt-2.5 sm:pt-3 border-t border-slate-100">
         <Link
           href={`/institutions/${partner.slug}`}
-          className="inline-flex items-center justify-between w-full text-xs font-semibold text-[#0A2164] group-hover:text-blue-700 transition-colors"
+          className="inline-flex items-center justify-between w-full text-xs font-semibold text-[#0A2164] group-hover:text-blue-700 transition-colors py-1"
         >
           <span>Explore Equipment &amp; Facilities</span>
           <ArrowRight className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" />
@@ -298,7 +298,7 @@ export default function ExclusivePartnershipsSection({
   return (
     <section 
       id="exclusive-partnerships" 
-      className="relative py-16 sm:py-20 bg-[#F8FAFF] border-b border-slate-200/80 scroll-mt-20 overflow-hidden"
+      className="relative py-10 sm:py-16 lg:py-20 bg-[#F8FAFF] border-b border-slate-200/80 scroll-mt-20 overflow-hidden"
     >
       {/* Ambient background decoration */}
       <div className="absolute inset-0 pointer-events-none opacity-[0.03]">
@@ -315,9 +315,9 @@ export default function ExclusivePartnershipsSection({
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6">
         
         {/* Section Header */}
-        <div className="max-w-3xl mb-12">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-50 text-emerald-800 border border-emerald-200/80 mb-3">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+        <div className="max-w-3xl mb-8 sm:mb-12">
+          <div className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wider bg-emerald-50 text-emerald-800 border border-emerald-200/80 mb-3">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
             <span>KSUM Institutional Alliance · Exclusive MoU Partnerships</span>
           </div>
 
@@ -325,21 +325,21 @@ export default function ExclusivePartnershipsSection({
             Privileged R&amp;D Access for Kerala Startups
           </h2>
 
-          <p className="text-slate-600 text-sm sm:text-base leading-relaxed font-sans">
+          <p className="text-slate-600 text-xs sm:text-sm md:text-base leading-relaxed font-sans">
             {`Kerala Startup Mission has partnered with ${partners.length} premier national and state research institutions under formal Memorandums of Understanding (MoUs). Startups with a valid KSUM Unique ID (UID) gain privileged access to advanced instrumentation, dedicated testing facilities, and up to 40% subsidized user-fee concessions.`}
           </p>
 
           {/* Quick value badges */}
-          <div className="flex flex-wrap gap-2.5 mt-5">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold bg-white border border-slate-200 text-slate-700 shadow-2xs">
+          <div className="flex flex-wrap gap-1.5 sm:gap-2.5 mt-3.5 sm:mt-5">
+            <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-lg text-[11px] sm:text-xs font-semibold bg-white border border-slate-200 text-slate-700 shadow-2xs">
               <Sparkles className="w-3 h-3 text-amber-500" />
               {`${partners.length} Premier Partner Institutions`}
             </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold bg-white border border-slate-200 text-slate-700 shadow-2xs">
+            <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-lg text-[11px] sm:text-xs font-semibold bg-white border border-slate-200 text-slate-700 shadow-2xs">
               <CheckCircle2 className="w-3 h-3 text-emerald-600" />
               Up to 40% Subsidized Fee Concession
             </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold bg-white border border-slate-200 text-slate-700 shadow-2xs">
+            <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-lg text-[11px] sm:text-xs font-semibold bg-white border border-slate-200 text-slate-700 shadow-2xs">
               <ShieldCheck className="w-3 h-3 text-blue-600" />
               Valid with KSUM Unique ID (UID)
             </span>
@@ -347,7 +347,7 @@ export default function ExclusivePartnershipsSection({
         </div>
 
         {/* Responsive Grid of Cards (Max 8 per page) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 mb-8">
           {currentPartners.map((partner) => (
             <PartnerCard key={partner.id} partner={partner} />
           ))}

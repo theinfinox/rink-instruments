@@ -85,12 +85,12 @@ export default function TechnologyCard({ instrument, compact = false }: Props) {
   return (
     <Link
       href={`/instruments/${vm.id}`}
-      className="block group h-full focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-2xl"
+      className="block group h-full focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-xl sm:rounded-2xl"
       id={`tech-card-${vm.id}`}
       aria-label={`View ${vm.title} by ${vm.institution}`}
     >
       <motion.div
-        className="h-full flex flex-col rounded-2xl overflow-hidden border transition-all duration-300 ease-out"
+        className="h-full flex flex-col rounded-xl sm:rounded-2xl overflow-hidden border transition-all duration-300 ease-out"
         style={{
           background: '#FCFDFF',
           borderColor: 'rgba(37,99,235,0.08)',
@@ -174,37 +174,38 @@ export default function TechnologyCard({ instrument, compact = false }: Props) {
         </div>
 
         {/* ── BODY ─────────────────────────────────────────────── */}
-        <div className="flex flex-col flex-1 px-5 py-4 gap-0">
+        <div className="flex flex-col flex-1 px-4 py-3.5 sm:px-5 sm:py-4 gap-0">
 
           {/* Institution */}
-          <div className="flex items-center gap-1.5 mb-2 min-w-0">
+          <div className="flex items-center gap-1.5 mb-1.5 sm:mb-2 min-w-0">
             <Building2 className="w-3 h-3 flex-shrink-0" style={{ color: '#94a3b8' }} />
             <span className="text-[11px] font-medium uppercase tracking-wide truncate" style={{ color: '#64748b' }}>
               {vm.institution}
             </span>
           </div>
 
-          {/* Title — full name */}
+          {/* Title — full name with 2-line clamp */}
           <h3
-            className="font-heading font-bold leading-snug transition-colors duration-200 group-hover:text-[#1b60bb] mb-2"
+            title={vm.title}
+            className="font-heading font-bold leading-snug transition-colors duration-200 group-hover:text-[#1b60bb] mb-1.5 sm:mb-2 line-clamp-2"
             style={{ fontSize: 15, color: '#0f172a' }}
           >
             {vm.displayTitle}
           </h3>
 
           <div className="mt-auto flex flex-col gap-0">
-            {/* Short description — fixed 2 lines */}
+            {/* Short description */}
             {shortDesc && (
               <p
-                className="line-clamp-2 font-sans leading-relaxed mb-3"
-                style={{ fontSize: 12, color: '#64748b', minHeight: '2.25rem' }}
+                className="line-clamp-1 sm:line-clamp-2 font-sans leading-relaxed mb-2 sm:mb-3 min-h-[1.25rem] sm:min-h-[2.25rem]"
+                style={{ fontSize: 12, color: '#64748b' }}
               >
                 {shortDesc}
               </p>
             )}
 
             {/* Metadata row */}
-            <div className="flex flex-wrap items-center gap-1.5 mb-3">
+            <div className="flex flex-wrap items-center gap-1 sm:gap-1.5 mb-2.5 sm:mb-3">
               {vm.tags.slice(0, 2).map((tag, i) => (
                 <span
                   key={i}
@@ -227,12 +228,12 @@ export default function TechnologyCard({ instrument, compact = false }: Props) {
           </div>
 
           {/* CTA Footer */}
-          <div className="pt-3 border-t flex items-center justify-between" style={{ borderColor: 'rgba(15,23,42,0.06)' }}>
+          <div className="pt-2.5 sm:pt-3 border-t flex items-center justify-between" style={{ borderColor: 'rgba(15,23,42,0.06)' }}>
             <span className="text-[11px] font-medium" style={{ color: '#94a3b8' }}>
               Equipment Access
             </span>
             <span
-              className="inline-flex items-center gap-1 text-[12px] font-bold transition-all duration-300 group-hover:gap-2"
+              className="inline-flex items-center gap-1 text-[11px] sm:text-[12px] font-bold transition-all duration-300 group-hover:gap-2"
               style={{ color: '#1b60bb' }}
             >
               Explore Instrument
