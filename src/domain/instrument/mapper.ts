@@ -3,6 +3,27 @@ import { InstrumentViewModel } from './view-model';
 import { getImageUrl } from '@/lib/utils';
 import { InstitutionRepository } from '@/repositories/InstitutionRepository';
 
+const DISTRICT_ALIASES: Record<string, string> = {
+  cochin: 'Ernakulam',
+  kochi: 'Ernakulam',
+  calicut: 'Kozhikode',
+  trivandrum: 'Thiruvananthapuram',
+  tvm: 'Thiruvananthapuram',
+  trichur: 'Thrissur',
+  quilon: 'Kollam',
+  cannanore: 'Kannur',
+  palghat: 'Palakkad',
+  alleppey: 'Alappuzha',
+  alappi: 'Alappuzha',
+};
+
+function normalizeDistrict(district?: string | null): string {
+  if (!district || district === 'None') return '';
+  const trimmed = district.trim();
+  const lower = trimmed.toLowerCase();
+  return DISTRICT_ALIASES[lower] || trimmed;
+}
+
 function mapLocation(instrument: Instrument, repo: InstitutionRepository): InstrumentViewModel['location'] {
   const instEntity = repo.getById(instrument.institution_id) || repo.getByName(instrument.institution_name);
   
@@ -28,8 +49,9 @@ function mapLocation(instrument: Instrument, repo: InstitutionRepository): Instr
     mapUrl = `https://www.google.com/maps/search/?api=1&query=${query}`;
   }
   
+  const rawDistrict = instrument.standardized_district || instrument.district;
   return {
-    district: instrument.standardized_district || instrument.district,
+    district: normalizeDistrict(rawDistrict),
     address: addressStr,
     coordinates,
     mapUrl,

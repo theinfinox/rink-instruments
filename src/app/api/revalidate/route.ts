@@ -34,6 +34,8 @@ export async function GET(request: NextRequest) {
     revalidatePath('/instruments');
     revalidatePath('/categories');
     revalidatePath('/institutions');
+    revalidatePath('/services');
+    revalidatePath('/services/list');
     revalidatePath('/api/search-index');
 
     const timestamp = new Date().toISOString();
@@ -48,6 +50,8 @@ export async function GET(request: NextRequest) {
         '/instruments',
         '/categories',
         '/institutions',
+        '/services',
+        '/services/list',
         '/api/search-index',
       ],
     });
