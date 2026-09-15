@@ -6,7 +6,6 @@ import Image from 'next/image';
 import { 
   ShieldCheck, 
   ArrowRight, 
-  Sparkles, 
   Building2, 
   CheckCircle2, 
   ChevronLeft, 
@@ -343,22 +342,6 @@ export default function ExclusivePartnershipsSection({
           <p className="text-slate-600 text-xs sm:text-sm md:text-base leading-relaxed font-sans">
             {`Kerala Startup Mission has partnered with ${partners.length} premier national and state research institutions under formal Memorandums of Understanding (MoUs). Startups with a valid KSUM Unique ID (UID) gain privileged access to advanced instrumentation, dedicated testing facilities, and up to 40% subsidized user-fee concessions.`}
           </p>
-
-          {/* Quick value badges */}
-          <div className="flex flex-wrap gap-1.5 sm:gap-2.5 mt-3.5 sm:mt-5">
-            <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-lg text-[11px] sm:text-xs font-semibold bg-white border border-slate-200 text-slate-700 shadow-2xs">
-              <Sparkles className="w-3 h-3 text-amber-500" />
-              {`${partners.length} Premier Partner Institutions`}
-            </span>
-            <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-lg text-[11px] sm:text-xs font-semibold bg-white border border-slate-200 text-slate-700 shadow-2xs">
-              <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-              Up to 40% Subsidized Fee Concession
-            </span>
-            <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-lg text-[11px] sm:text-xs font-semibold bg-white border border-slate-200 text-slate-700 shadow-2xs">
-              <ShieldCheck className="w-3 h-3 text-blue-600" />
-              Valid with KSUM Unique ID (UID)
-            </span>
-          </div>
         </div>
 
         {/* Responsive Grid of Cards (Max 8 per page) */}
