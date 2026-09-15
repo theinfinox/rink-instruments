@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import { headers } from 'next/headers';
 import Link from 'next/link';
 import { ChevronRight, ArrowRight, FileText, Microscope, Building2, ShieldCheck, MapPin } from 'lucide-react';
 import TechImage from '@/components/ui/TechImage';
@@ -12,6 +13,8 @@ import SubsidizedClaimSection from '@/components/ui/SubsidizedClaimSection';
 import { isLocationEnabled } from '@/config/locationConfig';
 import SmartBack from '@/components/ui/SmartBack';
 import { precisionSearch, buildSearchIndex } from '@/lib/searchEngine';
+import NativeShareButton from '@/components/ui/NativeShareButton';
+import QRCodeLabel from '@/components/ui/QRCodeLabel';
 const GOOGLE_FORM_URL =
   'https://docs.google.com/forms/';
 
@@ -93,6 +96,24 @@ export default async function TechnologyDetailPage({ params }: { params: Promise
   const finalBookingLink = getSafeUrl(rawBookingLink);
 
   const displayImage = vm.media.thumbnail;
+  
+  const headersList = await headers();
+  const host = headersList.get('host') || 'instruments.startupmission.in';
+  const protocol = host.includes('localhost') ? 'http' : 'https';
+  const canonicalUrl = `${protocol}://${host}/instruments/${id}`;
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: vm.displayTitle,
+    image: displayImage ? [displayImage] : undefined,
+    description: vm.tags?.join(', ') || vm.displayTitle,
+    brand: {
+      '@type': 'Organization',
+      name: vm.institution
+    },
+    productID: vm.id
+  };
 
   // Related technologies: Orama semantic search based on tags & category
   const searchIndex = buildSearchIndex(instruments, repo);
@@ -109,6 +130,10 @@ export default async function TechnologyDetailPage({ params }: { params: Promise
 
   return (
     <div className="min-h-screen bg-white text-gray-900 font-sans">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
 
       {/* ── MOBILE STICKY BOTTOM CTA ───────────────────────── */}
       <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white/95 backdrop-blur-md border-t border-slate-200 px-4 pt-3 pb-[calc(env(safe-area-inset-bottom,16px)+8px)] shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
@@ -174,10 +199,18 @@ export default async function TechnologyDetailPage({ params }: { params: Promise
                   ))}
                 </div>
 
-                {/* Title */}
-                <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-[#0A2164] leading-tight">
-                  {vm.displayTitle}
-                </h1>
+                {/* Title & Share */}
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                  <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-[#0A2164] leading-tight">
+                    {vm.displayTitle}
+                  </h1>
+                  <NativeShareButton 
+                    title={vm.displayTitle} 
+                    text={`Check out ${vm.displayTitle} at ${vm.institution} on RINK Kerala`} 
+                    url={canonicalUrl} 
+                    className="shrink-0 sm:mt-2"
+                  />
+                </div>
 
                 {/* Institution + ID */}
                 <div className="flex flex-wrap items-center gap-4 text-sm">
@@ -394,6 +427,17 @@ export default async function TechnologyDetailPage({ params }: { params: Promise
                         <FileText className="w-4 h-4 flex-shrink-0" />
                         Booking link
                       </a>
+                    </div>
+                    
+                    <div className="p-5 border-t border-slate-100 bg-slate-50/50 flex flex-col items-center">
+                      <QRCodeLabel 
+                        url={canonicalUrl} 
+                        title={vm.displayTitle} 
+                        institution={vm.institution} 
+                        location={vm.location.district} 
+                        itemId={vm.id} 
+                        itemType="Instrument"
+                      />
                     </div>
 
                   </div>

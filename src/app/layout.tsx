@@ -3,6 +3,7 @@ import './globals.css';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import NextTopLoader from 'nextjs-toploader';
+import CommandPalette from '@/components/ui/CommandPalette';
 
 import { headers } from 'next/headers';
 
@@ -54,6 +55,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Navbar />
         <main className="flex-1 relative z-10">{children}</main>
         <Footer />
+        <CommandPalette />
       </body>
     </html>
   );

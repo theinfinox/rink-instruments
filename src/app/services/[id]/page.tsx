@@ -1,9 +1,12 @@
 import { notFound } from 'next/navigation';
+import { headers } from 'next/headers';
 import Link from 'next/link';
 import { ArrowLeft, Building2, ExternalLink, ChevronRight, Microscope, MapPin, ShieldCheck, Layers } from 'lucide-react';
 import { fetchDataset } from '@/lib/dataFetcher';
 import { Service } from '@/types/service';
 import SmartBack from '@/components/ui/SmartBack';
+import NativeShareButton from '@/components/ui/NativeShareButton';
+import QRCodeLabel from '@/components/ui/QRCodeLabel';
 
 export const dynamicParams = true;
 
@@ -53,8 +56,27 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
     ? (service.bookingUrl.startsWith('http://') || service.bookingUrl.startsWith('https://') ? service.bookingUrl : `https://${service.bookingUrl}`)
     : null;
 
+  const headersList = await headers();
+  const host = headersList.get('host') || 'instruments.startupmission.in';
+  const protocol = host.includes('localhost') ? 'http' : 'https';
+  const canonicalUrl = `${protocol}://${host}/services/${id}`;
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: service.serviceName,
+    description: service.description || service.serviceName,
+    provider: {
+      '@type': 'Organization',
+      name: service.startupName
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* ── MOBILE STICKY BOTTOM CTA ───────────────────────── */}
       {formattedBookingUrl && (
         <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white/95 backdrop-blur-md border-t border-slate-200 px-4 pt-3 pb-[calc(env(safe-area-inset-bottom,16px)+8px)] shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
@@ -97,9 +119,17 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
             )}
           </div>
           
-          <h1 className="text-2xl md:text-3xl font-heading font-bold text-slate-900 mb-4 leading-tight">
-            {service.serviceName}
-          </h1>
+          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-4">
+            <h1 className="text-2xl md:text-3xl font-heading font-bold text-slate-900 leading-tight">
+              {service.serviceName}
+            </h1>
+            <NativeShareButton 
+              title={service.serviceName} 
+              text={`Check out ${service.serviceName} by ${service.startupName} on RINK Kerala`} 
+              url={canonicalUrl} 
+              className="shrink-0"
+            />
+          </div>
           
           <div className="flex flex-wrap items-center gap-2 text-slate-600 mb-8 text-sm">
             <Link href={`/services/list?q=${encodeURIComponent(service.startupName || '')}`} className="flex items-center gap-1.5 font-medium text-slate-900 hover:text-[#0A2164] hover:underline">
@@ -208,6 +238,17 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
                 </a>
               </div>
             )}
+          </div>
+          
+          <div className="border-t border-slate-100 pt-8 mt-8 flex flex-col items-center">
+            <QRCodeLabel 
+              url={canonicalUrl} 
+              title={service.serviceName} 
+              institution={service.startupName || ''} 
+              location={service.district} 
+              itemId={service.id || ''} 
+              itemType="Service"
+            />
           </div>
         </div>
       </div>

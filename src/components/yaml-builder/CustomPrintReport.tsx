@@ -110,6 +110,7 @@ export default function CustomPrintReport({
             <p className="font-mono text-indigo-700 font-bold flex items-center justify-end gap-1">
               <Globe size={12} /> {config.frontendBaseUrl || 'https://rink-inst.vercel.app'}
             </p>
+            {/* eslint-disable-next-line react-hooks/purity */}
             <p className="text-[10px] text-gray-400 font-mono">Doc ID: SPEC-{Date.now().toString(36).toUpperCase()}</p>
           </div>
         </div>
