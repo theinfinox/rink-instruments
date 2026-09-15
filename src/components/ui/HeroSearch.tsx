@@ -238,6 +238,35 @@ export default function HeroSearch({ config = DEFAULT_CONFIG }: { config?: Searc
     };
   }, []);
 
+  /* ── Global Type-to-Search Listener ── */
+  useEffect(() => {
+    function handleGlobalKeyDown(e: KeyboardEvent) {
+      // Ignore if user is already typing in an input, textarea, or contenteditable
+      const activeTag = document.activeElement?.tagName.toLowerCase();
+      const isEditable = document.activeElement?.hasAttribute('contenteditable');
+      if (activeTag === 'input' || activeTag === 'textarea' || isEditable) {
+        return;
+      }
+
+      // Ignore modifiers (Cmd, Ctrl, Alt)
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      
+      // Only trigger for actual printable characters (length 1) or Backspace
+      if (e.key.length !== 1 && e.key !== 'Backspace') return;
+
+      // Ignore space if query is currently empty to preserve page scrolling
+      if (e.key === ' ' && query.trim().length === 0) return;
+
+      // Focus the input; browser natively appends the character during keydown
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
+    }
+
+    document.addEventListener('keydown', handleGlobalKeyDown);
+    return () => document.removeEventListener('keydown', handleGlobalKeyDown);
+  }, [query]);
+
   /* ── Keyboard navigation — unchanged ── */
   function handleKeyDown(e: React.KeyboardEvent) {
     if (!showDrop) {
