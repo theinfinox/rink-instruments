@@ -44,7 +44,7 @@ export default function NativeShareButton({ title, text, url, className, variant
     }
   };
 
-  const baseStyles = 'inline-flex items-center justify-center gap-2 font-medium text-sm transition-all duration-200 rounded-lg whitespace-nowrap active:scale-[0.98]';
+  const baseStyles = 'inline-flex items-center justify-center gap-2 px-3 py-1.5 font-medium text-sm transition-all duration-200 rounded-sm whitespace-nowrap active:scale-[0.98]';
   const variants = {
     primary: 'bg-[#0A2164] hover:bg-blue-900 text-white shadow-sm',
     outline: 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-[#0A2164] shadow-sm',

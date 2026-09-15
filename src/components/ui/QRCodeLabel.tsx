@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { toPng } from 'html-to-image';
 import { Download } from 'lucide-react';
@@ -18,12 +18,21 @@ interface QRCodeLabelProps {
 export default function QRCodeLabel({ url, title, institution, location, itemId, itemType }: QRCodeLabelProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [downloading, setDownloading] = useState(false);
+  const [generatedDate, setGeneratedDate] = useState('');
+
+  useEffect(() => {
+    setGeneratedDate(new Date().toLocaleString('en-IN', { 
+      day: '2-digit', month: 'short', year: 'numeric', 
+      hour: '2-digit', minute: '2-digit' 
+    }));
+  }, []);
 
   const handleDownload = async () => {
     if (!cardRef.current) return;
     setDownloading(true);
     try {
-      const dataUrl = await toPng(cardRef.current, { cacheBust: true, pixelRatio: 3 });
+      // Increased pixelRatio to 8 for ultra-high resolution (3600x4800px) ideal for crisp printing
+      const dataUrl = await toPng(cardRef.current, { cacheBust: true, pixelRatio: 8 });
       const link = document.createElement('a');
       link.download = `rink-label-${itemId}.png`;
       link.href = dataUrl;
@@ -78,15 +87,15 @@ export default function QRCodeLabel({ url, title, institution, location, itemId,
               fgColor="#0A2164"
               imageSettings={{
                 src: "/images/rink_logo.png",
-                height: 22,
-                width: 66,
+                height: 20,
+                width: 86,
                 excavate: true,
               }}
             />
           </div>
 
           {/* Footer Metadata */}
-          <div className="w-full text-center space-y-1.5">
+          <div className="w-full text-center space-y-1.5 flex flex-col items-center">
             <div className="text-lg font-semibold text-slate-700">
               {institution}
             </div>
@@ -98,6 +107,11 @@ export default function QRCodeLabel({ url, title, institution, location, itemId,
             <div className="mt-4 inline-block bg-blue-50 text-[#0A2164] px-4 py-1.5 rounded-full font-mono text-sm font-bold border border-blue-100">
               ID: {itemId}
             </div>
+            {generatedDate && (
+              <div className="pt-4 text-[10px] text-slate-300 font-medium tracking-wide uppercase">
+                Generated on {generatedDate}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -117,8 +131,8 @@ export default function QRCodeLabel({ url, title, institution, location, itemId,
             fgColor="#0A2164"
             imageSettings={{
               src: "/images/rink_logo.png",
-              height: 11,
-              width: 33,
+              height: 10,
+              width: 43,
               excavate: true,
             }}
           />
