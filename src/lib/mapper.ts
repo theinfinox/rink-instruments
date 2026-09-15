@@ -79,12 +79,12 @@ export function toDriveEmbedUrl(url: string | null | undefined): string {
   //   drive.google.com/open?id=FILE_ID
   const fileMatch = trimmed.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
   if (fileMatch) {
-    return `https://drive.google.com/uc?export=view&id=${fileMatch[1]}`;
+    return `https://lh3.googleusercontent.com/d/${fileMatch[1]}`;
   }
 
   const idMatch = trimmed.match(/[?&]id=([a-zA-Z0-9_-]+)/);
   if (idMatch) {
-    return `https://drive.google.com/uc?export=view&id=${idMatch[1]}`;
+    return `https://lh3.googleusercontent.com/d/${idMatch[1]}`;
   }
 
   // Skip folder or drive links — they don't contain a file ID

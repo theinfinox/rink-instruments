@@ -26,11 +26,67 @@ const DISTRICT_ALIASES: Record<string, string[]> = {
   'kasaragod': ['kasargod', 'chowki'],
 };
 
+// ── Verified Local Institution Logos ─────────────────────────────
+const LOCAL_INSTITUTION_LOGOS: Record<string, string> = {
+  'cusat': '/images/institutions/cusat.webp',
+  'cochin-university-of-science-and-technology-cusat': '/images/institutions/cusat.webp',
+  'iit-palakkad': '/images/institutions/iit-palakkad.jpg',
+  'indian-institute-of-technology-palakkad-iit-palakkad': '/images/institutions/iit-palakkad.jpg',
+  'iiser-thiruvananthapuram': '/images/institutions/iiser-thiruvananthapuram.jpg',
+  'indian-institute-of-science-education-and-research-thiruvananthapuram-iiser-tvm': '/images/institutions/iiser-thiruvananthapuram.jpg',
+  'kscste-jntbgri': '/images/institutions/kscste-jntbgri.jpg',
+  'jawaharlal-nehru-tropical-botanic-garden-research-institute-jntbgri': '/images/institutions/kscste-jntbgri.jpg',
+  'jntbgri': '/images/institutions/kscste-jntbgri.jpg',
+  'centre-for-water-resources-development-and-management-cwrdm': '/images/institutions/cwrdm.jpg',
+  'cwrdm': '/images/institutions/cwrdm.jpg',
+  'icar-cpcri': '/images/institutions/cpcri.png',
+  'cpcri': '/images/institutions/cpcri.png',
+  'icar-central-plantation-crops-research-institute-cpcri': '/images/institutions/cpcri.png',
+  'icar-ctcri': '/images/institutions/ctcri.png',
+  'ctcri': '/images/institutions/ctcri.png',
+  'icar-central-tuber-crops-research-institute-ctcri': '/images/institutions/ctcri.png',
+  'csir-niist': '/images/institutions/csir-niist.png',
+  'c-dac': '/images/institutions/cdac.png',
+  'cdac': '/images/institutions/cdac.png',
+  'c-met': '/images/institutions/c-met.png',
+  'iisr': '/images/institutions/iisr.png',
+  'icar-indian-institute-of-spices-research-iisr': '/images/institutions/iisr.png',
+  'kau': '/images/institutions/kau.png',
+  'sctimst': '/images/institutions/sctimst.jpg',
+  'sree-chitra-tirunal-institute-for-medical-sciences-technology-sctimst': '/images/institutions/sctimst.jpg',
+  'rgcb': '/images/institutions/rgcb.jpg',
+  'rajiv-gandhi-centre-for-biotechnology-rgcb': '/images/institutions/rgcb.jpg',
+  'iav': '/images/institutions/iav.jpg',
+  'institute-of-advanced-virology-iav': '/images/institutions/iav.jpg',
+  'kufos': '/images/institutions/kufos-kochi.jpg',
+  'kerala-university-of-fisheries-and-ocean-studies-kufos': '/images/institutions/kufos-kochi.jpg',
+  'dr-moopens-inest': '/images/institutions/inest.jpg',
+  'inest': '/images/institutions/inest.jpg',
+};
+
 // ── Helpers ─────────────────────────────────────────────────────
 function getLogo(inst: Institution): string | null {
+  const s = (inst.slug || '').toLowerCase();
+  
+  // 1. Check local verified static logo first
+  if (LOCAL_INSTITUTION_LOGOS[s]) return LOCAL_INSTITUTION_LOGOS[s];
+  for (const [key, path] of Object.entries(LOCAL_INSTITUTION_LOGOS)) {
+    if (s.includes(key) || key.includes(s)) return path;
+  }
+
+  // 2. Check original Google Drive link (converted to lh3 direct image)
+  if (inst.original_logo_link) {
+    const driveUrl = toDriveEmbedUrl(inst.original_logo_link);
+    if (driveUrl) return driveUrl;
+  }
+
+  // 3. Check official database logo_link (if available/hosted)
+  if (inst.logo_link) {
+    return getImageUrl(inst.logo_link);
+  }
+
+  // 4. Other image fields
   return (
-    (inst.logo_link ? getImageUrl(inst.logo_link) : null) ||
-    (inst.original_logo_link ? toDriveEmbedUrl(inst.original_logo_link) : null) ||
     inst.logo_embed_url ||
     inst.institution_image_embed_url ||
     inst.institution_image ||
@@ -246,7 +302,7 @@ function InstitutionGridCard({
     <Link
       key={inst.slug}
       href={linkHref}
-      className={`group items-center gap-3 sm:gap-[18px] bg-white border border-[rgba(15,23,42,0.08)] rounded-xl sm:rounded-md p-3 sm:p-4 transition-all duration-250 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(15,23,42,0.10)] hover:border-[#1B4D9B]/25 ${
+      className={`group items-start gap-3 sm:gap-[18px] bg-white border border-[rgba(15,23,42,0.08)] rounded-xl sm:rounded-md p-3.5 sm:p-4 transition-all duration-250 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(15,23,42,0.10)] hover:border-[#1B4D9B]/25 ${
         hiddenOnMobile ? 'hidden sm:flex' : 'flex'
       }`}
       id={`browse-inst-${inst.slug}`}
@@ -292,32 +348,47 @@ function InstitutionGridCard({
         )}
       </div>
 
-      {/* Text */}
-      <div className="min-w-0 flex-1">
-        <div title={inst.name} className="font-heading font-bold text-[#0F172A] text-xs sm:text-sm leading-snug line-clamp-2 sm:line-clamp-3 group-hover:text-[#1B4D9B] transition-colors">
+      {/* Text column */}
+      <div className="min-w-0 flex-1 flex flex-col justify-start">
+        {/* Tier 1: Title with normalized baseline */}
+        <div
+          title={inst.name}
+          className="font-heading font-bold text-[#0F172A] text-xs sm:text-sm leading-snug line-clamp-2 min-h-[2.25rem] sm:min-h-[2.5rem] group-hover:text-[#1B4D9B] transition-colors"
+        >
           {inst.name}
         </div>
-        <div className="flex items-center gap-1.5 sm:gap-2 mt-1 sm:mt-1.5 flex-wrap">
-          <span className="text-[11px] sm:text-xs font-bold text-[#1B4D9B]">
+
+        {/* Tier 2: Primary Metadata (Count · District) */}
+        <div className="flex items-center gap-1.5 mt-1 sm:mt-1.5 text-[11px] sm:text-xs text-slate-500 font-medium">
+          <span className="font-bold text-[#1B4D9B] flex-shrink-0">
             {inst.tech_count} {inst.tech_count === 1 ? (isServices ? 'service' : 'instrument') : (isServices ? 'services' : 'instruments')}
           </span>
           {isLocationEnabled('placement1_directoryGridCards') && (inst.district || LOCATION_CONFIG.fallbacks.defaultDistrict) && (
-            <span className="inline-flex items-center gap-1 text-[10px] sm:text-[11px] font-medium text-slate-600 bg-slate-50 border border-slate-200/80 px-1.5 sm:px-2 py-0.2 sm:py-0.5 rounded-md flex-shrink-0">
-              <MapPin className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-slate-400 flex-shrink-0" />
-              <span>{inst.district || LOCATION_CONFIG.fallbacks.defaultDistrict}</span>
-            </span>
+            <>
+              <span className="text-slate-300 select-none">·</span>
+              <span className="inline-flex items-center gap-1 text-slate-500 truncate" title={inst.district || LOCATION_CONFIG.fallbacks.defaultDistrict}>
+                <MapPin className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-slate-400 flex-shrink-0" />
+                <span className="truncate">{inst.district || LOCATION_CONFIG.fallbacks.defaultDistrict}</span>
+              </span>
+            </>
           )}
-          {isStartup && !isServices && (
-            <span className="inline-flex items-center px-1.5 py-0.2 rounded text-[9px] sm:text-[10px] font-semibold bg-amber-50 text-amber-800 border border-amber-200">
-              Startup
-            </span>
-          )}
-          <MouBadge hasVerifiedMou={inst.has_verified_mou} variant="pill" details={inst.mou_details} />
         </div>
+
+        {/* Tier 3: Feature / Status Badges Row */}
+        {(isStartup || inst.has_verified_mou) && (
+          <div className="flex items-center gap-1.5 mt-1.5 sm:mt-2 flex-wrap">
+            {isStartup && !isServices && (
+              <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-bold tracking-wide uppercase bg-amber-50 text-amber-800 border border-amber-200/90 shadow-2xs">
+                Startup
+              </span>
+            )}
+            <MouBadge hasVerifiedMou={inst.has_verified_mou} variant="pill" details={inst.mou_details} />
+          </div>
+        )}
       </div>
 
       {/* Arrow */}
-      <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-300 group-hover:text-[#1B4D9B] group-hover:translate-x-1 transition-all duration-250 flex-shrink-0" />
+      <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-300 group-hover:text-[#1B4D9B] group-hover:translate-x-1 transition-all duration-250 flex-shrink-0 self-center" />
     </Link>
   );
 }
