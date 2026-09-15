@@ -22,6 +22,31 @@
 type AnyOrama = any;
 
 import type { SearchIndexItem } from '@/types';
+import type { Instrument } from '@/types/instrument';
+import type { InstitutionRepository } from '@/repositories/InstitutionRepository';
+
+export function buildSearchIndex(instruments: Instrument[], repo: InstitutionRepository): SearchIndexItem[] {
+  return instruments.map(inst => {
+    const tags = Array.isArray(inst.tag) ? inst.tag : (inst.tag ? inst.tag.split(',') : []);
+    const sectorName = tags.length > 0 ? tags[0].trim() : 'General';
+    const instEntity = repo.getInstitution(inst);
+    
+    return {
+      id: inst.provider_key || inst.id || '',
+      name: inst.instruments || '',
+      institution: instEntity.name,
+      institution_slug: instEntity.slug,
+      institution_id: instEntity.institution_id || inst.institution_id || '',
+      category: sectorName,
+      category_slug: sectorName.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+      ip_status: inst.warnings || '',
+      trl: inst.standardized_district || '',
+      keywords: tags,
+      problem_solved: inst.name_of_facility || '',
+      description: inst.address || '',
+    };
+  });
+}
 
 // ── Constants ─────────────────────────────────────────────────────
 const MIN_SCORE = 80;
@@ -64,7 +89,7 @@ async function getOramaDb(items: SearchIndexItem[]): Promise<AnyOrama> {
       name:             item.name,
       institution:      item.institution,
       category:         item.category,
-      keywords_str:     item.keywords.join(' '),
+      keywords_str:     (item.keywords || []).join(' '),
       problem_solved:   item.problem_solved || '',
       description:      item.description || '',
     });

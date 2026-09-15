@@ -124,7 +124,7 @@ export class InstitutionRepository {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const rawInst = instrument as any;
-    const rawName = (instrument.institution_name || instrument.matched_institution || rawInst.institution || '').trim();
+    const rawName = String(instrument.institution_name || instrument.matched_institution || rawInst.institution || '').trim();
     if (rawName) {
       const slug = rawName.toLowerCase().replace(/['’]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
       const entity = this.getBySlug(slug) || this.getByName(rawName);

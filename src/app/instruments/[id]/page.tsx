@@ -11,6 +11,7 @@ import ClientPartnerLogo from './ClientPartnerLogo';
 import SubsidizedClaimSection from '@/components/ui/SubsidizedClaimSection';
 import { isLocationEnabled } from '@/config/locationConfig';
 import SmartBack from '@/components/ui/SmartBack';
+import { precisionSearch, buildSearchIndex } from '@/lib/searchEngine';
 const GOOGLE_FORM_URL =
   'https://docs.google.com/forms/';
 
@@ -92,11 +93,18 @@ export default async function TechnologyDetailPage({ params }: { params: Promise
 
   const displayImage = vm.media.thumbnail;
 
-  // Related technologies: same district, different ID, max 4
-  const related = instruments
-    .filter(t => (t.standardized_district?.toLowerCase().replace(/[^a-z0-9]+/g, '-') || 'general') === sectorSlug && (t.provider_key || t.id) !== id)
+  // Related technologies: Orama semantic search based on tags & category
+  const searchIndex = buildSearchIndex(instruments, repo);
+  const semanticQuery = [...(vm.tags || [])].filter(Boolean).join(' ');
+  const searchResults = await precisionSearch(semanticQuery, searchIndex);
+  
+  const relatedRaw = searchResults
+    .filter(t => t.id !== id)
     .slice(0, 4)
-    .map(t => toInstrumentViewModel(t, repo));
+    .map(t => instruments.find(inst => (inst.provider_key || inst.id) === t.id))
+    .filter((t): t is Instrument => !!t);
+
+  const related = relatedRaw.map(t => toInstrumentViewModel(t, repo));
 
   return (
     <div className="min-h-screen bg-white text-gray-900 font-sans">
@@ -403,7 +411,7 @@ export default async function TechnologyDetailPage({ params }: { params: Promise
             <div className="max-w-6xl mx-auto px-4 sm:px-6">
               <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-900 font-heading">More from {vm.location.district || 'General'}</h2>
+                  <h2 className="text-2xl font-bold text-gray-900 font-heading">Related Technologies</h2>
                 </div>
                 <Link href={vm.location.district ? `/instruments?district=${encodeURIComponent(vm.location.district)}` : `/instruments`}
                   className="inline-flex items-center gap-1 text-sm font-semibold text-[#0A2164] hover:underline">
