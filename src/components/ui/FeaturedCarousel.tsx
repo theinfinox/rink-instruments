@@ -128,7 +128,7 @@ export default function FeaturedCarousel<T>({
         {/* Scrolling Container */}
         <div
           ref={containerRef}
-          className="flex gap-4 sm:gap-5 overflow-hidden px-4 sm:px-[5vw] md:px-[10vw] py-2 sm:py-4 featured-scroller"
+          className="flex gap-4 sm:gap-5 overflow-x-auto overflow-y-hidden touch-pan-x px-4 sm:px-[5vw] md:px-[10vw] py-2 sm:py-4 featured-scroller"
           style={{
             WebkitOverflowScrolling: 'touch',
             scrollbarWidth: 'none',
