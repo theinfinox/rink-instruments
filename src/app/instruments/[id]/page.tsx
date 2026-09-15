@@ -233,7 +233,7 @@ export default async function TechnologyDetailPage({ params }: { params: Promise
                     title={vm.displayTitle} 
                     text={`Check out ${vm.displayTitle} at ${vm.institution} on RINK Kerala`} 
                     url={canonicalUrl} 
-                    className="absolute top-3 right-3 z-10 opacity-90 hover:opacity-100 shadow-md backdrop-blur-md bg-white/90"
+                    className="hidden sm:inline-flex absolute top-3 right-3 z-10 opacity-90 hover:opacity-100 shadow-md backdrop-blur-md bg-white/90"
                   />
                 </div>
               </div>

@@ -136,7 +136,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
               title={service.serviceName} 
               text={`Check out ${service.serviceName} by ${service.startupName} on RINK Kerala`} 
               url={canonicalUrl} 
-              className="shrink-0"
+              className="hidden sm:inline-flex shrink-0"
             />
           </div>
           
@@ -241,7 +241,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
                   href={service.bookingUrl.startsWith('http://') || service.bookingUrl.startsWith('https://') ? service.bookingUrl : `https://${service.bookingUrl}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center px-6 py-3 bg-[#0A2164] text-white font-semibold rounded-lg hover:bg-blue-900 transition-colors shadow-sm"
+                  className="hidden sm:inline-flex items-center justify-center px-6 py-3 bg-[#0A2164] text-white font-semibold rounded-lg hover:bg-blue-900 transition-colors shadow-sm"
                 >
                   Visit Website <ExternalLink className="w-4 h-4 ml-2" />
                 </a>
