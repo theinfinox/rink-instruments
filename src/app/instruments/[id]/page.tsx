@@ -199,17 +199,11 @@ export default async function TechnologyDetailPage({ params }: { params: Promise
                   ))}
                 </div>
 
-                {/* Title & Share */}
-                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                {/* Title */}
+                <div className="flex flex-col gap-4">
                   <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-[#0A2164] leading-tight">
                     {vm.displayTitle}
                   </h1>
-                  <NativeShareButton 
-                    title={vm.displayTitle} 
-                    text={`Check out ${vm.displayTitle} at ${vm.institution} on RINK Kerala`} 
-                    url={canonicalUrl} 
-                    className="shrink-0 sm:mt-2"
-                  />
                 </div>
 
                 {/* Institution + ID */}
@@ -224,8 +218,14 @@ export default async function TechnologyDetailPage({ params }: { params: Promise
 
               {/* RIGHT COLUMN — Technology Image */}
               <div>
-                <div className="rounded-md overflow-hidden border border-slate-200 shadow-sm aspect-[16/9] w-full relative bg-white">
+                <div className="rounded-md overflow-hidden border border-slate-200 shadow-sm aspect-[16/9] w-full relative bg-white group">
                   <TechImage src={displayImage} alt={vm.displayTitle} />
+                  <NativeShareButton 
+                    title={vm.displayTitle} 
+                    text={`Check out ${vm.displayTitle} at ${vm.institution} on RINK Kerala`} 
+                    url={canonicalUrl} 
+                    className="absolute top-3 right-3 z-10 opacity-90 hover:opacity-100 shadow-md backdrop-blur-md bg-white/90"
+                  />
                 </div>
               </div>
 
