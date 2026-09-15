@@ -29,6 +29,7 @@ export default function FeaturedCarousel<T>({
   const containerRef   = useRef<HTMLDivElement>(null);
   const isInteracting  = useRef(false);
   const isVisible      = useRef(false);
+  const scrollTimeout  = useRef<NodeJS.Timeout | null>(null);
   const [isMounted, setIsMounted] = useState(false);
 
   // ── Build a tripled array so seamless looping works in both directions ──────
@@ -55,6 +56,14 @@ export default function FeaturedCarousel<T>({
 
   const pause  = useCallback(() => { isInteracting.current = true;  }, []);
   const resume = useCallback(() => { isInteracting.current = false; }, []);
+
+  const handleScroll = useCallback(() => {
+    isInteracting.current = true;
+    if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
+    scrollTimeout.current = setTimeout(() => {
+      isInteracting.current = false;
+    }, 150);
+  }, []);
 
   // ── rAF infinite scroll via scrollLeft (matches reference architecture) ─────
   useEffect(() => {
@@ -128,6 +137,7 @@ export default function FeaturedCarousel<T>({
         {/* Scrolling Container */}
         <div
           ref={containerRef}
+          onScroll={handleScroll}
           className="flex gap-4 sm:gap-5 overflow-x-auto overflow-y-hidden touch-pan-x px-4 sm:px-[5vw] md:px-[10vw] py-2 sm:py-4 featured-scroller"
           style={{
             WebkitOverflowScrolling: 'touch',
@@ -147,10 +157,10 @@ export default function FeaturedCarousel<T>({
             >
                 {itemType === 'instrument' ? (
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  <TechnologyCard instrument={item as any} />
+                  <TechnologyCard instrument={item as any} disableAnimation={true} />
                 ) : (
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  <ServiceCard service={item as any} />
+                  <ServiceCard service={item as any} disableAnimation={true} />
                 )}
             </div>
             );

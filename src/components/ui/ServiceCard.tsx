@@ -10,8 +10,9 @@ import { motion, useReducedMotion } from 'framer-motion';
 interface Props {
   service: Service;
   compact?: boolean;
+  disableAnimation?: boolean;
 }
-export default function ServiceCard({ service, compact = false }: Props) {
+export default function ServiceCard({ service, compact = false, disableAnimation = false }: Props) {
   const [imageFailed, setImageFailed]   = useState(false);
   const [imageLoaded, setImageLoaded]   = useState(false);
   const prefersReduced = useReducedMotion();
@@ -22,7 +23,7 @@ export default function ServiceCard({ service, compact = false }: Props) {
   const sectorSlug = (service.sector || service.category || 'general').toLowerCase().replace(/\s+/g, '-');
   const serviceId = service.id || service.serviceName;
 
-  const cardMotion = prefersReduced
+  const cardMotion = (prefersReduced || disableAnimation)
     ? {}
     : {
         initial: { opacity: 0, y: 10 },

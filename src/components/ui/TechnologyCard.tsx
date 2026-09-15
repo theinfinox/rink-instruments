@@ -11,8 +11,9 @@ import MouBadge from './MouBadge';
 interface Props {
   instrument: InstrumentViewModel;
   compact?: boolean;
+  disableAnimation?: boolean;
 }
-export default function TechnologyCard({ instrument, compact = false }: Props) {
+export default function TechnologyCard({ instrument, compact = false, disableAnimation = false }: Props) {
   const [imageFailed, setImageFailed]   = useState(false);
   const [imageLoaded, setImageLoaded]   = useState(false);
   const prefersReduced = useReducedMotion();
@@ -41,7 +42,7 @@ export default function TechnologyCard({ instrument, compact = false }: Props) {
   }, [vm.tags]);
   const sectorSlug = sectorName.toLowerCase().replace(/\s+/g, '-');
 
-  const cardMotion = prefersReduced
+  const cardMotion = (prefersReduced || disableAnimation)
     ? {}
     : {
         initial: { opacity: 0, y: 10 },
