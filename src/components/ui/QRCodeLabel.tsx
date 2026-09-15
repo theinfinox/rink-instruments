@@ -119,7 +119,7 @@ export default function QRCodeLabel({ url, title, institution, location, itemId,
       {/* Visible UI Preview */}
       <div className="w-full max-w-[280px] bg-slate-50/50 rounded-2xl p-5 border border-slate-200/60 shadow-sm flex flex-col items-center">
         <h3 className="font-serif text-sm font-bold text-slate-700 mb-4 text-center">
-          Print Equipment Label
+          Print {itemType === 'Service' ? 'Service' : 'Equipment'} Label
         </h3>
         
         <div className="bg-white p-3 rounded-xl shadow-sm border border-slate-100 mb-5 relative pointer-events-none opacity-90 scale-95 origin-center">

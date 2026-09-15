@@ -137,15 +137,24 @@ export default async function TechnologyDetailPage({ params }: { params: Promise
 
       {/* ── MOBILE STICKY BOTTOM CTA ───────────────────────── */}
       <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white/95 backdrop-blur-md border-t border-slate-200 px-4 pt-3 pb-[calc(env(safe-area-inset-bottom,16px)+8px)] shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
-        <a
-          href={finalBookingLink}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl bg-[#0A2164] text-white font-semibold text-sm shadow-md active:scale-[0.98] transition-all"
-        >
-          <FileText className="w-4 h-4" />
-          <span>Booking link</span>
-        </a>
+        <div className="flex gap-3">
+          <NativeShareButton 
+            title={vm.displayTitle} 
+            text={`Check out ${vm.displayTitle} at ${vm.institution} on RINK Kerala`} 
+            url={canonicalUrl} 
+            variant="outline"
+            className="flex-none w-[35%] py-3.5 rounded-xl border-slate-200 shadow-sm"
+          />
+          <a
+            href={finalBookingLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl bg-[#0A2164] text-white font-semibold text-sm shadow-md active:scale-[0.98] transition-all"
+          >
+            <FileText className="w-4 h-4" />
+            <span>Booking link</span>
+          </a>
+        </div>
       </div>
 
       <div className="pb-28 md:pb-0">
