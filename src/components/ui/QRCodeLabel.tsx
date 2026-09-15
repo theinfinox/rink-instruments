@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useState } from 'react';
-import QRCode from 'react-qr-code';
+import { QRCodeSVG } from 'qrcode.react';
 import { toPng } from 'html-to-image';
 import { Download } from 'lucide-react';
 import Image from 'next/image';
@@ -57,6 +57,7 @@ export default function QRCodeLabel({ url, title, institution, location, itemId,
               width={120} 
               height={40} 
               className="object-contain"
+              style={{ width: 'auto', height: 'auto' }}
             />
             <div className="w-full h-px bg-slate-100 mt-2 mb-2"></div>
             <h1 className="text-2xl font-bold text-[#0A2164] uppercase tracking-wide">
@@ -69,25 +70,19 @@ export default function QRCodeLabel({ url, title, institution, location, itemId,
 
           {/* QR Code Container */}
           <div className="relative my-6 p-4 bg-white rounded-xl shadow-[0_0_20px_rgba(10,33,100,0.05)] border border-blue-50">
-            <QRCode
+            <QRCodeSVG
               value={url}
               size={220}
               level="H"
               bgColor="#ffffff"
               fgColor="#0A2164"
+              imageSettings={{
+                src: "/images/rink_logo.png",
+                height: 22,
+                width: 64,
+                excavate: true,
+              }}
             />
-            {/* Center Logo Overlay */}
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <div className="bg-white p-1.5 rounded-lg shadow-sm border border-slate-100 flex items-center justify-center">
-                <Image 
-                  src="/images/rink_logo.png" 
-                  alt="RINK" 
-                  width={40} 
-                  height={14} 
-                  className="object-contain"
-                />
-              </div>
-            </div>
           </div>
 
           {/* Footer Metadata */}
@@ -114,24 +109,19 @@ export default function QRCodeLabel({ url, title, institution, location, itemId,
         </h3>
         
         <div className="bg-white p-3 rounded-xl shadow-sm border border-slate-100 mb-5 relative pointer-events-none opacity-90 scale-95 origin-center">
-          <QRCode
+          <QRCodeSVG
             value={url}
             size={120}
             level="H"
             bgColor="#ffffff"
             fgColor="#0A2164"
+            imageSettings={{
+              src: "/images/rink_logo.png",
+              height: 11,
+              width: 32,
+              excavate: true,
+            }}
           />
-          <div className="absolute inset-0 flex items-center justify-center">
-             <div className="bg-white p-0.5 rounded shadow-sm flex items-center justify-center">
-                <Image 
-                  src="/images/rink_logo.png" 
-                  alt="RINK" 
-                  width={24} 
-                  height={8} 
-                  className="object-contain"
-                />
-              </div>
-          </div>
         </div>
 
         <button

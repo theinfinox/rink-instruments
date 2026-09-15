@@ -1,4 +1,3 @@
-@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@500;600;700;800;900&display=swap");
 @import "tailwindcss";
 
 /* ============================================================
@@ -211,8 +210,8 @@
   --color-border-dark:  var(--border-card-hover);
 
   /* Fonts */
-  --font-sans:    'Plus Jakarta Sans', 'Inter', sans-serif;
-  --font-heading: 'Plus Jakarta Sans', 'Playfair Display', Georgia, serif;
+  --font-sans:    var(--font-plus-jakarta-sans), 'Inter', sans-serif;
+  --font-heading: var(--font-plus-jakarta-sans), var(--font-playfair-display), Georgia, serif;
 
   /* Shadows */
   --shadow-card:       var(--shadow-card);
