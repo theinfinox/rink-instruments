@@ -173,7 +173,7 @@ function PartnerCard({
 
           <span className="inline-flex items-center gap-1 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[11px] sm:text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/80 leading-none">
             <ShieldCheck className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-emerald-600 flex-shrink-0" />
-            <span>Verified MoU</span>
+            <span>Subsidized Rates</span>
           </span>
         </div>
 

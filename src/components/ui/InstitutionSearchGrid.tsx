@@ -167,7 +167,7 @@ function SuggestionItem({
           </span>
           {inst.has_verified_mou && (
             <span className="text-emerald-600 font-semibold flex items-center gap-0.5">
-              · <ShieldCheck className="w-3 h-3 inline" /> MoU Partner
+              · <ShieldCheck className="w-3 h-3 inline" /> Subsidized Rates
             </span>
           )}
         </div>

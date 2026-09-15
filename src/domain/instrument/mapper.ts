@@ -169,6 +169,7 @@ export function toInstrumentViewModel(
   const hasVerifiedMou = instEntity?.has_verified_mou === true;
     
   const facility = instrument.name_of_facility && instrument.name_of_facility !== 'None' ? instrument.name_of_facility : null;
+  const specifications = instrument.specifications && instrument.specifications !== 'None' ? instrument.specifications : null;
   
   let tags: string[] = [];
   if (Array.isArray(instrument.tag)) {
@@ -199,6 +200,7 @@ export function toInstrumentViewModel(
     institution_entity: instEntity || undefined,
     hasVerifiedMou,
     facility,
+    specifications,
     location,
     media,
     contact,

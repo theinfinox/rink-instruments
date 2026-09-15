@@ -25,7 +25,20 @@ export default function TechnologyCard({ instrument, compact = false }: Props) {
 
   // Short description mapping: use facility, or fallback to primary tag/scope
   const shortDesc = vm.facility || (vm.tags && vm.tags.length > 0 ? vm.tags[0] : '');
-  const sectorName = vm.tags && vm.tags.length > 0 ? vm.tags[0].trim() : 'General';
+
+  // Tag chips filter: only genuine, compact chips (<= 35 chars) that don't duplicate shortDesc
+  const validTagChips = useMemo(() => {
+    return (vm.tags || []).filter(t => {
+      const clean = t?.trim();
+      return clean && clean.length <= 35 && clean.toLowerCase() !== shortDesc.trim().toLowerCase();
+    });
+  }, [vm.tags, shortDesc]);
+
+  // Sector name for compact / illustration fallback: pick first valid short tag or 'General'
+  const sectorName = useMemo(() => {
+    const shortTag = (vm.tags || []).find(t => t && t.trim().length <= 35);
+    return shortTag ? shortTag.trim() : 'General';
+  }, [vm.tags]);
   const sectorSlug = sectorName.toLowerCase().replace(/\s+/g, '-');
 
   const cardMotion = prefersReduced
@@ -206,11 +219,12 @@ export default function TechnologyCard({ instrument, compact = false }: Props) {
 
             {/* Metadata row */}
             <div className="flex flex-wrap items-center gap-1 sm:gap-1.5 mb-2.5 sm:mb-3">
-              {vm.tags.slice(0, 2).map((tag, i) => (
+              {validTagChips.slice(0, 2).map((tag, i) => (
                 <span
                   key={i}
-                  className="inline-flex items-center px-2 py-0.5 rounded-full font-semibold"
+                  className="inline-flex items-center px-2 py-0.5 rounded-full font-semibold truncate max-w-[160px]"
                   style={{ fontSize: 10, background: 'rgba(37,99,235,0.07)', color: '#1d4ed8', border: '1px solid rgba(37,99,235,0.12)' }}
+                  title={tag}
                 >
                   {tag}
                 </span>

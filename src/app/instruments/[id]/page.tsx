@@ -78,6 +78,9 @@ export default async function TechnologyDetailPage({ params }: { params: Promise
   
   const vm = toInstrumentViewModel(rawTech, repo);
   
+  const shortTags = (vm.tags || []).filter(t => t && t.trim().length <= 35);
+  const longDescriptions = (vm.tags || []).filter(t => t && t.trim().length > 35);
+
   // Create a sector slug based on the district for routing, same as the mapper
   const sectorSlug = vm.location.district ? vm.location.district.toLowerCase().replace(/[^a-z0-9]+/g, '-') : 'general';
 
@@ -147,7 +150,7 @@ export default async function TechnologyDetailPage({ params }: { params: Promise
                     {vm.location.district || 'General'}
                   </span>
                   <MouBadge hasVerifiedMou={hasVerifiedMou} />
-                  {vm.tags.map((t, i) => (
+                  {shortTags.map((t, i) => (
                     <span key={i} className="bg-slate-50 border border-slate-200 text-slate-700 rounded-sm text-xs px-3 py-1 font-sans">
                       {t}
                     </span>
@@ -213,6 +216,28 @@ export default async function TechnologyDetailPage({ params }: { params: Promise
                         {vm.facility}
                       </p>
                     </div>
+                  </div>
+                )}
+
+                {/* ── SCOPE & APPLICATIONS ── */}
+                {longDescriptions.length > 0 && (
+                  <div className="space-y-3">
+                    <h2 className="font-serif text-xl font-bold text-[#0A2164]">Scope &amp; Applications</h2>
+                    {longDescriptions.map((desc, i) => (
+                      <p key={i} className="text-slate-700 leading-relaxed font-sans text-[15px] whitespace-pre-line bg-blue-50/40 border border-blue-100 rounded-xl p-4 sm:p-5">
+                        {desc}
+                      </p>
+                    ))}
+                  </div>
+                )}
+
+                {/* ── TECHNICAL SPECIFICATIONS ── */}
+                {vm.specifications && (
+                  <div className="space-y-3">
+                    <h2 className="font-serif text-xl font-bold text-[#0A2164]">Technical Specifications</h2>
+                    <p className="text-slate-700 leading-relaxed font-sans text-[15px] whitespace-pre-line bg-slate-50 border border-slate-200/80 rounded-xl p-4 sm:p-5">
+                      {vm.specifications}
+                    </p>
                   </div>
                 )}
 

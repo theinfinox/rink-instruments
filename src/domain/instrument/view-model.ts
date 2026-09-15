@@ -39,6 +39,9 @@ export interface InstrumentViewModel {
   /** Optional facility name within the institution */
   facility: string | null;
 
+  /** Technical specifications of the instrument */
+  specifications: string | null;
+
   location: {
     district: string;
     address: string | null;

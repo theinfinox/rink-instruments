@@ -25,4 +25,5 @@ export interface Instrument {
   institution_type?: string;
   ksum_uid?: string;
   source_type?: string;
+  specifications?: string;
 }

@@ -121,7 +121,7 @@ export default function TechListClient({
                 <ChevronRight className="w-3 h-3 text-slate-300 flex-shrink-0" />
                 <span className="text-emerald-700 font-semibold flex items-center gap-1">
                   <ShieldCheck className="w-3 h-3 text-emerald-600" />
-                  MoU Partners
+                  Subsidized Rates
                 </span>
               </>
             )}
@@ -152,7 +152,7 @@ export default function TechListClient({
                 : filters.institution
                 ? `Instruments at ${institutionDisplayName}`
                 : filters.mou === 'true'
-                ? 'MoU Partner Instruments'
+                ? 'Subsidized Rate Instruments'
                 : 'All Instruments'}
             </h1>
             <p className="text-sm text-text-secondary mt-1">
@@ -162,7 +162,7 @@ export default function TechListClient({
                 : filters.institution
                 ? `at ${institutionDisplayName}`
                 : filters.mou === 'true'
-                ? 'from verified KSUM MoU partner research institutions'
+                ? 'from partner research institutions offering subsidized rates for startups'
                 : 'from Kerala research institutes and startups'}
               .
               {filters.q && <span> matching &ldquo;<strong>{filters.q}</strong>&rdquo;</span>}
@@ -258,10 +258,10 @@ export default function TechListClient({
                     : 'bg-card border-border text-text-secondary hover:text-text-primary hover:border-accent/40 hover:bg-card-secondary'
                 }`}
                 aria-pressed={filters.mou === 'true'}
-                title="Filter by verified MoU partner institutions"
+                title="Filter by partner institutions offering subsidized rates for startups"
               >
                 <ShieldCheck className={`w-3.5 h-3.5 ${filters.mou === 'true' ? 'text-accent fill-accent/20' : 'text-text-muted'}`} />
-                <span>MoU Partners Only</span>
+                <span>Subsidized Rates Only</span>
                 {filters.mou === 'true' && (
                   <span className="w-1.5 h-1.5 rounded-full bg-accent ml-0.5 animate-pulse" />
                 )}
@@ -289,10 +289,10 @@ export default function TechListClient({
                       type="button"
                       onClick={() => applyFilter('mou', '')}
                       className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300 transition-colors group cursor-pointer shadow-2xs"
-                      title="Remove MoU filter"
+                      title="Remove Subsidized Rates filter"
                     >
                       <ShieldCheck className="w-3 h-3 text-emerald-600" />
-                      <span>MoU Partners Only</span>
+                      <span>Subsidized Rates Only</span>
                       <X className="w-3 h-3 text-emerald-500 group-hover:text-red-500 transition-colors" />
                     </button>
                   )}
