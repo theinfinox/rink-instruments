@@ -327,7 +327,7 @@ export default function ExclusivePartnershipsSection({
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6">
         {/* Proper Scroll Anchor for Exclusive Partnerships */}
-        <div id="exclusive-partnerships" className="scroll-mt-[88px] sm:scroll-mt-[104px]" />
+        <div id="exclusive-partnerships" className="scroll-mt-[78px] sm:scroll-mt-[104px]" />
         
         {/* Section Header */}
         <div className="max-w-3xl mb-8 sm:mb-12">
