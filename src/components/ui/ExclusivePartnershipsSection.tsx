@@ -340,7 +340,7 @@ export default function ExclusivePartnershipsSection({
           </h2>
 
           <p className="text-slate-600 text-xs sm:text-sm md:text-base leading-relaxed font-sans">
-            {`Kerala Startup Mission has partnered with ${partners.length} premier national and state research institutions under formal Memorandums of Understanding (MoUs). Startups with a valid KSUM Unique ID (UID) gain privileged access to advanced instrumentation, dedicated testing facilities, and up to 40% subsidized user-fee concessions.`}
+            Kerala Startup Mission has partnered with leading research and academic institutions to provide KSUM UID startups access to advanced instrumentation and R&amp;D testing services at subsidized rates. These partnerships help startups leverage institutional research infrastructure and technical expertise to support product development, testing and validation.
           </p>
         </div>
 
