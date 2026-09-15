@@ -18,6 +18,7 @@
     "nextjs-toploader": "^3.9.17",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "react-qr-code": "^2.2.0",
     "tailwind-merge": "^3.6.0",
     "zustand": "^5.0.14"
   },
