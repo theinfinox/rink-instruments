@@ -29,6 +29,7 @@ export default function FeaturedCarousel<T>({
   const containerRef   = useRef<HTMLDivElement>(null);
   const isInteracting  = useRef(false);
   const isVisible      = useRef(false);
+  const isProgrammaticScroll = useRef(false);
   const scrollTimeout  = useRef<NodeJS.Timeout | null>(null);
   const [isMounted, setIsMounted] = useState(false);
 
@@ -58,6 +59,10 @@ export default function FeaturedCarousel<T>({
   const resume = useCallback(() => { isInteracting.current = false; }, []);
 
   const handleScroll = useCallback(() => {
+    if (isProgrammaticScroll.current) {
+      isProgrammaticScroll.current = false;
+      return;
+    }
     isInteracting.current = true;
     if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
     scrollTimeout.current = setTimeout(() => {
@@ -88,6 +93,7 @@ export default function FeaturedCarousel<T>({
         const third = el.scrollWidth / 3;
         if (current >= third * 2) current -= third;
         else if (current <= 0)    current += third;
+        isProgrammaticScroll.current = true;
         el.scrollLeft = current;
       } else {
         current = el.scrollLeft; // sync on drag
