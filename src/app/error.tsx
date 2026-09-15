@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
-import { AlertTriangle } from 'lucide-react';
+import { AlertCircle, RefreshCcw, Home } from 'lucide-react';
 
 export default function Error({
   error,
@@ -17,33 +17,34 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="min-h-[70vh] flex items-center justify-center bg-gray-50 dark:bg-[#05112B] px-4 py-16">
-      <div className="text-center max-w-lg mx-auto">
-        <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-500 mb-8">
-          <AlertTriangle className="w-12 h-12" />
+    <div className="flex-1 flex flex-col items-center justify-center bg-white dark:bg-[#0a1635] px-4 py-20 w-full rounded-2xl border border-gray-100 dark:border-slate-800/60 shadow-sm my-8 max-w-4xl mx-auto">
+      <div className="text-center max-w-md mx-auto">
+        <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-red-50 dark:bg-red-900/10 text-red-500 mb-6 border border-red-100 dark:border-red-900/20">
+          <AlertCircle className="w-10 h-10" strokeWidth={1.5} />
         </div>
         
-        <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-          Something went wrong
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-3 tracking-tight">
+          Oops! Something went wrong
         </h1>
         
-        <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">
-          We encountered an unexpected error while trying to process your request. 
-          Please try again or return to the homepage.
+        <p className="text-base text-gray-500 dark:text-gray-400 mb-8 leading-relaxed">
+          We encountered an unexpected issue while loading this content. Please try refreshing the page or navigating back home.
         </p>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <button
             onClick={() => reset()}
-            className="px-8 py-3 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors w-full sm:w-auto"
+            className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-gray-900 hover:bg-gray-800 dark:bg-white dark:hover:bg-gray-100 text-white dark:text-gray-900 font-medium transition-colors w-full sm:w-auto text-sm"
           >
+            <RefreshCcw className="w-4 h-4" />
             Try Again
           </button>
           
           <Link 
             href="/"
-            className="px-8 py-3 rounded-full bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-medium transition-colors border border-slate-200 dark:border-slate-700 w-full sm:w-auto"
+            className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 font-medium transition-colors border border-gray-200 dark:border-slate-700 w-full sm:w-auto text-sm"
           >
+            <Home className="w-4 h-4" />
             Return Home
           </Link>
         </div>

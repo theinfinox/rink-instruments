@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
+import NextTopLoader from 'nextjs-toploader';
 
 import { headers } from 'next/headers';
 
@@ -14,7 +15,7 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL(`${protocol}://${host}`),
     title: 'RINK Instruments and Services Portal | Research Innovation Network Kerala',
     description:
-      'Discover and license instruments and services from Kerala\u2019s leading research institutions and startups — Kerala Startup Mission.',
+      'Discover and license instruments and services from Kerala’s leading research institutions and startups — Kerala Startup Mission.',
     keywords: 'Kerala startup, research technology, KSUM, RINK, CTCRI, CPCRI, NIIST',
     icons: {
       icon: [
@@ -49,6 +50,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body suppressHydrationWarning className="flex flex-col min-h-screen bg-background text-text-primary relative pt-16">
+        <NextTopLoader color="#2563eb" showSpinner={false} />
         <Navbar />
         <main className="flex-1 relative z-10">{children}</main>
         <Footer />
