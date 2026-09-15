@@ -35,7 +35,7 @@ export default function CommandPalette() {
   const pathname = usePathname();
   const inputRef = useRef<HTMLInputElement>(null);
   
-  const isServices = pathname.startsWith('/services');
+  const isServices = pathname?.startsWith('/services') || false;
   const dataset = isServices ? 'services' : 'instruments';
   const detailRoute = isServices ? '/services' : '/instruments';
 

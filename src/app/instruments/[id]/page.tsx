@@ -99,7 +99,7 @@ export default async function TechnologyDetailPage({ params }: { params: Promise
   
   const headersList = await headers();
   const host = headersList.get('host') || 'instruments.startupmission.in';
-  const protocol = host.includes('localhost') ? 'http' : 'https';
+  const protocol = headersList.get('x-forwarded-proto') || (host.includes('localhost') ? 'http' : 'https');
   const canonicalUrl = `${protocol}://${host}/instruments/${id}`;
 
   const jsonLd = {

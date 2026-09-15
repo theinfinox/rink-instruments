@@ -58,7 +58,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
 
   const headersList = await headers();
   const host = headersList.get('host') || 'instruments.startupmission.in';
-  const protocol = host.includes('localhost') ? 'http' : 'https';
+  const protocol = headersList.get('x-forwarded-proto') || (host.includes('localhost') ? 'http' : 'https');
   const canonicalUrl = `${protocol}://${host}/services/${id}`;
   const jsonLd = {
     '@context': 'https://schema.org',

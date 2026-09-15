@@ -79,7 +79,7 @@ export default function QRCodeLabel({ url, title, institution, location, itemId,
               imageSettings={{
                 src: "/images/rink_logo.png",
                 height: 22,
-                width: 64,
+                width: 66,
                 excavate: true,
               }}
             />
@@ -118,7 +118,7 @@ export default function QRCodeLabel({ url, title, institution, location, itemId,
             imageSettings={{
               src: "/images/rink_logo.png",
               height: 11,
-              width: 32,
+              width: 33,
               excavate: true,
             }}
           />
