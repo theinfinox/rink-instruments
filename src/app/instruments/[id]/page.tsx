@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ChevronRight, ArrowRight, FileText, Microscope, Building2 } from 'lucide-react';
 import TechImage from '@/components/ui/TechImage';
-import { CDN_HOST, getImageUrl } from '@/lib/utils';
+import { CDN_HOST, getImageUrl, getSafeUrl } from '@/lib/utils';
 import { Instrument } from '@/types/instrument';
 import { toInstrumentViewModel } from '@/domain/instrument/mapper';
 import { toDriveEmbedUrl } from '@/lib/mapper';
@@ -23,6 +23,8 @@ function clean(val: string | undefined | null): string {
     .includes(v.toLowerCase())) return '';
   return v;
 }
+
+
 
 // ── Meta ──────────────────────────────────────────────────────
 
@@ -79,7 +81,8 @@ export default async function TechnologyDetailPage({ params }: { params: Promise
   // Create a sector slug based on the district for routing, same as the mapper
   const sectorSlug = vm.location.district ? vm.location.district.toLowerCase().replace(/[^a-z0-9]+/g, '-') : 'general';
 
-  const finalBookingLink = clean(rawTech.website_booking_link) || clean(rawTech.website_booking_link_fallback) || GOOGLE_FORM_URL;
+  const rawBookingLink = clean(rawTech.website_booking_link) || clean(rawTech.website_booking_link_fallback) || GOOGLE_FORM_URL;
+  const finalBookingLink = getSafeUrl(rawBookingLink);
 
   const displayImage = vm.media.thumbnail;
 
@@ -240,10 +243,10 @@ export default async function TechnologyDetailPage({ params }: { params: Promise
                           <strong>Phone:</strong> {vm.contact.phone}
                         </li>
                       )}
-                      {vm.contact.website && (
+                      {vm.contact.website && getSafeUrl(vm.contact.website) !== '#' && (
                         <li className="flex items-start gap-3 text-slate-700 font-sans text-[15px]">
                           <span className="mt-1.5 flex-shrink-0 w-1.5 h-1.5 rounded-full bg-[#0A2164]" />
-                          <strong>Website:</strong> <a href={vm.contact.website} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{vm.contact.website}</a>
+                          <strong>Website:</strong> <a href={getSafeUrl(vm.contact.website)} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{vm.contact.website}</a>
                         </li>
                       )}
                     </ul>

@@ -100,7 +100,19 @@ export class InstitutionRepository {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const rawInst = instrument as any;
-    return instrument.institution_name || instrument.matched_institution || rawInst.institution || 'Research Institution';
+    const rawName = (instrument.institution_name || instrument.matched_institution || rawInst.institution || '').trim();
+    if (rawName) {
+      const slug = rawName.toLowerCase().replace(/['’]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+      const entity = this.getBySlug(slug) || this.getByName(rawName);
+      if (entity?.name) return entity.name;
+      return rawName;
+    }
+
+    if (process.env.NODE_ENV !== 'production' && instrument.institution_id) {
+      console.warn(`[InstitutionRepository] Fallback activated for unmapped institution_id: "${instrument.institution_id}"`);
+    }
+
+    return 'Research Institution';
   }
 
   getCoordinates(id?: string | null) {
@@ -256,7 +268,7 @@ export class InstitutionRepository {
               contact_email: inst.enquiry_mail !== 'None' ? inst.enquiry_mail : undefined,
               contact_phone: inst.enquiry_contact_number !== 'None' ? inst.enquiry_contact_number : undefined,
               website: inst.website_booking_link !== 'None' ? inst.website_booking_link : undefined,
-              logo_link: rawInst.logo_link || inst.image_link,
+              logo_link: (rawInst.logo_link && rawInst.logo_link !== 'None') ? rawInst.logo_link : undefined,
             });
           }
           institutionMap.get(fallbackId)!.tech_count++;

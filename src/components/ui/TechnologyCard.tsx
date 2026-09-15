@@ -23,8 +23,8 @@ export default function TechnologyCard({ instrument, compact = false }: Props) {
   const displayImage = vm.media.thumbnail;
   const hasImage = !!displayImage && !imageFailed;
 
-  // Short description mapping
-  const shortDesc = vm.facility || '';
+  // Short description mapping: use facility, or fallback to primary tag/scope
+  const shortDesc = vm.facility || (vm.tags && vm.tags.length > 0 ? vm.tags[0] : '');
   const sectorName = vm.tags && vm.tags.length > 0 ? vm.tags[0].trim() : 'General';
   const sectorSlug = sectorName.toLowerCase().replace(/\s+/g, '-');
 

@@ -8,7 +8,7 @@ import MouBadge from '@/components/ui/MouBadge';
 import { fetchInstrumentBundle } from '@/lib/dataFetcher';
 import { InstitutionRepository } from '@/repositories/InstitutionRepository';
 import { toInstrumentViewModel } from '@/domain/instrument/mapper';
-import { getImageUrl } from '@/lib/utils';
+import { getImageUrl, getSafeUrl } from '@/lib/utils';
 
 async function getRepo() {
   const bundle = await fetchInstrumentBundle();
@@ -76,10 +76,15 @@ const LOCAL_LOGOS: Record<string, string> = {
   'iav': '/images/institutions/iav.jpg',
 };
 
+
+
 function getAcronym(name: string): string {
   const match = name.match(/\(([^)]+)\)/);
   if (match && match[1]) return match[1].trim();
   const upper = name.toUpperCase();
+  if (upper.includes('DOCTOR JOHN')) return 'DJBC';
+  if (upper.includes('PHYTOCOM')) return 'PHYTOCOM';
+  if (upper.includes('BAGMO')) return 'BAGMO';
   if (upper.includes('CUSAT')) return 'CUSAT';
   if (upper.includes('IIT')) return 'IIT';
   if (upper.includes('IISER')) return 'IISER';
@@ -90,6 +95,21 @@ function getAcronym(name: string): string {
   if (upper.includes('CPCRI')) return 'CPCRI';
   if (upper.includes('CTCRI')) return 'CTCRI';
   if (upper.includes('KUFOS')) return 'KUFOS';
+  if (upper.includes('CDAC') || upper.includes('C-DAC')) return 'C-DAC';
+  if (upper.includes('CMET') || upper.includes('C-MET')) return 'C-MET';
+  if (upper.includes('SCTIMST')) return 'SCTIMST';
+  if (upper.includes('RGCB')) return 'RGCB';
+  if (upper.includes('NIIST')) return 'NIIST';
+
+  // Generate clean initialism from significant words
+  const words = name
+    .replace(/[^a-zA-Z0-9\s]/g, '')
+    .split(/\s+/)
+    .filter(w => !['for', 'and', 'the', 'of', 'in', 'at', 'centre', 'center'].includes(w.toLowerCase()));
+  
+  if (words.length >= 2) {
+    return words.slice(0, 4).map(w => w[0].toUpperCase()).join('');
+  }
   return name.slice(0, 4).toUpperCase();
 }
 
@@ -188,9 +208,9 @@ export default async function InstitutionDetailPage({ params }: Props) {
                   </span>
                 )}
 
-                {institution.website && (
+                {getSafeUrl(institution.website) !== '#' && (
                   <a
-                    href={institution.website}
+                    href={getSafeUrl(institution.website)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1 text-[#0A2164] hover:underline font-medium"

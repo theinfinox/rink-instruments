@@ -22,10 +22,14 @@ export const getImageUrl = (url: string | null | undefined) => {
 
 export const getSafeUrl = (url: string | null | undefined): string => {
   if (!url) return '#';
+  const trimmed = url.trim();
+  if (!trimmed || ['na', 'n/a', 'nil', 'none', 'not specified', 'not available'].includes(trimmed.toLowerCase())) return '#';
+  if (trimmed.startsWith('mailto:') || trimmed.startsWith('tel:')) return trimmed;
+  const withProtocol = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
   try {
-    const parsedUrl = new URL(url, 'https://fallback.com');
-    if (['http:', 'https:', 'mailto:', 'tel:'].includes(parsedUrl.protocol)) {
-      return url;
+    const parsedUrl = new URL(withProtocol);
+    if (['http:', 'https:'].includes(parsedUrl.protocol)) {
+      return withProtocol;
     }
     return '#';
   } catch {

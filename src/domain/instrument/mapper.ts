@@ -44,12 +44,20 @@ function mapMedia(instrument: Instrument): InstrumentViewModel['media'] {
   };
 }
 
+function sanitizeUrl(url?: string | null): string | null {
+  if (!url) return null;
+  const trimmed = url.trim();
+  if (!trimmed || ['na', 'n/a', 'nil', 'none', 'not specified'].includes(trimmed.toLowerCase())) return null;
+  return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+}
+
 function mapContact(instrument: Instrument, repo: InstitutionRepository): InstrumentViewModel['contact'] {
-  const instEntity = repo.getById(instrument.institution_id) || repo.getByName(instrument.institution_name);
+  const instEntity = repo.getInstitution(instrument);
 
   const phone = instEntity?.contact_phone || (instrument.enquiry_contact_number && instrument.enquiry_contact_number !== 'None' ? instrument.enquiry_contact_number : null);
   const email = instEntity?.contact_email || (instrument.enquiry_mail && instrument.enquiry_mail !== 'None' ? instrument.enquiry_mail : null);
-  const website = instEntity?.website || (instrument.website_booking_link_fallback && instrument.website_booking_link_fallback !== 'None' ? instrument.website_booking_link_fallback : null);
+  const rawWebsite = instEntity?.website || (instrument.website_booking_link_fallback && instrument.website_booking_link_fallback !== 'None' ? instrument.website_booking_link_fallback : null);
+  const website = sanitizeUrl(rawWebsite);
 
   return { phone, email, website };
 }
@@ -66,7 +74,7 @@ function mapActions(
   };
 
   const bookingUrl = instrument.website_booking_link && instrument.website_booking_link !== 'None' 
-    ? instrument.website_booking_link 
+    ? sanitizeUrl(instrument.website_booking_link) 
     : null;
 
   if (bookingUrl) {
@@ -128,14 +136,14 @@ export function toInstrumentViewModel(
   instrument: Instrument,
   repo: InstitutionRepository
 ): Readonly<InstrumentViewModel> {
-  const instEntity = repo.getById(instrument.institution_id) || repo.getByName(instrument.institution_name);
+  const instEntity = repo.getInstitution(instrument);
 
   const id = instrument.provider_key || instrument.id || '';
   const title = instrument.instruments;
   const acronym = instrument.acronym && instrument.acronym !== 'None' ? instrument.acronym : null;
   const displayTitle = acronym ? `${title} (${acronym})` : title;
   
-  const institutionName = repo.resolveDisplayName(instrument);
+  const institutionName = instEntity.name || repo.resolveDisplayName(instrument);
   const hasVerifiedMou = instEntity?.has_verified_mou === true;
     
   const facility = instrument.name_of_facility && instrument.name_of_facility !== 'None' ? instrument.name_of_facility : null;
