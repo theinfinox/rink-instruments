@@ -2,20 +2,19 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { 
   ShieldCheck, 
   ArrowRight, 
   Building2, 
   CheckCircle2, 
   ChevronLeft, 
-  ChevronRight,
-  ChevronDown,
-  ChevronUp,
-  MapPin
+  ChevronRight, 
+  ChevronDown, 
+  ChevronUp, 
+  MapPin 
 } from 'lucide-react';
-import { getImageUrl } from '@/lib/utils';
 import { isLocationEnabled, LOCATION_CONFIG } from '@/config/locationConfig';
+import { resolveInstitutionLogo, getMonogram, LOCAL_INSTITUTION_LOGOS } from '@/lib/institutionLogos';
 
 export interface MouPartner {
   id: string;
@@ -28,18 +27,11 @@ export interface MouPartner {
   summary: string;
   localLogo?: string;
   cdnLogo?: string;
+  originalLogoLink?: string;
   eligibility: string;
   district?: string;
   gmaps_link?: string;
 }
-
-const LOCAL_LOGOS_MAP: Record<string, string> = {
-  'indian-institute-of-technology-palakkad-iit-palakkad': '/images/institutions/iit-palakkad.jpg',
-  'indian-institute-of-science-education-and-research-thiruvananthapuram-iiser-tvm': '/images/institutions/iiser-thiruvananthapuram.jpg',
-  'cochin-university-of-science-and-technology-cusat': '/images/institutions/cusat.webp',
-  'jawaharlal-nehru-tropical-botanic-garden-research-institute-jntbgri': '/images/institutions/kscste-jntbgri.jpg',
-  'centre-for-water-resources-development-and-management-cwrdm': '/images/institutions/cwrdm.jpg',
-};
 
 // Resilient curated fallback list in case network or API is offline
 const FALLBACK_MOU_PARTNERS: MouPartner[] = [
@@ -53,6 +45,7 @@ const FALLBACK_MOU_PARTNERS: MouPartner[] = [
     concessionRate: 'Subsidized internal user fee rates',
     summary: 'Startups with a valid KSUM UID can avail subsidized access to advanced CIF and Central Micro-Fabrication facilities.',
     localLogo: '/images/institutions/iit-palakkad.jpg',
+    originalLogoLink: 'https://drive.google.com/file/d/1QNIqun57FJOGC342k9T-psulkGEgraSs/view?usp=drive_link',
     cdnLogo: '/assets/instrument/1QNIqun57FJOGC342k9T-psulkGEgraSs.webp',
     eligibility: 'Valid KSUM UID',
   },
@@ -66,6 +59,7 @@ const FALLBACK_MOU_PARTNERS: MouPartner[] = [
     concessionRate: 'Category II Government R&D Rates',
     summary: 'Direct online booking on the official CIF portal with concessional government R&D institution user fees.',
     localLogo: '/images/institutions/iiser-thiruvananthapuram.jpg',
+    originalLogoLink: 'https://drive.google.com/file/d/1RWENagWNAddbUhn2UQmbKtrrg7yIJNlr/view?usp=drive_link',
     cdnLogo: '/assets/instrument/1RWENagWNAddbUhn2UQmbKtrrg7yIJNlr.webp',
     eligibility: 'KSUM UID CIF Login',
   },
@@ -79,6 +73,7 @@ const FALLBACK_MOU_PARTNERS: MouPartner[] = [
     concessionRate: 'Category II User Fee Rates (inclusive of taxes)',
     summary: 'Access to university testing, analytical laboratories, and STIC at standardized Government R&D fee tiers.',
     localLogo: '/images/institutions/cusat.webp',
+    originalLogoLink: 'https://drive.google.com/file/d/1mkaLLR_Wfdv3NLoKKhGZMf-_SM-DDV9A/view?usp=drive_link',
     cdnLogo: '/assets/instrument/1mkaLLR_Wfdv3NLoKKhGZMf-_SM-DDV9A.webp',
     eligibility: 'KSUM UID Requisition',
   },
@@ -91,6 +86,7 @@ const FALLBACK_MOU_PARTNERS: MouPartner[] = [
     facility: 'Central Sophisticated Instrumentation Facility (CSIF)',
     concessionRate: 'Internal R&D Laboratory User Rates',
     summary: 'Five-year formal MoU granting startups access to CSIF analytical instrumentation at internal R&D rates.',
+    originalLogoLink: 'https://drive.google.com/file/d/187F1EHhdBudZq_M2JB3Ql54Ud70VHqy-/view?usp=drive_link',
     cdnLogo: '/assets/instrument/187F1EHhdBudZq_M2JB3Ql54Ud70VHqy-.webp',
     eligibility: 'KSUM UID Certificate',
   },
@@ -103,6 +99,8 @@ const FALLBACK_MOU_PARTNERS: MouPartner[] = [
     facility: 'KFRI Analytical & Testing Laboratories',
     concessionRate: 'Up to 40% subsidized fee concession',
     summary: 'Covered under KSCSTE startup support for material characterization, forestry, and biological sample testing.',
+    localLogo: '/images/institutions/kscste.jpg',
+    originalLogoLink: 'https://drive.google.com/file/d/1MsHIIRz4BitgfPYrnrlElmME5-PTXkCh/view?usp=drive_link',
     cdnLogo: '/assets/instrument/1MsHIIRz4BitgfPYrnrlElmME5-PTXkCh.webp',
     eligibility: 'KSUM Registered Startup',
   },
@@ -116,6 +114,7 @@ const FALLBACK_MOU_PARTNERS: MouPartner[] = [
     concessionRate: 'Up to 40% testing concession (10 samples/mo)',
     summary: 'Discounted access for herbal, botanical, and phytochemical characterization under KSCSTE support.',
     localLogo: '/images/institutions/kscste-jntbgri.jpg',
+    originalLogoLink: 'https://drive.google.com/file/d/1K8kO4n5YYtwInqIiq72eyUuhYQFDvn3p/view?usp=drive_link',
     cdnLogo: '/assets/instrument/1K8kO4n5YYtwInqIiq72eyUuhYQFDvn3p.webp',
     eligibility: 'KSUM UID / KSCSTE Policy',
   },
@@ -129,6 +128,7 @@ const FALLBACK_MOU_PARTNERS: MouPartner[] = [
     concessionRate: 'Concession as per KSCSTE Policy',
     summary: 'Direct access to advanced hydrological instrumentation and incubation centre testing support.',
     localLogo: '/images/institutions/cwrdm.jpg',
+    originalLogoLink: 'https://drive.google.com/file/d/1193EUyBU2mx7SXuhOLCLfNmEXA05jQqD/view?usp=drive_link',
     cdnLogo: '/assets/instrument/1193EUyBU2mx7SXuhOLCLfNmEXA05jQqD.webp',
     eligibility: 'Incubatees & KSUM Startups',
   },
@@ -150,7 +150,8 @@ function PartnerCard({
   hiddenOnMobile?: boolean; 
 }) {
   const [imageError, setImageError] = useState(false);
-  const logoSrc = (partner.cdnLogo ? getImageUrl(partner.cdnLogo) : null) || partner.localLogo;
+  const logoSrc = resolveInstitutionLogo(partner);
+  const monogram = getMonogram(partner.name);
 
   return (
     <div className={`bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-slate-200/90 shadow-sm hover:shadow-md hover:border-blue-300 hover:-translate-y-1 transition-all duration-200 flex-col justify-between group ${
@@ -161,16 +162,28 @@ function PartnerCard({
         <div className="flex items-start justify-between gap-3 mb-3 sm:mb-4">
           <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center overflow-hidden flex-shrink-0 p-1">
             {logoSrc && !imageError ? (
-              <Image
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
                 src={logoSrc}
                 alt={partner.name}
-                width={48}
-                height={48}
                 className="w-full h-full object-contain"
+                loading="lazy"
                 onError={() => setImageError(true)}
               />
             ) : (
-              <Building2 className="w-5 h-5 sm:w-6 sm:h-6 text-[#0A2164]" />
+              <div className="w-full h-full flex items-center justify-center select-none bg-gradient-to-br from-blue-50 via-slate-50 to-indigo-50/40 text-[#1B4D9B] rounded-md sm:rounded-lg">
+                <span
+                  className={`font-heading font-black uppercase text-center leading-none tracking-wider ${
+                    monogram.length <= 2
+                      ? 'text-xs sm:text-sm font-black'
+                      : monogram.length <= 4
+                      ? 'text-[10px] sm:text-xs font-black tracking-tight'
+                      : 'text-[9px] sm:text-[10px] font-bold tracking-tighter'
+                  }`}
+                >
+                  {monogram}
+                </span>
+              </div>
             )}
           </div>
 
@@ -308,8 +321,9 @@ export default function ExclusivePartnershipsSection({
         facility: item.ksum_facility || 'Central Testing & Instrumentation Facilities',
         concessionRate: item.ksum_discount_or_rate || 'Subsidized rates for registered startups',
         summary: item.ksum_mou_details || item.ksum_conditions || 'Subsidized access for eligible startups.',
-        localLogo: LOCAL_LOGOS_MAP[slug],
-        cdnLogo: inst.logo_link || inst.original_logo_link,
+        localLogo: LOCAL_INSTITUTION_LOGOS[slug] || inst.localLogo,
+        cdnLogo: inst.logo_link,
+        originalLogoLink: inst.original_logo_link || item.original_logo_link,
         eligibility: item.ksum_eligible_for || 'Valid KSUM UID',
         district: district,
         gmaps_link: inst.gmaps_link || inst.link,

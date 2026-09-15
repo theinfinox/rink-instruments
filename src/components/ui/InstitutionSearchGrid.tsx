@@ -8,8 +8,8 @@ import type { Institution } from '@/types';
 
 import MouBadge from './MouBadge';
 import { toDriveEmbedUrl } from '@/lib/mapper';
-import { getImageUrl } from '@/lib/utils';
 import { isLocationEnabled, LOCATION_CONFIG } from '@/config/locationConfig';
+import { resolveInstitutionLogo, getMonogram } from '@/lib/institutionLogos';
 
 // ── Regional District Aliases for Natural Geosearch ───────────────
 const DISTRICT_ALIASES: Record<string, string[]> = {
@@ -26,73 +26,9 @@ const DISTRICT_ALIASES: Record<string, string[]> = {
   'kasaragod': ['kasargod', 'chowki'],
 };
 
-// ── Verified Local Institution Logos ─────────────────────────────
-const LOCAL_INSTITUTION_LOGOS: Record<string, string> = {
-  'cusat': '/images/institutions/cusat.webp',
-  'cochin-university-of-science-and-technology-cusat': '/images/institutions/cusat.webp',
-  'iit-palakkad': '/images/institutions/iit-palakkad.jpg',
-  'indian-institute-of-technology-palakkad-iit-palakkad': '/images/institutions/iit-palakkad.jpg',
-  'iiser-thiruvananthapuram': '/images/institutions/iiser-thiruvananthapuram.jpg',
-  'indian-institute-of-science-education-and-research-thiruvananthapuram-iiser-tvm': '/images/institutions/iiser-thiruvananthapuram.jpg',
-  'kscste-jntbgri': '/images/institutions/kscste-jntbgri.jpg',
-  'jawaharlal-nehru-tropical-botanic-garden-research-institute-jntbgri': '/images/institutions/kscste-jntbgri.jpg',
-  'jntbgri': '/images/institutions/kscste-jntbgri.jpg',
-  'centre-for-water-resources-development-and-management-cwrdm': '/images/institutions/cwrdm.jpg',
-  'cwrdm': '/images/institutions/cwrdm.jpg',
-  'icar-cpcri': '/images/institutions/cpcri.png',
-  'cpcri': '/images/institutions/cpcri.png',
-  'icar-central-plantation-crops-research-institute-cpcri': '/images/institutions/cpcri.png',
-  'icar-ctcri': '/images/institutions/ctcri.png',
-  'ctcri': '/images/institutions/ctcri.png',
-  'icar-central-tuber-crops-research-institute-ctcri': '/images/institutions/ctcri.png',
-  'csir-niist': '/images/institutions/csir-niist.png',
-  'c-dac': '/images/institutions/cdac.png',
-  'cdac': '/images/institutions/cdac.png',
-  'c-met': '/images/institutions/c-met.png',
-  'iisr': '/images/institutions/iisr.png',
-  'icar-indian-institute-of-spices-research-iisr': '/images/institutions/iisr.png',
-  'kau': '/images/institutions/kau.png',
-  'sctimst': '/images/institutions/sctimst.jpg',
-  'sree-chitra-tirunal-institute-for-medical-sciences-technology-sctimst': '/images/institutions/sctimst.jpg',
-  'rgcb': '/images/institutions/rgcb.jpg',
-  'rajiv-gandhi-centre-for-biotechnology-rgcb': '/images/institutions/rgcb.jpg',
-  'iav': '/images/institutions/iav.jpg',
-  'institute-of-advanced-virology-iav': '/images/institutions/iav.jpg',
-  'kufos': '/images/institutions/kufos-kochi.jpg',
-  'kerala-university-of-fisheries-and-ocean-studies-kufos': '/images/institutions/kufos-kochi.jpg',
-  'dr-moopens-inest': '/images/institutions/inest.jpg',
-  'inest': '/images/institutions/inest.jpg',
-};
-
 // ── Helpers ─────────────────────────────────────────────────────
 function getLogo(inst: Institution): string | null {
-  const s = (inst.slug || '').toLowerCase();
-  
-  // 1. Check local verified static logo first
-  if (LOCAL_INSTITUTION_LOGOS[s]) return LOCAL_INSTITUTION_LOGOS[s];
-  for (const [key, path] of Object.entries(LOCAL_INSTITUTION_LOGOS)) {
-    if (s.includes(key) || key.includes(s)) return path;
-  }
-
-  // 2. Check original Google Drive link (converted to lh3 direct image)
-  if (inst.original_logo_link) {
-    const driveUrl = toDriveEmbedUrl(inst.original_logo_link);
-    if (driveUrl) return driveUrl;
-  }
-
-  // 3. Check official database logo_link (if available/hosted)
-  if (inst.logo_link) {
-    return getImageUrl(inst.logo_link);
-  }
-
-  // 4. Other image fields
-  return (
-    inst.logo_embed_url ||
-    inst.institution_image_embed_url ||
-    inst.institution_image ||
-    inst.image ||
-    null
-  );
+  return resolveInstitutionLogo(inst);
 }
 
 function norm(s: string): string {
@@ -133,65 +69,6 @@ function matchesInstitution(inst: Institution, query: string): boolean {
   }
 
   return false;
-}
-
-function getMonogram(name: string): string {
-  if (!name) return 'RI';
-
-  // 1. Check for acronym in parentheses: e.g. "(CUSAT)", "(KFRI)", "(CLIF)", "(JNTBGRI)"
-  const parenMatch = name.match(/\(([A-Za-z0-9\s-]+)\)/);
-  if (parenMatch) {
-    const inside = parenMatch[1].trim();
-    if (!inside.includes(' ') && inside.length >= 2 && inside.length <= 7) {
-      return inside.toUpperCase();
-    }
-    const insideWords = inside.split(/[\s-]+/).filter(Boolean);
-    if (insideWords.length >= 2 && insideWords[0].toUpperCase() === 'IIT') {
-      return 'IIT';
-    }
-    if (insideWords.length === 1 && insideWords[0].length <= 6) {
-      return insideWords[0].toUpperCase();
-    }
-  }
-
-  // 2. Clean name: replace punctuation, dashes, en-dashes, em-dashes
-  const cleanName = name
-    .replace(/[–—\-_/\\()[\],.:;+]/g, ' ')
-    .replace(/['’]/g, '')
-    .trim();
-
-  const stopWords = new Set([
-    'and', 'of', 'for', 'the', 'in', 'at', 'to',
-    'private', 'pvt', 'ltd', 'limited', 'solution', 'solutions', 'llp', 
-    'center', 'centre', 'facility', 'services', 'service', 'tech', 'technologies', 'technology'
-  ]);
-
-  const words = cleanName
-    .split(/\s+/)
-    .map(w => w.trim())
-    .filter(w => w.length > 0 && !stopWords.has(w.toLowerCase()));
-
-  // Check if first word is internal camelCase e.g. BioQuatix (B, Q) or PhyEcoSyS (P, E)
-  if (words.length > 0) {
-    const firstWord = words[0];
-    const upperCount = (firstWord.match(/[A-Z]/g) || []).length;
-    const lowerCount = (firstWord.match(/[a-z]/g) || []).length;
-    if (upperCount >= 2 && lowerCount >= 2) {
-      const caps = firstWord.replace(/[^A-Z]/g, '');
-      return caps.slice(0, 2);
-    }
-  }
-
-  if (words.length >= 2) {
-    return (words[0][0] + words[1][0]).toUpperCase();
-  }
-
-  if (words.length === 1) {
-    return words[0].slice(0, 2).toUpperCase();
-  }
-
-  const rawClean = cleanName.replace(/\s+/g, '');
-  return rawClean.slice(0, 2).toUpperCase() || 'RI';
 }
 
 // ── Suggestion Dropdown ─────────────────────────────────────────
