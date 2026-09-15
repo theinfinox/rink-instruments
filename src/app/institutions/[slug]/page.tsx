@@ -12,6 +12,7 @@ import { InstitutionRepository } from '@/repositories/InstitutionRepository';
 import { toInstrumentViewModel } from '@/domain/instrument/mapper';
 import { getImageUrl, getSafeUrl } from '@/lib/utils';
 import { isLocationEnabled } from '@/config/locationConfig';
+import { resolveInstitutionLogo } from '@/lib/institutionLogos';
 
 async function getRepo() {
   const bundle = await fetchInstrumentBundle();
@@ -42,6 +43,8 @@ export async function generateMetadata({ params }: Props) {
 
   const metaDescription = `Explore ${inst.tech_count} scientific instruments and testing facilities from ${inst.name}. Partner with top Kerala research institutions through the RINK Instruments and Services Portal.`;
 
+  const logoUrl = resolveInstitutionLogo(inst);
+
   return {
     title: `${inst.name} Instruments | RINK Kerala`,
     description: metaDescription,
@@ -49,6 +52,7 @@ export async function generateMetadata({ params }: Props) {
       title: `${inst.name} Instruments | RINK Kerala`,
       description: metaDescription,
       type: 'website',
+      ...(logoUrl ? { images: [logoUrl] } : {}),
     },
   };
 }

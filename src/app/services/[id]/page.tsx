@@ -32,6 +32,11 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   return {
     title: `${service.serviceName} | ${service.startupName} — RINK Services`,
     description: service.description || `Research service offered by ${service.startupName}.`,
+    openGraph: {
+      title: `${service.serviceName} | ${service.startupName}`,
+      description: service.description || `Research service offered by ${service.startupName}.`,
+      type: 'article',
+    },
   };
 }
 

@@ -3,28 +3,37 @@ import './globals.css';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 
-export const metadata: Metadata = {
-  title: 'RINK Instruments and Services Portal | Research Innovation Network Kerala',
-  description:
-    'Discover and license instruments and services from Kerala\u2019s leading research institutions and startups — Kerala Startup Mission.',
-  keywords: 'Kerala startup, research technology, KSUM, RINK, CTCRI, CPCRI, NIIST',
-  icons: {
-    icon: [
-      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
-      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
-      { url: '/favicon.ico', sizes: 'any' }
-    ],
-    apple: [
-      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
-    ]
-  },
-  manifest: '/site.webmanifest',
-  openGraph: {
-    title: 'RINK Instruments and Services Portal',
-    description: 'Connecting Research • Innovation • Commercialization — Kerala Startup Mission',
-    type: 'website',
-  },
-};
+import { headers } from 'next/headers';
+
+export async function generateMetadata(): Promise<Metadata> {
+  const headersList = await headers();
+  const host = headersList.get('host') || 'instruments.startupmission.in';
+  const protocol = host.includes('localhost') ? 'http' : 'https';
+
+  return {
+    metadataBase: new URL(`${protocol}://${host}`),
+    title: 'RINK Instruments and Services Portal | Research Innovation Network Kerala',
+    description:
+      'Discover and license instruments and services from Kerala\u2019s leading research institutions and startups — Kerala Startup Mission.',
+    keywords: 'Kerala startup, research technology, KSUM, RINK, CTCRI, CPCRI, NIIST',
+    icons: {
+      icon: [
+        { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+        { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+        { url: '/favicon.ico', sizes: 'any' }
+      ],
+      apple: [
+        { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+      ]
+    },
+    manifest: '/site.webmanifest',
+    openGraph: {
+      title: 'RINK Instruments and Services Portal',
+      description: 'Connecting Research • Innovation • Commercialization — Kerala Startup Mission',
+      type: 'website',
+    },
+  };
+}
 
 export const revalidate = 60;
 

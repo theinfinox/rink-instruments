@@ -60,6 +60,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
       title: `${vm.displayTitle} at ${vm.institution}`,
       description: metaDescription,
       type: 'article',
+      ...(vm.media.thumbnail ? { images: [vm.media.thumbnail] } : {}),
     },
   };
 }

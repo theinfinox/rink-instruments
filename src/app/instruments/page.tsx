@@ -6,12 +6,9 @@ import { SearchIndexItem } from '@/types';
 import { Instrument } from '@/types/instrument';
 import { toInstrumentViewModel } from '@/domain/instrument/mapper';
 
-export const metadata = {
-  title: 'All Instruments — RINK Instruments and Services Portal',
-  description: 'Browse all instruments from Kerala research institutions. Filter by sector, institution, type, and more.',
-};
+import type { Metadata } from 'next';
 
-interface Props {
+type SearchParamsProps = {
   searchParams: Promise<{
     q?: string;
     sector?: string;
@@ -22,7 +19,34 @@ interface Props {
     mou?: string;
     page?: string;
   }>;
+};
+
+export async function generateMetadata({ searchParams }: SearchParamsProps): Promise<Metadata> {
+  const params = await searchParams;
+  
+  if (params.district) {
+    const districtName = params.district.charAt(0).toUpperCase() + params.district.slice(1).toLowerCase();
+    const metaDescription = `Browse instruments and research facilities located in ${districtName}. Filter by sector, institution, and more on RINK.`;
+    return {
+      title: `Instruments in ${districtName} — RINK Kerala`,
+      description: metaDescription,
+      openGraph: {
+        title: `Instruments in ${districtName} — RINK Kerala`,
+        description: metaDescription,
+        images: [`/images/districts/${params.district.toLowerCase()}.webp`],
+        type: 'website',
+      },
+    };
+  }
+
+  // Fallback for all instruments without district filter
+  return {
+    title: 'All Instruments — RINK Instruments and Services Portal',
+    description: 'Browse all instruments from Kerala research institutions. Filter by sector, institution, type, and more.',
+  };
 }
+
+interface Props extends SearchParamsProps {}
 
 export default async function TechnologiesPage({ searchParams }: Props) {
   const params = await searchParams;
