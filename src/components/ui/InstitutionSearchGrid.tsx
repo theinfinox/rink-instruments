@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Building2, Search, X, Check, Rocket, ShieldCheck, ChevronDown, ChevronUp } from 'lucide-react';
+import { ArrowRight, Building2, Search, X, Check, Rocket, ShieldCheck, ChevronDown, ChevronUp, Landmark } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import type { Institution } from '@/types';
 
@@ -282,8 +282,8 @@ export default function InstitutionSearchGrid({ institutions, startups = [], con
   const router = useRouter();
   const isServices = context === 'services';
 
-  // Active filter tab: 'all' | 'startups' | 'partnered' (single-select mutually exclusive)
-  const [filterTab, setFilterTab] = useState<'all' | 'startups' | 'partnered'>('all');
+  // Active filter tab: 'all' | 'institutions' | 'startups' | 'partnered' (single-select mutually exclusive)
+  const [filterTab, setFilterTab] = useState<'all' | 'institutions' | 'startups' | 'partnered'>('all');
 
   // Mobile progressive disclosure (initially shows 6 on mobile)
   const [isMobileExpanded, setIsMobileExpanded] = useState(false);
@@ -316,7 +316,9 @@ export default function InstitutionSearchGrid({ institutions, startups = [], con
     }
 
     let pool: Institution[] = [];
-    if (filterTab === 'startups') {
+    if (filterTab === 'institutions') {
+      pool = institutions;
+    } else if (filterTab === 'startups') {
       pool = startups;
     } else if (filterTab === 'partnered') {
       pool = [...institutions, ...startups].filter((inst: Institution) => inst.has_verified_mou === true);
@@ -344,6 +346,7 @@ export default function InstitutionSearchGrid({ institutions, startups = [], con
   const mobileToggleLabel = useMemo(() => {
     if (isServices) return 'Startups';
     if (filterTab === 'partnered') return 'Partnered Institutions';
+    if (filterTab === 'institutions') return 'Research Institutions';
     if (filterTab === 'startups') return 'Startups';
     return 'Institutions & Startups';
   }, [isServices, filterTab]);
@@ -427,7 +430,7 @@ export default function InstitutionSearchGrid({ institutions, startups = [], con
       if (h === 'startups') {
         setFilterTab('startups');
       } else if (h === 'institutions') {
-        setFilterTab('all');
+        setFilterTab('institutions');
       }
     };
 
@@ -471,6 +474,15 @@ export default function InstitutionSearchGrid({ institutions, startups = [], con
           ? `Showing ${filteredInstitutions.length} of ${countPartnered} Partnered Institutions`
           : `Showing All ${countPartnered} Partnered Institutions`,
         secondary: 'with Subsidized Startup Rates',
+      };
+    }
+
+    if (filterTab === 'institutions') {
+      return {
+        primary: query.trim()
+          ? `Showing ${filteredInstitutions.length} of ${countResearch} Research Institutions`
+          : `Showing All ${countResearch} Research Institutions`,
+        secondary: null,
       };
     }
 
@@ -565,9 +577,12 @@ export default function InstitutionSearchGrid({ institutions, startups = [], con
           )}
         </div>
 
-        {/* ── 3 Filter Tabs: All, Startups, Partnered (Strict 1-line layout) ── */}
+        {/* ── 4 Filter Tabs: All, Institutions, Startups, Partnered ── */}
         {!isServices && (
-          <div className="grid grid-cols-3 sm:flex sm:items-center gap-1.5 sm:gap-2 mt-2.5 sm:mt-3.5 max-w-[460px] sm:max-w-none">
+          <div 
+            className="flex items-center gap-1.5 sm:gap-2 mt-2.5 sm:mt-3.5 overflow-x-auto no-scrollbar scroll-smooth py-1 -mx-4 px-4 sm:mx-0 sm:px-0 sm:overflow-visible sm:flex-wrap [&::-webkit-scrollbar]:hidden"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
             {/* 1. All */}
             <button
               type="button"
@@ -575,7 +590,7 @@ export default function InstitutionSearchGrid({ institutions, startups = [], con
               aria-checked={filterTab === 'all'}
               id="filter-tab-all"
               onClick={() => setFilterTab('all')}
-              className={`group flex items-center justify-center gap-1 sm:gap-1.5 px-1.5 sm:px-3.5 h-8 sm:h-9 rounded-lg sm:rounded-xl border text-[11px] sm:text-xs font-semibold whitespace-nowrap transition-all duration-200 select-none shadow-xs cursor-pointer ${
+              className={`group flex items-center justify-center gap-1 sm:gap-1.5 px-2.5 sm:px-3.5 h-8 sm:h-9 rounded-lg sm:rounded-xl border text-[11px] sm:text-xs font-semibold whitespace-nowrap transition-all duration-200 select-none shadow-xs cursor-pointer flex-shrink-0 ${
                 filterTab === 'all'
                   ? 'bg-blue-50 text-[#1B4D9B] border-[#1B4D9B]/35 shadow-[0_1px_3px_rgba(27,77,155,0.12)]'
                   : 'bg-white text-slate-600 border-slate-200/90 hover:border-slate-300 hover:bg-slate-50'
@@ -590,14 +605,36 @@ export default function InstitutionSearchGrid({ institutions, startups = [], con
               </span>
             </button>
 
-            {/* 2. Startups */}
+            {/* 2. Institutions */}
+            <button
+              type="button"
+              role="radio"
+              aria-checked={filterTab === 'institutions'}
+              id="filter-tab-institutions"
+              onClick={() => setFilterTab('institutions')}
+              className={`group flex items-center justify-center gap-1 sm:gap-1.5 px-2.5 sm:px-3.5 h-8 sm:h-9 rounded-lg sm:rounded-xl border text-[11px] sm:text-xs font-semibold whitespace-nowrap transition-all duration-200 select-none shadow-xs cursor-pointer flex-shrink-0 ${
+                filterTab === 'institutions'
+                  ? 'bg-indigo-50/80 text-[#0A2164] border-[#0A2164]/35 shadow-[0_1px_3px_rgba(10,33,100,0.12)]'
+                  : 'bg-white text-slate-600 border-slate-200/90 hover:border-slate-300 hover:bg-slate-50'
+              }`}
+            >
+              <Landmark className={`w-3.5 h-3.5 flex-shrink-0 ${filterTab === 'institutions' ? 'text-[#0A2164]' : 'text-slate-400 group-hover:text-slate-600'}`} />
+              <span>Institutions</span>
+              <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold leading-none flex-shrink-0 ${
+                filterTab === 'institutions' ? 'bg-[#0A2164]/15 text-[#0A2164]' : 'bg-slate-100 text-slate-500'
+              }`}>
+                {countResearch}
+              </span>
+            </button>
+
+            {/* 3. Startups */}
             <button
               type="button"
               role="radio"
               aria-checked={filterTab === 'startups'}
               id="filter-tab-startups"
               onClick={() => setFilterTab('startups')}
-              className={`group flex items-center justify-center gap-1 sm:gap-1.5 px-1.5 sm:px-3.5 h-8 sm:h-9 rounded-lg sm:rounded-xl border text-[11px] sm:text-xs font-semibold whitespace-nowrap transition-all duration-200 select-none shadow-xs cursor-pointer ${
+              className={`group flex items-center justify-center gap-1 sm:gap-1.5 px-2.5 sm:px-3.5 h-8 sm:h-9 rounded-lg sm:rounded-xl border text-[11px] sm:text-xs font-semibold whitespace-nowrap transition-all duration-200 select-none shadow-xs cursor-pointer flex-shrink-0 ${
                 filterTab === 'startups'
                   ? 'bg-amber-50 text-amber-900 border-amber-300 shadow-[0_1px_3px_rgba(217,119,6,0.12)]'
                   : 'bg-white text-slate-600 border-slate-200/90 hover:border-slate-300 hover:bg-slate-50'
@@ -612,14 +649,14 @@ export default function InstitutionSearchGrid({ institutions, startups = [], con
               </span>
             </button>
 
-            {/* 3. Partnered */}
+            {/* 4. Partnered */}
             <button
               type="button"
               role="radio"
               aria-checked={filterTab === 'partnered'}
               id="filter-tab-partnered"
               onClick={() => setFilterTab('partnered')}
-              className={`group flex items-center justify-center gap-1 sm:gap-1.5 px-1.5 sm:px-3.5 h-8 sm:h-9 rounded-lg sm:rounded-xl border text-[11px] sm:text-xs font-semibold whitespace-nowrap transition-all duration-200 select-none shadow-xs cursor-pointer ${
+              className={`group flex items-center justify-center gap-1 sm:gap-1.5 px-2.5 sm:px-3.5 h-8 sm:h-9 rounded-lg sm:rounded-xl border text-[11px] sm:text-xs font-semibold whitespace-nowrap transition-all duration-200 select-none shadow-xs cursor-pointer flex-shrink-0 ${
                 filterTab === 'partnered'
                   ? 'bg-emerald-50 text-emerald-900 border-emerald-400 ring-1 ring-emerald-400/25 shadow-[0_1px_4px_rgba(5,150,105,0.15)]'
                   : 'bg-white text-slate-600 border-slate-200/90 hover:border-emerald-300 hover:bg-emerald-50/30'
