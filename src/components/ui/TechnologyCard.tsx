@@ -237,7 +237,10 @@ export default function TechnologyCard({ instrument, compact = false }: Props) {
                   # {vm.id}
                 </span>
               )}
-              <MouBadge hasVerifiedMou={vm.hasVerifiedMou} />
+              <MouBadge 
+                hasVerifiedMou={vm.hasVerifiedMou} 
+                details={vm.subsidizedPolicy?.discountOrRate || undefined} 
+              />
             </div>
           </div>
 

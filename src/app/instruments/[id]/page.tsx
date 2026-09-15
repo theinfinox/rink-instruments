@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { ChevronRight, ArrowRight, FileText, Microscope, Building2 } from 'lucide-react';
+import { ChevronRight, ArrowRight, FileText, Microscope, Building2, ShieldCheck } from 'lucide-react';
 import TechImage from '@/components/ui/TechImage';
 import { CDN_HOST, getImageUrl, getSafeUrl } from '@/lib/utils';
 import { Instrument } from '@/types/instrument';
@@ -8,6 +8,7 @@ import { toInstrumentViewModel } from '@/domain/instrument/mapper';
 import { toDriveEmbedUrl } from '@/lib/mapper';
 import MouBadge from '@/components/ui/MouBadge';
 import ClientPartnerLogo from './ClientPartnerLogo';
+import SubsidizedClaimSection from '@/components/ui/SubsidizedClaimSection';
 const GOOGLE_FORM_URL =
   'https://docs.google.com/forms/d/e/1FAIpQLSfJlFIqrK5Dzd5R-Voh19OvhUKxj7OzEqeW8XIdjJMNKxc8Eg/viewform';
 
@@ -38,7 +39,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const bundle = await fetchInstrumentBundle();
-  const repo = InstitutionRepository.fromInstrumentData(bundle.main_data, bundle.instituitiion_list, bundle.mou_list);
+  const repo = InstitutionRepository.fromInstrumentData(bundle.main_data, bundle.instituitiion_list, bundle.mou_list, bundle.subsidized_list);
   const rawTech = bundle.main_data.find(t => (t.provider_key || t.id) === id);
   if (!rawTech) return { title: 'Instrument Not Found — RINK' };
   
@@ -68,7 +69,7 @@ export default async function TechnologyDetailPage({ params }: { params: Promise
   
   const bundle = await fetchInstrumentBundle();
   const instruments = bundle.main_data;
-  const repo = InstitutionRepository.fromInstrumentData(instruments, bundle.instituitiion_list, bundle.mou_list);
+  const repo = InstitutionRepository.fromInstrumentData(instruments, bundle.instituitiion_list, bundle.mou_list, bundle.subsidized_list);
   
   const rawTech = instruments.find(t => (t.provider_key || t.id) === id);
   if (!rawTech) notFound();
@@ -231,6 +232,14 @@ export default async function TechnologyDetailPage({ params }: { params: Promise
                   </div>
                 )}
 
+                {/* ── SUBSIDIZED CLAIM POLICY & PROCEDURE ── */}
+                {vm.subsidizedPolicy && vm.subsidizedPolicy.hasSubsidizedRates && (
+                  <SubsidizedClaimSection
+                    policy={vm.subsidizedPolicy}
+                    institutionName={vm.institution}
+                  />
+                )}
+
                 {/* ── TECHNICAL SPECIFICATIONS ── */}
                 {vm.specifications && (
                   <div className="space-y-3">
@@ -322,9 +331,25 @@ export default async function TechnologyDetailPage({ params }: { params: Promise
                       <h3 className="font-serif text-base font-bold mb-2" style={{ color: '#FFFFFF' }}>
                         Interested in this Instrument?
                       </h3>
-                      <p className="text-xs leading-relaxed font-sans mb-4" style={{ color: 'rgba(191,219,254,0.9)' }}>
+                      <p className="text-xs leading-relaxed font-sans mb-3" style={{ color: 'rgba(191,219,254,0.9)' }}>
                         Submit an enquiry to book this instrument or request analysis services for your research, development, and testing needs.
                       </p>
+
+                      {/* Subsidized Rates Highlight */}
+                      {vm.subsidizedPolicy?.hasSubsidizedRates && (
+                        <div className="mb-4 flex items-start gap-2.5 p-3 rounded-lg bg-emerald-500/15 border border-emerald-400/30 text-emerald-100 text-xs font-sans">
+                          <ShieldCheck className="w-4 h-4 text-emerald-300 flex-shrink-0 mt-0.5" />
+                          <div>
+                            <span className="font-bold text-emerald-200 block text-xs">
+                              Subsidized Rates Applicable
+                            </span>
+                            <span className="text-emerald-100/90 text-[11px] leading-tight block mt-0.5">
+                              {vm.subsidizedPolicy.discountOrRate || 'Concessional rates available for KSUM startups'}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+
                       <a
                         href={finalBookingLink}
                         target="_blank"

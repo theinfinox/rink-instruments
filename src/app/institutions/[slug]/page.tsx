@@ -5,6 +5,7 @@ import InstitutionFilterView from './InstitutionFilterView';
 import InstitutionEcosystemBackground from '@/components/ui/InstitutionEcosystemBackground';
 import InstitutionHeaderLogo from '@/components/ui/InstitutionHeaderLogo';
 import MouBadge from '@/components/ui/MouBadge';
+import SubsidizedClaimSection from '@/components/ui/SubsidizedClaimSection';
 import { fetchInstrumentBundle } from '@/lib/dataFetcher';
 import { InstitutionRepository } from '@/repositories/InstitutionRepository';
 import { toInstrumentViewModel } from '@/domain/instrument/mapper';
@@ -15,7 +16,8 @@ async function getRepo() {
   const repo = InstitutionRepository.fromInstrumentData(
     bundle.main_data,
     bundle.instituitiion_list,
-    bundle.mou_list
+    bundle.mou_list,
+    bundle.subsidized_list
   );
   return { repo, instruments: bundle.main_data };
 }
@@ -144,6 +146,7 @@ export default async function InstitutionDetailPage({ params }: Props) {
     null;
 
   const acronym = getAcronym(institution.name);
+  const subsidizedPolicy = repo.getSubsidizedPolicy(institution.institution_id);
 
   return (
     <div className="min-h-screen bg-[#F6F8FC]">
@@ -226,7 +229,13 @@ export default async function InstitutionDetailPage({ params }: Props) {
       </div>
 
       {/* ── Main Content Area ── */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 pb-24 md:pb-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 pb-24 md:pb-8 space-y-8">
+        {subsidizedPolicy && subsidizedPolicy.hasSubsidizedRates && (
+          <SubsidizedClaimSection
+            policy={subsidizedPolicy}
+            institutionName={institution.name}
+          />
+        )}
         <InstitutionFilterView
           initialInstruments={institutionViewModels}
           institutionName={institution.name}

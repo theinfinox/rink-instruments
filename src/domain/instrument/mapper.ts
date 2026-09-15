@@ -167,6 +167,7 @@ export function toInstrumentViewModel(
   
   const institutionName = instEntity.name || repo.resolveDisplayName(instrument);
   const hasVerifiedMou = instEntity?.has_verified_mou === true;
+  const subsidizedPolicy = repo.getSubsidizedPolicy(instrument);
     
   const facility = instrument.name_of_facility && instrument.name_of_facility !== 'None' ? instrument.name_of_facility : null;
   const specifications = instrument.specifications && instrument.specifications !== 'None' ? instrument.specifications : null;
@@ -199,6 +200,7 @@ export function toInstrumentViewModel(
     ksum_uid: instrument.ksum_uid || (instrument as any).ksum_uid || instEntity?.ksum_uid,
     institution_entity: instEntity || undefined,
     hasVerifiedMou,
+    subsidizedPolicy: subsidizedPolicy || undefined,
     facility,
     specifications,
     location,

@@ -37,7 +37,7 @@ export default async function TechnologiesPage({ searchParams }: Props) {
   const instruments = bundle.main_data;
   const rawInstitutions = bundle.instituitiion_list;
   
-  const repo = InstitutionRepository.fromInstrumentData(instruments, rawInstitutions, bundle.mou_list);
+  const repo = InstitutionRepository.fromInstrumentData(instruments, rawInstitutions, bundle.mou_list, bundle.subsidized_list);
   const institutions = repo.getAll();
 
   // Extract Categories (Tags), Districts, and Verification Statuses as fallback

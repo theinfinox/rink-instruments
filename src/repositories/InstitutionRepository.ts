@@ -1,5 +1,5 @@
 import { Institution } from '@/types';
-import { Instrument } from '@/types/instrument';
+import { Instrument, SubsidizedClaimPolicy } from '@/types/instrument';
 
 let _globalRepo: InstitutionRepository | null = null;
 
@@ -7,6 +7,7 @@ export class InstitutionRepository {
   private byId = new Map<string, Institution>();
   private bySlug = new Map<string, Institution>();
   private byName = new Map<string, Institution>();
+  private subsidizedPolicies = new Map<string, SubsidizedClaimPolicy>();
 
   constructor(institutions: Institution[]) {
     institutions.forEach(inst => {
@@ -54,6 +55,25 @@ export class InstitutionRepository {
     if (!name) return undefined;
     const cleanName = name.toLowerCase().trim();
     return this.byName.get(cleanName);
+  }
+
+  setSubsidizedPolicies(policies: Map<string, SubsidizedClaimPolicy>) {
+    this.subsidizedPolicies = policies;
+  }
+
+  getSubsidizedPolicy(instOrId?: Instrument | string | null): SubsidizedClaimPolicy | null {
+    if (!instOrId) return null;
+    let id: string | undefined;
+    if (typeof instOrId === 'string') {
+      id = instOrId;
+    } else {
+      const inst = this.getInstitution(instOrId);
+      id = inst?.institution_id || instOrId.institution_id;
+    }
+    if (id && this.subsidizedPolicies.has(id)) {
+      return this.subsidizedPolicies.get(id) || null;
+    }
+    return null;
   }
 
   /**
@@ -141,16 +161,68 @@ export class InstitutionRepository {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     institutionList: any[] = [],
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    mouList: any[] = []
+    mouList: any[] = [],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    subsidizedList: any[] = []
   ): InstitutionRepository {
     const institutionMap = new Map<string, Institution>();
     const mouMap = new Map<string, boolean>();
+    const subsidizedMap = new Map<string, SubsidizedClaimPolicy>();
 
-    // 0. Build O(1) MoU lookup map indexed ONLY by institution_id
+    // 0. Build Subsidized Claim Policy map from live Subsidized sheet
+    if (Array.isArray(subsidizedList) && subsidizedList.length > 0) {
+      subsidizedList.forEach(raw => {
+        const id = raw?.institution_id;
+        if (id && (raw?.ksum_mou_status === 'Yes' || raw?.verification_status === 'Verified')) {
+          mouMap.set(id, true);
+          subsidizedMap.set(id, {
+            hasSubsidizedRates: true,
+            institutionId: id,
+            institutionName: (raw.institution_name || '').trim(),
+            benefitType: raw.benefit_type || undefined,
+            discountOrRate: raw.discount_or_rate || undefined,
+            eligibility: raw.eligibility || undefined,
+            facilityOrCentre: raw.facility_or_centre || undefined,
+            accessConditions: raw.access_conditions || undefined,
+            validity: raw.validity && raw.validity !== 'Not Specified' ? raw.validity : undefined,
+            applicationMethod: raw.application_method || undefined,
+            referenceOrDocument: raw.reference_or_document || undefined,
+            notes: raw.notes || undefined,
+            description: raw.description || undefined,
+            verificationStatus: raw.verification_status || undefined,
+            facilityNameReference: raw.facility_name_reference || undefined,
+            additionalPolicyDetails: raw.additional_policy_details || undefined,
+            sourceUrl: raw.source_url && raw.source_url.startsWith('http') ? raw.source_url.trim() : null,
+            applicationFormUrl: raw.application_form_url && raw.application_form_url.startsWith('http') ? raw.application_form_url.trim() : null,
+          });
+        }
+      });
+    }
+
+    // 0b. Fallback / merge with legacy mouList
     if (Array.isArray(mouList)) {
       mouList.forEach(raw => {
-        if (raw?.institution_id && raw?.verification_status === 'Verified') {
-          mouMap.set(raw.institution_id, true);
+        const id = raw?.institution_id;
+        if (id && (raw?.ksum_mou === 'Yes' || raw?.verification_status === 'Verified')) {
+          mouMap.set(id, true);
+          if (!subsidizedMap.has(id)) {
+            subsidizedMap.set(id, {
+              hasSubsidizedRates: true,
+              institutionId: id,
+              institutionName: (raw.institution_name || '').trim(),
+              benefitType: raw.ksum_benefit_type,
+              discountOrRate: raw.ksum_discount_or_rate,
+              eligibility: raw.ksum_eligible_for,
+              facilityOrCentre: raw.ksum_facility,
+              accessConditions: raw.ksum_conditions,
+              validity: raw.ksum_validity && raw.ksum_validity !== 'Not Specified' ? raw.ksum_validity : undefined,
+              applicationMethod: raw.ksum_application_method,
+              description: raw.ksum_mou_details,
+              verificationStatus: raw.verification_status,
+              sourceUrl: null,
+              applicationFormUrl: null,
+            });
+          }
         }
       });
     }
@@ -277,6 +349,7 @@ export class InstitutionRepository {
     });
 
     const repo = new InstitutionRepository(Array.from(institutionMap.values()));
+    repo.setSubsidizedPolicies(subsidizedMap);
     InstitutionRepository.setGlobal(repo);
     return repo;
   }

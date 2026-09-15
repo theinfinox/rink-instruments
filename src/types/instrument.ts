@@ -27,3 +27,24 @@ export interface Instrument {
   source_type?: string;
   specifications?: string;
 }
+
+export interface SubsidizedClaimPolicy {
+  hasSubsidizedRates: boolean;
+  institutionId: string;
+  institutionName: string;
+  benefitType?: string;
+  discountOrRate?: string;
+  eligibility?: string;
+  facilityOrCentre?: string;
+  accessConditions?: string;
+  validity?: string;
+  applicationMethod?: string;
+  referenceOrDocument?: string;
+  notes?: string;
+  description?: string;
+  verificationStatus?: string;
+  facilityNameReference?: string;
+  additionalPolicyDetails?: string;
+  sourceUrl?: string | null;
+  applicationFormUrl?: string | null;
+}

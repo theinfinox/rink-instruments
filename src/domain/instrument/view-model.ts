@@ -1,4 +1,5 @@
 import { Institution } from '@/types';
+import { SubsidizedClaimPolicy } from '@/types/instrument';
 
 export interface Action {
   label: string;
@@ -35,6 +36,9 @@ export interface InstrumentViewModel {
 
   /** Inherited MoU verification status from parent institution */
   hasVerifiedMou: boolean;
+
+  /** Subsidized claim policy and how-to-claim details */
+  subsidizedPolicy?: SubsidizedClaimPolicy | null;
 
   /** Optional facility name within the institution */
   facility: string | null;
