@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { ChevronRight, ArrowRight, FileText, Microscope, Building2, ShieldCheck } from 'lucide-react';
+import { ChevronRight, ArrowRight, FileText, Microscope, Building2, ShieldCheck, MapPin } from 'lucide-react';
 import TechImage from '@/components/ui/TechImage';
 import { CDN_HOST, getImageUrl, getSafeUrl } from '@/lib/utils';
 import { Instrument } from '@/types/instrument';
@@ -9,6 +9,7 @@ import { toDriveEmbedUrl } from '@/lib/mapper';
 import MouBadge from '@/components/ui/MouBadge';
 import ClientPartnerLogo from './ClientPartnerLogo';
 import SubsidizedClaimSection from '@/components/ui/SubsidizedClaimSection';
+import { isLocationEnabled } from '@/config/locationConfig';
 const GOOGLE_FORM_URL =
   'https://docs.google.com/forms/d/e/1FAIpQLSfJlFIqrK5Dzd5R-Voh19OvhUKxj7OzEqeW8XIdjJMNKxc8Eg/viewform';
 
@@ -324,6 +325,25 @@ export default async function TechnologyDetailPage({ params }: { params: Promise
                         })()}
                         {vm.institution}
                       </Link>
+                      {isLocationEnabled('placement5_instrumentDetailSidebar') && (vm.location.district || vm.location.address) && (
+                        <div className="flex items-center gap-1.5 mt-2 text-xs text-slate-500 font-sans">
+                          <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                          <span title={vm.location.address || undefined}>
+                            {vm.location.district || vm.location.address}
+                          </span>
+                          {vm.location.mapUrl && (
+                            <a
+                              href={vm.location.mapUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-[#0A2164] hover:underline font-medium inline-flex items-center gap-0.5 ml-1"
+                              title="View on Google Maps"
+                            >
+                              Directions ↗
+                            </a>
+                          )}
+                        </div>
+                      )}
                     </div>
 
                     {/* ── CTA ── */}

@@ -236,6 +236,7 @@ export class InstitutionRepository {
       const name = (raw.institution_name || raw.matched_institution || '').trim();
       const slug = generateSlug(name);
       if (id && name) {
+        const mapsLink = raw.gmaps_link || raw.link || (raw.latitude && raw.longitude ? `https://www.google.com/maps?q=${raw.latitude},${raw.longitude}` : undefined);
         institutionMap.set(id, {
           institution_id: id,
           slug,
@@ -244,7 +245,8 @@ export class InstitutionRepository {
           has_verified_mou: mouMap.get(id) === true,
           latitude: raw.latitude,
           longitude: raw.longitude,
-          link: raw.link,
+          link: mapsLink,
+          gmaps_link: mapsLink,
           plus_code: raw.plus_code,
           correct_provider_key: raw.correct_provider_key,
           reason_classification: raw.reason_classification,
@@ -304,7 +306,23 @@ export class InstitutionRepository {
           }
         }
         if (institutionMap.has(id)) {
-          institutionMap.get(id)!.tech_count++;
+          const existing = institutionMap.get(id)!;
+          existing.tech_count++;
+          if (!existing.district && inst.district) {
+            existing.district = inst.district;
+          }
+          if (!existing.address && inst.address && inst.address !== 'None') {
+            existing.address = inst.address;
+          }
+          if (!existing.contact_phone && inst.enquiry_contact_number && inst.enquiry_contact_number !== 'None') {
+            existing.contact_phone = inst.enquiry_contact_number;
+          }
+          if (!existing.contact_email && inst.enquiry_mail && inst.enquiry_mail !== 'None') {
+            existing.contact_email = inst.enquiry_mail;
+          }
+          if (!existing.website && inst.website_booking_link && inst.website_booking_link !== 'None') {
+            existing.website = inst.website_booking_link;
+          }
         }
       } else if (name) {
         // Check if an existing institution matches by slug or name
@@ -331,12 +349,11 @@ export class InstitutionRepository {
               name,
               tech_count: 0,
               has_verified_mou: false,
-              address: inst.address !== 'None' ? inst.address : undefined,
               is_partner_institute: false,
               entity_type: entityType,
               is_startup: isStartup,
-              ksum_uid: inst.ksum_uid,
               district: inst.district,
+              address: inst.address !== 'None' ? inst.address : undefined,
               contact_email: inst.enquiry_mail !== 'None' ? inst.enquiry_mail : undefined,
               contact_phone: inst.enquiry_contact_number !== 'None' ? inst.enquiry_contact_number : undefined,
               website: inst.website_booking_link !== 'None' ? inst.website_booking_link : undefined,
@@ -347,6 +364,56 @@ export class InstitutionRepository {
         }
       }
     });
+
+    // 3. Fallback resolution for district and Google Maps links
+    const PLUS_CODE_DISTRICTS: Record<string, string> = {
+      'kochi': 'Ernakulam',
+      'thiruvananthapuram': 'Trivandrum',
+      'athirampuzha': 'Kottayam',
+      'kanjikode': 'Palakkad',
+      'kozhikode': 'Kozhikode',
+      'palode': 'Trivandrum',
+      'thonnakkal': 'Trivandrum',
+      'peechi': 'Thrissur',
+      'kalavoor': 'Alappuzha',
+      'kattangal': 'Kozhikode',
+      'neyyatinkara': 'Trivandrum',
+      'chowki': 'Kasaragod',
+      'thenhipalam': 'Malappuram',
+      'mannuthy': 'Thrissur',
+      'vithura': 'Trivandrum',
+      'aakkulam': 'Trivandrum',
+      'meppadi': 'Wayanad',
+      'mundakkal': 'Kollam'
+    };
+
+    for (const inst of institutionMap.values()) {
+      if (!inst.district || inst.district === 'None') {
+        const textToSearch = `${inst.plus_code || ''} ${inst.address || ''} ${inst.name || ''}`.toLowerCase();
+        for (const [key, dist] of Object.entries(PLUS_CODE_DISTRICTS)) {
+          if (textToSearch.includes(key)) {
+            inst.district = dist;
+            break;
+          }
+        }
+        if (!inst.district) {
+          inst.district = 'Kerala';
+        }
+      }
+
+      if (!inst.gmaps_link && !inst.link) {
+        if (inst.latitude && inst.longitude) {
+          inst.gmaps_link = `https://www.google.com/maps?q=${inst.latitude},${inst.longitude}`;
+          inst.link = inst.gmaps_link;
+        } else if (inst.address && inst.address !== 'None') {
+          inst.gmaps_link = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(inst.address)}`;
+          inst.link = inst.gmaps_link;
+        } else if (inst.district) {
+          inst.gmaps_link = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${inst.name}, ${inst.district}, Kerala`)}`;
+          inst.link = inst.gmaps_link;
+        }
+      }
+    }
 
     const repo = new InstitutionRepository(Array.from(institutionMap.values()));
     repo.setSubsidizedPolicies(subsidizedMap);

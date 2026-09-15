@@ -3,8 +3,9 @@
 import { useState } from 'react';
 import { Institution } from '@/types';
 import Link from 'next/link';
-import { ArrowRight, Calendar } from 'lucide-react';
+import { ArrowRight, Calendar, MapPin } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
+import { isLocationEnabled } from '@/config/locationConfig';
 
 import MouBadge from './MouBadge';
 
@@ -207,6 +208,12 @@ export default function InstitutionCard({ institution }: Props) {
             <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-bold tracking-wide bg-blue-50 text-[#0A2164] border border-blue-200">
               {acronym}
             </span>
+            {isLocationEnabled('placement6_institutionCard') && institution.district && (
+              <span className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-500 bg-slate-50 border border-slate-200/80 px-2 py-0.5 rounded-md">
+                <MapPin className="w-3 h-3 text-slate-400" />
+                {institution.district}
+              </span>
+            )}
           </div>
 
           {/* Institution Name */}

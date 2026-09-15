@@ -10,6 +10,7 @@ import { fetchInstrumentBundle } from '@/lib/dataFetcher';
 import { InstitutionRepository } from '@/repositories/InstitutionRepository';
 import { toInstrumentViewModel } from '@/domain/instrument/mapper';
 import { getImageUrl, getSafeUrl } from '@/lib/utils';
+import { isLocationEnabled } from '@/config/locationConfig';
 
 async function getRepo() {
   const bundle = await fetchInstrumentBundle();
@@ -154,6 +155,12 @@ export default async function InstitutionDetailPage({ params, searchParams }: Pr
 
   const acronym = getAcronym(institution.name);
   const subsidizedPolicy = repo.getSubsidizedPolicy(institution.institution_id);
+  const mapUrl =
+    institution.gmaps_link ||
+    institution.link ||
+    (institution.district
+      ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(institution.name + ', ' + institution.district + ', Kerala')}`
+      : null);
 
   return (
     <div className="min-h-screen bg-[#F6F8FC]">
@@ -211,10 +218,24 @@ export default async function InstitutionDetailPage({ params, searchParams }: Pr
                   {institution.tech_count === 1 ? 'instrument' : 'instruments'} available
                 </span>
 
-                {institution.district && (
-                  <span className="inline-flex items-center gap-1">
-                    <MapPin className="w-3.5 h-3.5 text-slate-400" />
-                    <span>{institution.district}</span>
+                {isLocationEnabled('placement2_institutionDetailPage') && (institution.district || institution.address) && (
+                  <span
+                    className="inline-flex items-center gap-1.5 text-slate-600"
+                    title={institution.address || institution.district || undefined}
+                  >
+                    <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                    <span>{institution.district || institution.address}</span>
+                    {mapUrl && (
+                      <a
+                        href={mapUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="ml-0.5 text-[#0A2164] hover:underline font-semibold inline-flex items-center gap-0.5"
+                        title="View on Google Maps"
+                      >
+                        (Directions ↗)
+                      </a>
+                    )}
                   </span>
                 )}
 

@@ -39,8 +39,8 @@ function mapLocation(instrument: Instrument, repo: InstitutionRepository): Instr
   }
 
   let mapUrl: string | null = null;
-  if (instEntity?.link) {
-    mapUrl = instEntity.link;
+  if (instEntity?.gmaps_link || instEntity?.link) {
+    mapUrl = instEntity.gmaps_link || instEntity.link || null;
   } else if (coordinates) {
     mapUrl = `https://www.google.com/maps?q=${coordinates.latitude},${coordinates.longitude}`;
   } else {
@@ -49,7 +49,7 @@ function mapLocation(instrument: Instrument, repo: InstitutionRepository): Instr
     mapUrl = `https://www.google.com/maps/search/?api=1&query=${query}`;
   }
   
-  const rawDistrict = instrument.standardized_district || instrument.district;
+  const rawDistrict = instrument.standardized_district || instrument.district || instEntity?.district;
   return {
     district: normalizeDistrict(rawDistrict),
     address: addressStr,

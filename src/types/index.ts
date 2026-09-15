@@ -73,6 +73,7 @@ export interface Institution {
   latitude?: string;
   longitude?: string;
   link?: string;
+  gmaps_link?: string;
   plus_code?: string;
   correct_provider_key?: string;
   reason_classification?: string;

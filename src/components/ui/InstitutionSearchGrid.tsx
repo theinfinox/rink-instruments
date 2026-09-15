@@ -2,13 +2,29 @@
 
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Building2, Search, X, Check, Rocket, ShieldCheck, ChevronDown, ChevronUp, Landmark } from 'lucide-react';
+import { ArrowRight, Building2, Search, X, Check, Rocket, ShieldCheck, ChevronDown, ChevronUp, Landmark, MapPin } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import type { Institution } from '@/types';
 
 import MouBadge from './MouBadge';
 import { toDriveEmbedUrl } from '@/lib/mapper';
 import { getImageUrl } from '@/lib/utils';
+import { isLocationEnabled, LOCATION_CONFIG } from '@/config/locationConfig';
+
+// ── Regional District Aliases for Natural Geosearch ───────────────
+const DISTRICT_ALIASES: Record<string, string[]> = {
+  'ernakulam': ['kochi', 'cochin', 'kakkanad', 'kalamassery'],
+  'trivandrum': ['thiruvananthapuram', 'tvm', 'palode', 'vithura', 'kariavattom', 'thonnakkal', 'aakkulam'],
+  'kozhikode': ['calicut', 'kattangal', 'kunnamangalam'],
+  'alappuzha': ['alleppey', 'kalavoor', 'kayamkulam'],
+  'thrissur': ['trichur', 'peechi', 'mannuthy'],
+  'palakkad': ['palghat', 'kanjikode'],
+  'kottayam': ['athirampuzha'],
+  'malappuram': ['thenhipalam'],
+  'kollam': ['quilon', 'kottarakkara', 'kottarakara', 'mundakkal'],
+  'wayanad': ['meppadi'],
+  'kasaragod': ['kasargod', 'chowki'],
+};
 
 // ── Helpers ─────────────────────────────────────────────────────
 function getLogo(inst: Institution): string | null {
@@ -37,6 +53,29 @@ function matches(institutionName: string, query: string): boolean {
   const joinedQ = nq.replace(/\s+/g, '');
   const joinedName = nName.replace(/\s+/g, '');
   if (joinedName.includes(joinedQ)) return true;
+  return false;
+}
+
+function matchesInstitution(inst: Institution, query: string): boolean {
+  if (matches(inst.name, query)) return true;
+
+  if (isLocationEnabled('placement3_directorySearchAndAutocomplete')) {
+    const nq = norm(query);
+    if (inst.district && matches(inst.district, nq)) return true;
+    if (inst.address && matches(inst.address, nq)) return true;
+    if (inst.plus_code && matches(inst.plus_code, nq)) return true;
+
+    // Check regional city/district aliases
+    for (const [dist, aliases] of Object.entries(DISTRICT_ALIASES)) {
+      const distLower = (inst.district || '').toLowerCase();
+      if (distLower.includes(dist) || dist.includes(distLower)) {
+        if (aliases.some(alias => alias.includes(nq) || nq.includes(alias))) {
+          return true;
+        }
+      }
+    }
+  }
+
   return false;
 }
 
@@ -165,6 +204,12 @@ function SuggestionItem({
           <span>
             {inst.tech_count} {inst.tech_count === 1 ? (isServices ? 'service' : 'instrument') : (isServices ? 'services' : 'instruments')}
           </span>
+          {isLocationEnabled('placement3_directorySearchAndAutocomplete') && (inst.district || LOCATION_CONFIG.fallbacks.defaultDistrict) && (
+            <span className="flex items-center gap-0.5 text-slate-500 font-medium">
+              · <MapPin className="w-2.5 h-2.5 inline text-slate-400" />
+              <span>{inst.district || LOCATION_CONFIG.fallbacks.defaultDistrict}</span>
+            </span>
+          )}
           {inst.has_verified_mou && (
             <span className="text-emerald-600 font-semibold flex items-center gap-0.5">
               · <ShieldCheck className="w-3 h-3 inline" /> Subsidized Rates
@@ -256,6 +301,12 @@ function InstitutionGridCard({
           <span className="text-[11px] sm:text-xs font-bold text-[#1B4D9B]">
             {inst.tech_count} {inst.tech_count === 1 ? (isServices ? 'service' : 'instrument') : (isServices ? 'services' : 'instruments')}
           </span>
+          {isLocationEnabled('placement1_directoryGridCards') && (inst.district || LOCATION_CONFIG.fallbacks.defaultDistrict) && (
+            <span className="inline-flex items-center gap-1 text-[10px] sm:text-[11px] font-medium text-slate-600 bg-slate-50 border border-slate-200/80 px-1.5 sm:px-2 py-0.2 sm:py-0.5 rounded-md flex-shrink-0">
+              <MapPin className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-slate-400 flex-shrink-0" />
+              <span>{inst.district || LOCATION_CONFIG.fallbacks.defaultDistrict}</span>
+            </span>
+          )}
           {isStartup && !isServices && (
             <span className="inline-flex items-center px-1.5 py-0.2 rounded text-[9px] sm:text-[10px] font-semibold bg-amber-50 text-amber-800 border border-amber-200">
               Startup
@@ -335,7 +386,7 @@ export default function InstitutionSearchGrid({ institutions, startups = [], con
   // Filtered cards by search query
   const filteredInstitutions: Institution[] = useMemo<Institution[]>(() => {
     if (!query.trim()) return currentPool;
-    return currentPool.filter((inst: Institution) => matches(inst.name, query));
+    return currentPool.filter((inst: Institution) => matchesInstitution(inst, query));
   }, [currentPool, query]);
 
   // Reset mobile expansion when query or tab changes
@@ -368,7 +419,7 @@ export default function InstitutionSearchGrid({ institutions, startups = [], con
       return;
     }
     const matchesList = currentPool
-      .filter((inst: Institution) => matches(inst.name, val))
+      .filter((inst: Institution) => matchesInstitution(inst, val))
       .slice(0, 6);
     setSuggestions(matchesList);
     setIsOpen(matchesList.length > 0);

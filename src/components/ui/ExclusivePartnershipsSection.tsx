@@ -11,9 +11,11 @@ import {
   ChevronLeft, 
   ChevronRight,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  MapPin
 } from 'lucide-react';
 import { getImageUrl } from '@/lib/utils';
+import { isLocationEnabled, LOCATION_CONFIG } from '@/config/locationConfig';
 
 export interface MouPartner {
   id: string;
@@ -27,6 +29,8 @@ export interface MouPartner {
   localLogo?: string;
   cdnLogo?: string;
   eligibility: string;
+  district?: string;
+  gmaps_link?: string;
 }
 
 const LOCAL_LOGOS_MAP: Record<string, string> = {
@@ -207,6 +211,12 @@ function PartnerCard({
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
             <span className="line-clamp-1 sm:line-clamp-none"><strong className="text-slate-700">Concession:</strong> {partner.concessionRate}</span>
           </div>
+          {isLocationEnabled('placement4_exclusiveMoUPartnerships') && (partner.district || LOCATION_CONFIG.fallbacks.defaultDistrict) && (
+            <div className="flex items-start gap-1.5">
+              <MapPin className="w-3.5 h-3.5 text-slate-400 mt-0.5 flex-shrink-0" />
+              <span className="line-clamp-1 sm:line-clamp-none"><strong className="text-slate-700">Location:</strong> {partner.district || LOCATION_CONFIG.fallbacks.defaultDistrict}</span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -274,6 +284,21 @@ export default function ExclusivePartnershipsSection({
         name.toLowerCase().replace(/['’]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
       );
 
+      const plusCode = inst.plus_code || '';
+      let district = inst.district;
+      if (!district || district === 'None') {
+        const lower = `${plusCode} ${name}`.toLowerCase();
+        if (lower.includes('palakkad') || lower.includes('kanjikode')) district = 'Palakkad';
+        else if (lower.includes('kochi') || lower.includes('cusat') || lower.includes('ernakulam')) district = 'Ernakulam';
+        else if (lower.includes('thiruvananthapuram') || lower.includes('tvm') || lower.includes('palode') || lower.includes('vithura')) district = 'Trivandrum';
+        else if (lower.includes('kozhikode') || lower.includes('calicut')) district = 'Kozhikode';
+        else if (lower.includes('thrissur') || lower.includes('peechi')) district = 'Thrissur';
+        else if (lower.includes('alappuzha') || lower.includes('kalavoor')) district = 'Alappuzha';
+        else if (lower.includes('kottayam')) district = 'Kottayam';
+        else if (lower.includes('kollam')) district = 'Kollam';
+        else district = LOCATION_CONFIG.fallbacks.defaultDistrict;
+      }
+
       return {
         id: item.institution_id,
         name: name,
@@ -286,6 +311,8 @@ export default function ExclusivePartnershipsSection({
         localLogo: LOCAL_LOGOS_MAP[slug],
         cdnLogo: inst.logo_link || inst.original_logo_link,
         eligibility: item.ksum_eligible_for || 'Valid KSUM UID',
+        district: district,
+        gmaps_link: inst.gmaps_link || inst.link,
       };
     });
   }, [mouList, institutionList]);
