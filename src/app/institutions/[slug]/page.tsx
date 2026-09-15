@@ -24,6 +24,7 @@ async function getRepo() {
 
 interface Props {
   params: Promise<{ slug: string }>;
+  searchParams?: Promise<{ from?: string }>;
 }
 
 export async function generateStaticParams() {
@@ -115,8 +116,14 @@ function getAcronym(name: string): string {
   return name.slice(0, 4).toUpperCase();
 }
 
-export default async function InstitutionDetailPage({ params }: Props) {
+export default async function InstitutionDetailPage({ params, searchParams }: Props) {
   const { slug } = await params;
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const from = resolvedSearchParams?.from;
+
+  const backTarget = from === 'partnerships' ? '/#exclusive-partnerships' : '/#institutions';
+  const backLabel = from === 'partnerships' ? 'Subsidized Partnerships' : 'All Institutions';
+
   const { repo, instruments } = await getRepo();
   const institution = repo.getBySlug(slug);
 
@@ -157,11 +164,11 @@ export default async function InstitutionDetailPage({ params }: Props) {
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6">
           <Link
-            href="/#institutions"
+            href={backTarget}
             className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-[#0A2164] transition-colors mb-4 font-sans"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            <span>All Institutions</span>
+            <span>{backLabel}</span>
           </Link>
 
           <div className="flex flex-col sm:flex-row sm:items-center gap-5">

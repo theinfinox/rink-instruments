@@ -213,7 +213,7 @@ function PartnerCard({
       {/* Action Link */}
       <div className="mt-4 sm:mt-5 pt-2.5 sm:pt-3 border-t border-slate-100">
         <Link
-          href={`/institutions/${partner.slug}`}
+          href={`/institutions/${partner.slug}?from=partnerships`}
           className="inline-flex items-center justify-between w-full text-xs font-semibold text-[#0A2164] group-hover:text-blue-700 transition-colors py-1"
         >
           <span>Explore Equipment &amp; Facilities</span>
