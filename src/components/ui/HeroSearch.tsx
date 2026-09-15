@@ -259,7 +259,7 @@ export default function HeroSearch({ config = DEFAULT_CONFIG }: { config?: Searc
       setShowDrop(false);
       setFocused(false);
       if (activeIdx >= 0 && suggestions[activeIdx]) {
-        window.location.href = `/instruments/${suggestions[activeIdx].id}`;
+        window.location.href = `${config.detailRoute}/${suggestions[activeIdx].id}`;
       } else if (query.trim()) {
         window.location.href = `${config.searchRoute}?q=${encodeURIComponent(query.trim())}`;
       }

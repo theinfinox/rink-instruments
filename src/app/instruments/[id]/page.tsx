@@ -10,8 +10,9 @@ import MouBadge from '@/components/ui/MouBadge';
 import ClientPartnerLogo from './ClientPartnerLogo';
 import SubsidizedClaimSection from '@/components/ui/SubsidizedClaimSection';
 import { isLocationEnabled } from '@/config/locationConfig';
+import SmartBack from '@/components/ui/SmartBack';
 const GOOGLE_FORM_URL =
-  'https://docs.google.com/forms/d/e/1FAIpQLSfJlFIqrK5Dzd5R-Voh19OvhUKxj7OzEqeW8XIdjJMNKxc8Eg/viewform';
+  'https://docs.google.com/forms/';
 
 // ── Helpers ───────────────────────────────────────────────────
 
@@ -121,6 +122,11 @@ export default async function TechnologyDetailPage({ params }: { params: Promise
         <section className="border-b border-slate-200 bg-white">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-5 sm:pt-8 pb-8 sm:pb-12">
 
+            {/* Smart Back Button */}
+            <div className="mb-6">
+              <SmartBack fallbackUrl="/instruments" label="Back to Instruments" />
+            </div>
+
             {/* Breadcrumb */}
             <nav className="flex items-center gap-1.5 text-xs text-slate-500 flex-wrap mb-8">
               <Link href="/" className="hover:text-[#0A2164] transition-colors">Home</Link>
@@ -166,7 +172,7 @@ export default async function TechnologyDetailPage({ params }: { params: Promise
 
                 {/* Institution + ID */}
                 <div className="flex flex-wrap items-center gap-4 text-sm">
-                  <Link href={`/institutions/${vm.institution.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`} className="font-bold text-[#0A2164] hover:underline">
+                  <Link href={`/institutions/${instEntity.slug}`} className="font-bold text-[#0A2164] hover:underline">
                     {vm.institution}
                   </Link>
                   <span className="text-slate-300">|</span>
@@ -305,7 +311,7 @@ export default async function TechnologyDetailPage({ params }: { params: Promise
                         Partner Institution
                       </div>
                       <Link
-                        href={`/institutions/${vm.institution.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
+                        href={`/institutions/${instEntity.slug}`}
                         className="group flex items-center gap-2 text-sm font-semibold text-[#0A2164] hover:underline font-sans"
                       >
                         {(() => {
@@ -399,7 +405,7 @@ export default async function TechnologyDetailPage({ params }: { params: Promise
                 <div>
                   <h2 className="text-2xl font-bold text-gray-900 font-heading">More from {vm.location.district || 'General'}</h2>
                 </div>
-                <Link href={`/sectors/${sectorSlug}`}
+                <Link href={vm.location.district ? `/instruments?district=${encodeURIComponent(vm.location.district)}` : `/instruments`}
                   className="inline-flex items-center gap-1 text-sm font-semibold text-[#0A2164] hover:underline">
                   View all <ArrowRight className="w-4 h-4" />
                 </Link>

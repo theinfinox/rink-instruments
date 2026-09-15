@@ -59,7 +59,7 @@ function ResultCard({ r }: { r: AISearchResult }) {
           className="inline-flex items-center gap-1.5 text-xs font-semibold text-accent bg-accent/10 hover:bg-accent/20 px-3 py-1.5 rounded-lg transition-colors"
           id={`ai-result-${instr.id}`}
         >
-          View Technology <ExternalLink size={11} />
+          View Technology <ArrowRight size={11} />
         </Link>
       </div>
     </div>

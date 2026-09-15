@@ -127,8 +127,12 @@ export default async function TechnologiesPage({ searchParams }: Props) {
   }
 
   if (canonicalDistrict) {
-    const districtQuery = canonicalDistrict.toLowerCase();
-    filtered = filtered.filter(i => i.standardized_district && i.standardized_district.toLowerCase() === districtQuery);
+    const { normalizeDistrict } = require('@/lib/districtUtils');
+    const target = normalizeDistrict(canonicalDistrict);
+    filtered = filtered.filter(i => 
+      normalizeDistrict(i.standardized_district) === target || 
+      normalizeDistrict(i.district) === target
+    );
   }
 
   if (params.patent) {

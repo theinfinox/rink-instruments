@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { ArrowLeft, Building2, ExternalLink, ChevronRight, Microscope, MapPin, ShieldCheck, Layers } from 'lucide-react';
 import { fetchDataset } from '@/lib/dataFetcher';
 import { Service } from '@/types/service';
+import SmartBack from '@/components/ui/SmartBack';
 
 export const dynamicParams = true;
 
@@ -75,10 +76,9 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
           <span className="text-slate-900 font-medium truncate max-w-[200px] sm:max-w-sm">{service.serviceName}</span>
         </nav>
 
-        <Link href="/services/list" className="inline-flex items-center text-sm font-medium text-slate-500 hover:text-[#0A2164] transition-colors mb-6">
-          <ArrowLeft className="w-4 h-4 mr-1" />
-          Back to Services
-        </Link>
+        <div className="mb-6">
+          <SmartBack fallbackUrl="/services/list" label="Back to Services" />
+        </div>
         
         <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-8">
           <div className="flex flex-wrap items-center gap-2 mb-4 sm:mb-6">
@@ -97,10 +97,10 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
           </h1>
           
           <div className="flex flex-wrap items-center gap-2 text-slate-600 mb-8 text-sm">
-            <div className="flex items-center gap-1.5 font-medium text-slate-900">
+            <Link href={`/services/list?q=${encodeURIComponent(service.startupName || '')}`} className="flex items-center gap-1.5 font-medium text-slate-900 hover:text-[#0A2164] hover:underline">
               <Building2 className="w-4 h-4 text-slate-400" />
-              <span>{service.startupName}</span>
-            </div>
+              {service.startupName}
+            </Link>
             {service.district && (
               <>
                 <span className="text-slate-300 mx-1">•</span>

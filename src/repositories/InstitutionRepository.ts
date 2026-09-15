@@ -36,6 +36,10 @@ export class InstitutionRepository {
     return _globalRepo;
   }
 
+  getAllInstitutions(): Institution[] {
+    return Array.from(this.byId.values());
+  }
+
   getById(id?: string | null): Institution | undefined {
     if (!id) return undefined;
     const inst = this.byId.get(id);

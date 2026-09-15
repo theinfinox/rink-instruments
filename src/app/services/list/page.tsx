@@ -59,19 +59,7 @@ export default async function ServicesPage({ searchParams }: Props) {
     );
   }
 
-  // Preserve compatibility if category or startup is passed via legacy URL
-  if (params.category) {
-    const catQuery = params.category.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-    filtered = filtered.filter(s => 
-      s.category && s.category.toLowerCase().replace(/[^a-z0-9]+/g, '-') === catQuery
-    );
-  }
-  if (params.startup) {
-    const startupQuery = params.startup.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-    filtered = filtered.filter(s => 
-      s.startupName && s.startupName.toLowerCase().replace(/[^a-z0-9]+/g, '-') === startupQuery
-    );
-  }
+  // Removed legacy category and startup URL filtering (using Q search instead)
 
   const perPage = 12;
   const paginatedServices = filtered.slice((page - 1) * perPage, page * perPage);

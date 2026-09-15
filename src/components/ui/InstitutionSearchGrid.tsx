@@ -159,10 +159,12 @@ function InstitutionGridCard({
   inst, 
   context,
   hiddenOnMobile,
+  hiddenOnDesktop,
 }: { 
   inst: Institution; 
   context?: 'instruments' | 'services';
   hiddenOnMobile?: boolean;
+  hiddenOnDesktop?: boolean;
 }) {
   if (!inst.name || !inst.slug) return null;
   const isServices = context === 'services';
@@ -175,13 +177,20 @@ function InstitutionGridCard({
 
   const monogram = getMonogram(inst.name);
 
+  let displayClass = 'flex';
+  if (hiddenOnMobile && hiddenOnDesktop) {
+    displayClass = 'hidden';
+  } else if (hiddenOnMobile) {
+    displayClass = 'hidden sm:flex';
+  } else if (hiddenOnDesktop) {
+    displayClass = 'flex sm:hidden';
+  }
+
   return (
     <Link
       key={inst.slug}
       href={linkHref}
-      className={`group items-start gap-3 sm:gap-[18px] bg-white border border-[rgba(15,23,42,0.08)] rounded-xl sm:rounded-md p-3.5 sm:p-4 transition-all duration-250 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(15,23,42,0.10)] hover:border-[#1B4D9B]/25 ${
-        hiddenOnMobile ? 'hidden sm:flex' : 'flex'
-      }`}
+      className={`group items-start gap-3 sm:gap-[18px] bg-white border border-[rgba(15,23,42,0.08)] rounded-xl sm:rounded-md p-3.5 sm:p-4 transition-all duration-250 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(15,23,42,0.10)] hover:border-[#1B4D9B]/25 ${displayClass}`}
       id={`browse-inst-${inst.slug}`}
       style={{
         animation: 'inst-fadeIn 200ms ease both',
@@ -284,9 +293,10 @@ export default function InstitutionSearchGrid({ institutions, startups = [], con
   // Active filter tab: 'all' | 'institutions' | 'startups' | 'partnered' (single-select mutually exclusive)
   const [filterTab, setFilterTab] = useState<'all' | 'institutions' | 'startups' | 'partnered'>('all');
 
-  // Mobile progressive disclosure (initially shows 6 on mobile)
-  const [isMobileExpanded, setIsMobileExpanded] = useState(false);
+  // Progressive disclosure thresholds
+  const [isExpanded, setIsExpanded] = useState(false);
   const MOBILE_THRESHOLD = 6;
+  const DESKTOP_THRESHOLD = 15;
 
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
@@ -337,9 +347,9 @@ export default function InstitutionSearchGrid({ institutions, startups = [], con
     return currentPool.filter((inst: Institution) => matchesInstitution(inst, query));
   }, [currentPool, query]);
 
-  // Reset mobile expansion when query or tab changes
+  // Reset expansion when query or tab changes
   useEffect(() => {
-    setIsMobileExpanded(false);
+    setIsExpanded(false);
   }, [query, filterTab]);
 
   const mobileToggleLabel = useMemo(() => {
@@ -704,35 +714,38 @@ export default function InstitutionSearchGrid({ institutions, startups = [], con
                 key={inst.slug} 
                 inst={inst} 
                 context={context} 
-                hiddenOnMobile={!isMobileExpanded && index >= MOBILE_THRESHOLD}
+                hiddenOnMobile={!isExpanded && index >= MOBILE_THRESHOLD}
+                hiddenOnDesktop={!isExpanded && index >= DESKTOP_THRESHOLD}
               />
             ))}
           </div>
 
-          {/* ── Mobile Progressive Disclosure: View All / Show Less ── */}
-          {filteredInstitutions.length > MOBILE_THRESHOLD && (
-            <div className="sm:hidden flex justify-center mt-4">
+          {/* ── Progressive Disclosure: View All / Show Less ── */}
+          {(filteredInstitutions.length > MOBILE_THRESHOLD) && (
+            <div className={`flex justify-center mt-4 ${
+              filteredInstitutions.length <= DESKTOP_THRESHOLD ? 'sm:hidden' : ''
+            }`}>
               <button
                 type="button"
                 onClick={() => {
-                  if (isMobileExpanded) {
-                    setIsMobileExpanded(false);
+                  if (isExpanded) {
+                    setIsExpanded(false);
                     const el = document.getElementById('institutions') || containerRef.current;
                     if (el) {
                       el.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     }
                   } else {
-                    setIsMobileExpanded(true);
+                    setIsExpanded(true);
                   }
                 }}
-                className="w-full flex items-center justify-center gap-2 h-11 px-4 rounded-xl font-semibold text-xs text-[#1B4D9B] bg-slate-50 hover:bg-slate-100 border border-slate-200/90 shadow-2xs active:scale-[0.98] transition-all cursor-pointer select-none"
+                className="w-full sm:w-auto sm:min-w-[280px] flex items-center justify-center gap-2 h-11 px-4 rounded-xl font-semibold text-xs text-[#1B4D9B] bg-slate-50 hover:bg-slate-100 border border-slate-200/90 shadow-2xs active:scale-[0.98] transition-all cursor-pointer select-none"
               >
                 <span>
-                  {isMobileExpanded 
+                  {isExpanded 
                     ? `Show Fewer ${mobileToggleLabel}` 
-                    : `View All ${filteredInstitutions.length} ${mobileToggleLabel} (${filteredInstitutions.length - MOBILE_THRESHOLD} More)`}
+                    : `View All ${filteredInstitutions.length} ${mobileToggleLabel}`}
                 </span>
-                {isMobileExpanded ? (
+                {isExpanded ? (
                   <ChevronUp className="w-4 h-4 text-[#1B4D9B]/70" />
                 ) : (
                   <ChevronDown className="w-4 h-4 text-[#1B4D9B]/70" />

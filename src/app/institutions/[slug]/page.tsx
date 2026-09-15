@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, MapPin, Globe } from 'lucide-react';
+import SmartBack from '@/components/ui/SmartBack';
 import InstitutionFilterView from './InstitutionFilterView';
 import InstitutionEcosystemBackground from '@/components/ui/InstitutionEcosystemBackground';
 import InstitutionHeaderLogo from '@/components/ui/InstitutionHeaderLogo';
@@ -170,13 +171,9 @@ export default async function InstitutionDetailPage({ params, searchParams }: Pr
         <InstitutionEcosystemBackground />
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6">
-          <Link
-            href={backTarget}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-[#0A2164] transition-colors mb-4 font-sans"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span>{backLabel}</span>
-          </Link>
+          <div className="mb-4">
+            <SmartBack fallbackUrl={backTarget} label={backLabel} />
+          </div>
 
           <div className="flex flex-col sm:flex-row sm:items-center gap-5">
             {/* Institution Brand Logo */}
