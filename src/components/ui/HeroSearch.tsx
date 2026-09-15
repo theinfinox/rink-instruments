@@ -387,7 +387,7 @@ export default function HeroSearch({ config = DEFAULT_CONFIG }: { config?: Searc
               id="hero-search-listbox"
               role="listbox"
               aria-label="Search suggestions"
-              className="vision-drop absolute left-0 right-0 mt-3 overflow-y-auto"
+              className="vision-drop absolute left-0 right-0 mt-3 overflow-y-auto text-left"
               style={{
                 borderRadius: 24,
                 background: '#ffffff',
