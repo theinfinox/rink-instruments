@@ -311,8 +311,7 @@ export default function ExclusivePartnershipsSection({
 
   return (
     <section 
-      id="exclusive-partnerships" 
-      className="relative py-10 sm:py-16 lg:py-20 bg-[#F8FAFF] border-b border-slate-200/80 scroll-mt-20 overflow-hidden"
+      className="relative py-10 sm:py-16 lg:py-20 bg-[#F8FAFF] border-b border-slate-200/80 overflow-hidden"
     >
       {/* Ambient background decoration */}
       <div className="absolute inset-0 pointer-events-none opacity-[0.03]">
@@ -327,6 +326,8 @@ export default function ExclusivePartnershipsSection({
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6">
+        {/* Proper Scroll Anchor for Exclusive Partnerships */}
+        <div id="exclusive-partnerships" className="scroll-mt-[88px] sm:scroll-mt-[104px]" />
         
         {/* Section Header */}
         <div className="max-w-3xl mb-8 sm:mb-12">
