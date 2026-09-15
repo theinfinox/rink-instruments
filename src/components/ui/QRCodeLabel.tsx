@@ -117,34 +117,43 @@ export default function QRCodeLabel({ url, title, institution, location, itemId,
       </div>
 
       {/* Visible UI Preview */}
-      <div className="w-full max-w-[280px] bg-slate-50/50 rounded-2xl p-5 border border-slate-200/60 shadow-sm flex flex-col items-center">
-        <h3 className="font-serif text-sm font-bold text-slate-700 mb-4 text-center">
-          Print {itemType === 'Service' ? 'Service' : 'Equipment'} Label
-        </h3>
+      <div className="w-full max-w-[320px] mx-auto bg-slate-50/40 rounded-2xl p-4 sm:p-5 border border-slate-200/50 shadow-[0_2px_12px_rgba(0,0,0,0.02)] flex flex-col sm:flex-col gap-4">
         
-        <div className="bg-white p-3 rounded-xl shadow-sm border border-slate-100 mb-5 relative pointer-events-none opacity-90 scale-95 origin-center">
-          <QRCodeSVG
-            value={url}
-            size={120}
-            level="H"
-            bgColor="#ffffff"
-            fgColor="#0A2164"
-            imageSettings={{
-              src: "/images/rink_logo.png",
-              height: 10,
-              width: 43,
-              excavate: true,
-            }}
-          />
+        {/* Content & Action Row */}
+        <div className="flex flex-row sm:flex-col items-center justify-between gap-4">
+          <div className="flex flex-col sm:items-center text-left sm:text-center gap-1.5 flex-1">
+            <h3 className="font-serif text-sm font-bold text-slate-800 leading-snug">
+              {itemType === 'Service' ? 'Service Label' : 'Equipment Label'}
+            </h3>
+            <p className="text-[11px] text-slate-500 font-medium leading-tight max-w-[140px] sm:max-w-none">
+              High-resolution printable asset tag
+            </p>
+          </div>
+          
+          <div className="bg-white p-2 rounded-xl shadow-sm border border-slate-100 relative pointer-events-none opacity-95 shrink-0 flex items-center justify-center group-hover:scale-105 transition-transform">
+            <QRCodeSVG
+              value={url}
+              size={80}
+              level="H"
+              bgColor="#ffffff"
+              fgColor="#0A2164"
+              imageSettings={{
+                src: "/images/rink_logo.png",
+                height: 7,
+                width: 30,
+                excavate: true,
+              }}
+            />
+          </div>
         </div>
 
         <button
           onClick={handleDownload}
           disabled={downloading}
-          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-[#0A2164] text-white font-medium text-sm transition-all hover:bg-blue-900 active:scale-95 disabled:opacity-70"
+          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-white border border-slate-200 text-[#0A2164] font-semibold text-sm transition-all hover:bg-slate-50 hover:border-[#0A2164]/30 active:scale-[0.98] disabled:opacity-70 shadow-sm"
         >
           <Download className="w-4 h-4" />
-          <span>{downloading ? 'Generating...' : 'Download Label'}</span>
+          <span>{downloading ? 'Generating...' : 'Download PNG'}</span>
         </button>
       </div>
     </div>

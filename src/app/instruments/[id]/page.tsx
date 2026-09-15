@@ -252,31 +252,6 @@ export default async function TechnologyDetailPage({ params }: { params: Promise
               {/* ── LEFT / MAIN COLUMN ── */}
               <div className="lg:col-span-2 space-y-8">
 
-                {/* ── 💡 FACILITY CARD ── */}
-                {vm.facility && (
-                  <div className="relative rounded-xl overflow-hidden">
-                    {/* Gradient border effect */}
-                    <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-blue-500/30 via-indigo-500/20 to-cyan-500/20 p-px">
-                      <div className="h-full w-full rounded-xl bg-[#0A1D37]/5" />
-                    </div>
-                    {/* Soft glow */}
-                    <div className="absolute -inset-1 bg-blue-500/10 blur-2xl rounded-2xl" />
-                    {/* Card body */}
-                    <div className="relative rounded-xl border border-blue-200/60 bg-gradient-to-br from-blue-50 to-indigo-50/60 p-4 sm:p-6 shadow-sm">
-                      <div className="flex items-center gap-3 mb-4">
-                        <div className="flex-shrink-0 w-9 h-9 rounded-lg bg-blue-600/10 flex items-center justify-center border border-blue-200/50">
-                          <Building2 className="w-5 h-5 text-blue-600" />
-                        </div>
-                        <h2 className="font-serif text-lg font-bold text-blue-900 tracking-tight">
-                          Facility
-                        </h2>
-                      </div>
-                      <p className="text-slate-700 leading-relaxed font-sans text-[15px]">
-                        {vm.facility}
-                      </p>
-                    </div>
-                  </div>
-                )}
 
                 {/* ── SCOPE & APPLICATIONS ── */}
                 {longDescriptions.length > 0 && (
@@ -401,15 +376,26 @@ export default async function TechnologyDetailPage({ params }: { params: Promise
                           )}
                         </div>
                       )}
+
+                      {vm.facility && (
+                        <div className="mt-4 pt-4 border-t border-slate-100">
+                          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">
+                            Facility / Centre
+                          </div>
+                          <div className="text-[13px] font-semibold text-slate-700 font-sans leading-snug">
+                            {vm.facility}
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                     {/* ── CTA ── */}
                     <div className="p-5 bg-gradient-to-br from-[#0A2164] to-[#0d3285]">
                       <h3 className="font-serif text-base font-bold mb-2" style={{ color: '#FFFFFF' }}>
-                        Interested in this Instrument?
+                        Access this Instrument
                       </h3>
                       <p className="text-xs leading-relaxed font-sans mb-3" style={{ color: 'rgba(191,219,254,0.9)' }}>
-                        Submit an enquiry to book this instrument or request analysis services for your research, development, and testing needs.
+                        Connect directly with the partner institution to book this facility for your research, development, and testing needs.
                       </p>
 
                       {/* Subsidized Rates Highlight */}

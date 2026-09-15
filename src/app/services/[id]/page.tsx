@@ -213,51 +213,59 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
           </div>
           
           <div className="border-t border-slate-100 pt-8 mt-8">
-            <h3 className="text-lg font-bold text-slate-900 mb-4">Contact Startup</h3>
-            <div className="flex flex-col gap-2 text-slate-600 text-sm">
-              {service.email && (
-                <div className="flex items-center gap-2">
-                  <span className="font-medium text-slate-700">Email:</span>
-                  <a href={`mailto:${service.email}`} className="text-blue-600 hover:underline">{service.email}</a>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+              {/* Left Column: Contact Details */}
+              <div>
+                <h3 className="text-lg font-bold text-slate-900 mb-4">Contact Startup</h3>
+                <div className="flex flex-col gap-3 text-slate-600 text-sm">
+                  {service.email && (
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium text-slate-700 w-16">Email:</span>
+                      <a href={`mailto:${service.email}`} className="text-blue-600 hover:underline break-all">{service.email}</a>
+                    </div>
+                  )}
+                  {service.phone && (
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium text-slate-700 w-16">Phone:</span>
+                      <span>{service.phone}</span>
+                    </div>
+                  )}
+                  {service.address && (
+                    <div className="flex items-start gap-2">
+                      <span className="font-medium text-slate-700 w-16 flex-shrink-0 pt-0.5">Address:</span>
+                      <span className="text-slate-600 whitespace-pre-line leading-relaxed">{service.address}</span>
+                    </div>
+                  )}
                 </div>
-              )}
-              {service.phone && (
-                <div className="flex items-center gap-2">
-                  <span className="font-medium text-slate-700">Phone:</span>
-                  <span>{service.phone}</span>
-                </div>
-              )}
-              {service.address && (
-                <div className="flex items-start gap-2 mt-1">
-                  <span className="font-medium text-slate-700 flex-shrink-0">Address:</span>
-                  <span className="text-slate-600 whitespace-pre-line">{service.address}</span>
-                </div>
-              )}
-            </div>
-            
-            {service.bookingUrl && (
-              <div className="mt-8 flex flex-wrap gap-4">
-                <a
-                  href={service.bookingUrl.startsWith('http://') || service.bookingUrl.startsWith('https://') ? service.bookingUrl : `https://${service.bookingUrl}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hidden sm:inline-flex items-center justify-center px-6 py-3 bg-[#0A2164] text-white font-semibold rounded-lg hover:bg-blue-900 transition-colors shadow-sm"
-                >
-                  Visit Website <ExternalLink className="w-4 h-4 ml-2" />
-                </a>
+                
+                {service.bookingUrl && (
+                  <div className="mt-8 flex flex-wrap gap-4">
+                    <a
+                      href={service.bookingUrl.startsWith('http://') || service.bookingUrl.startsWith('https://') ? service.bookingUrl : `https://${service.bookingUrl}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hidden sm:inline-flex items-center justify-center px-6 py-2.5 bg-[#0A2164] text-white font-semibold rounded-lg hover:bg-blue-900 transition-colors shadow-sm"
+                    >
+                      Visit Website <ExternalLink className="w-4 h-4 ml-2" />
+                    </a>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-          
-          <div className="border-t border-slate-100 pt-8 mt-8 flex flex-col items-center">
-            <QRCodeLabel 
-              url={canonicalUrl} 
-              title={service.serviceName} 
-              institution={service.startupName || ''} 
-              location={service.district} 
-              itemId={service.id || ''} 
-              itemType="Service"
-            />
+
+              {/* Right Column: QR Code & Admin Actions */}
+              <div className="flex md:justify-end pt-2 md:pt-0 border-t border-slate-100 md:border-0 mt-4 md:mt-0">
+                <div className="w-full">
+                  <QRCodeLabel 
+                    url={canonicalUrl} 
+                    title={service.serviceName} 
+                    institution={service.startupName || ''} 
+                    location={service.district} 
+                    itemId={service.id || ''} 
+                    itemType="Service"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
