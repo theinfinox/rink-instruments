@@ -336,7 +336,7 @@ export default function ExclusivePartnershipsSection({
           </div>
 
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-heading font-bold text-[#0F172A] tracking-tight mb-3">
-            Privileged R&amp;D Access for Kerala Startups
+            Subsidized Instrumentation &amp; Testing Access for Kerala Startups
           </h2>
 
           <p className="text-slate-600 text-xs sm:text-sm md:text-base leading-relaxed font-sans">
