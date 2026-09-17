@@ -1065,9 +1065,10 @@ input::placeholder, textarea::placeholder { color: var(--text-secondary) !import
     display: none !important;
   }
   
-  /* Reverse the peg glow to shine upwards */
+  /* Reverse the peg glow to shine upwards and remove default rotation */
   #nprogress .peg {
-    box-shadow: 0 -4px 10px #3B82F6, 0 -4px 5px #3B82F6 !important;
+    transform: none !important;
+    box-shadow: 0 -3px 8px rgba(59, 130, 246, 0.8), 0 -2px 4px rgba(59, 130, 246, 0.8) !important;
   }
 
   /* Default: if Bottom Nav is present */
