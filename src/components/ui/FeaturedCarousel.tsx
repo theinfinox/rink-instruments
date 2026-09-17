@@ -64,7 +64,7 @@ export default function FeaturedCarousel<T>({
     if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
     scrollTimeout.current = setTimeout(() => {
       isInteracting.current = false;
-    }, 150);
+    }, 1500);
   }, []);
 
   const handleScroll = useCallback(() => {
@@ -76,7 +76,7 @@ export default function FeaturedCarousel<T>({
     if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
     scrollTimeout.current = setTimeout(() => {
       isInteracting.current = false;
-    }, 150);
+    }, 1500);
   }, []);
 
   // ── rAF infinite scroll via scrollLeft (matches reference architecture) ─────
