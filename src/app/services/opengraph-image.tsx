@@ -78,7 +78,7 @@ export default async function Image() {
               </span>
             </div>
             <div style={{ fontSize: 22, fontWeight: 600, color: '#94A3B8', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
-              Research Innovation Network
+              Research Innovation Network Kerala (RINK)
             </div>
           </div>
 
