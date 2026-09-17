@@ -64,7 +64,7 @@ export default function FeaturedCarousel<T>({
     if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
     scrollTimeout.current = setTimeout(() => {
       isInteracting.current = false;
-    }, 1500);
+    }, 800);
   }, []);
 
   const handleScroll = useCallback(() => {
@@ -76,7 +76,7 @@ export default function FeaturedCarousel<T>({
     if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
     scrollTimeout.current = setTimeout(() => {
       isInteracting.current = false;
-    }, 1500);
+    }, 800);
   }, []);
 
   // ── rAF infinite scroll via scrollLeft (matches reference architecture) ─────
@@ -86,25 +86,31 @@ export default function FeaturedCarousel<T>({
     if (!el) return;
 
     // Start at the middle third so dragging backward still works
+    isProgrammaticScroll.current = true;
     el.scrollLeft = el.scrollWidth / 3;
 
     let animId: number;
     let current = el.scrollLeft;
     let lastTs  = performance.now();
-    const SPEED = 0.055; // px per ms — smooth & elegant
+    const TARGET_SPEED = 0.055; // px per ms — smooth & elegant
+    let activeSpeed = 0;
 
     const tick = (now: number) => {
       const dt = Math.min(now - lastTs, 32);
       lastTs   = now;
 
       if (!isInteracting.current && isVisible.current) {
-        current += SPEED * dt;
+        // Smooth exponential ease-in to cruising speed
+        activeSpeed += (TARGET_SPEED - activeSpeed) * 0.003 * dt;
+        
+        current += activeSpeed * dt;
         const third = el.scrollWidth / 3;
         if (current >= third * 2) current -= third;
         else if (current <= 0)    current += third;
         isProgrammaticScroll.current = true;
         el.scrollLeft = current;
       } else {
+        activeSpeed = 0;
         current = el.scrollLeft; // sync on drag
       }
       animId = requestAnimationFrame(tick);
