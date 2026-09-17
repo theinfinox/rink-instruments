@@ -21,6 +21,7 @@ export default function QRCodeLabel({ url, title, institution, location, itemId,
   const [generatedDate, setGeneratedDate] = useState('');
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setGeneratedDate(new Date().toLocaleString('en-IN', { 
       day: '2-digit', month: 'short', year: 'numeric', 
       hour: '2-digit', minute: '2-digit' 

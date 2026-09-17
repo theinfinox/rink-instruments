@@ -94,6 +94,7 @@ export default function PortalManager({
 
   // Keep view synchronized with initialView on props update / Back-Forward navigation
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setView(initialView);
   }, [initialView]);
 

@@ -18,6 +18,7 @@ export default function SmartBack({ fallbackUrl, label = 'Back', className = '' 
     // window.history.length is > 2 if there's actual history within the app
     // Sometimes it's > 1, so we check > 1 for safety
     if (window.history.length > 1) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setHasHistory(true);
     }
   }, []);
