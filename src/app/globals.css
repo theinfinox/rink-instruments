@@ -1058,3 +1058,17 @@ input::placeholder, textarea::placeholder { color: var(--text-secondary) !import
 .rink-ai-fab { animation: rinkPulseGlow 2.5s ease-in-out infinite; }
 .rink-chip:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,63,138,0.15); }
 
+/* Make the loading bar adapt to the mobile bottom UI */
+@media (max-width: 767px) {
+  /* Default: if Bottom Nav is present */
+  html:has(nav[aria-label="Mobile navigation"]) #nprogress .bar {
+    top: auto !important;
+    bottom: calc(64px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+  
+  /* Override: if Sticky Detail CTA is present */
+  html:has(#mobile-sticky-cta) #nprogress .bar {
+    top: auto !important;
+    bottom: calc(68px + env(safe-area-inset-bottom, 16px)) !important;
+  }
+}

@@ -55,8 +55,17 @@ export default function FeaturedCarousel<T>({
     return () => obs.disconnect();
   }, [isMounted]);
 
-  const pause  = useCallback(() => { isInteracting.current = true;  }, []);
-  const resume = useCallback(() => { isInteracting.current = false; }, []);
+  const pause  = useCallback(() => { 
+    isInteracting.current = true;
+    if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
+  }, []);
+  
+  const resume = useCallback(() => { 
+    if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
+    scrollTimeout.current = setTimeout(() => {
+      isInteracting.current = false;
+    }, 150);
+  }, []);
 
   const handleScroll = useCallback(() => {
     if (isProgrammaticScroll.current) {

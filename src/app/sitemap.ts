@@ -41,7 +41,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }));
 
     // 5. Dynamic Institutions
-    const institutionRoutes = (bundle.instituitiion_list || []).map((inst) => ({
+    const institutionRoutes = (bundle.instituitiion_list || [])
+      .filter((inst: any) => inst && inst.name)
+      .map((inst: any) => ({
       // Clean slug generation assuming standard formatting
       url: `${baseUrl}/institutions/${inst.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`,
       lastModified: new Date(),
