@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Service } from '@/types/service';
 import Link from 'next/link';
-import { Building2, Layers, CheckCircle } from 'lucide-react';
+import { Building2, Layers, CheckCircle, ArrowRight } from 'lucide-react';
 import { SectorIllustration, SECTOR_ACCENTS } from './SectorCard';
 import { motion, useReducedMotion } from 'framer-motion';
 
@@ -64,10 +64,12 @@ export default function ServiceCard({ service, compact = false, disableAnimation
               <h4 className="font-heading font-bold text-gray-900 text-[14px] leading-tight group-hover:text-[#0A2164] transition-colors">
                 {service.serviceName}
               </h4>
-              <div className="flex items-center gap-1 mt-1.5">
-                <Building2 className="w-3 h-3 text-gray-400 flex-shrink-0" />
-                <span className="text-[10px] text-gray-500 line-clamp-1">{service.startupName}</span>
-              </div>
+              {service.startupName && (
+                <div className="flex items-center gap-1 mt-1.5">
+                  <Building2 className="w-3 h-3 text-gray-400 flex-shrink-0" />
+                  <span className="text-[10px] text-gray-500 line-clamp-1">{service.startupName}</span>
+                </div>
+              )}
             </div>
           </div>
         </motion.div>
@@ -157,12 +159,14 @@ export default function ServiceCard({ service, compact = false, disableAnimation
         </div>
 
         <div className="flex flex-col flex-1 px-4 py-3.5 sm:px-5 sm:py-4 gap-0">
-          <div className="flex items-center gap-1.5 mb-1.5 sm:mb-2 min-w-0">
-            <Building2 className="w-3 h-3 flex-shrink-0" style={{ color: '#94a3b8' }} />
-            <span className="text-[11px] font-medium uppercase tracking-wide truncate" style={{ color: '#64748b' }}>
-              {service.startupName}
-            </span>
-          </div>
+          {service.startupName && (
+            <div className="flex items-center gap-1.5 mb-1.5 sm:mb-2 min-w-0">
+              <Building2 className="w-3 h-3 flex-shrink-0" style={{ color: '#94a3b8' }} />
+              <span className="text-[11px] font-medium uppercase tracking-wide truncate" style={{ color: '#64748b' }}>
+                {service.startupName}
+              </span>
+            </div>
+          )}
 
           <h3
             title={service.serviceName}
@@ -173,23 +177,45 @@ export default function ServiceCard({ service, compact = false, disableAnimation
           </h3>
 
           <div className="mt-auto flex flex-col gap-0">
-            <div className="flex flex-wrap items-center gap-1 sm:gap-1.5 mb-2.5 sm:mb-3">
-              <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-[#f8fafc] border border-[#e2e8f0]">
-                <Layers className="w-3 h-3 text-[#64748b]" />
-                <span className="text-[10px] font-semibold text-[#475569] truncate max-w-[120px]">
-                  {service.category || 'General Service'}
-                </span>
-              </div>
+            <div className="min-h-[1.25rem] sm:min-h-[2.25rem] mb-2 sm:mb-3">
+              {/* Spacer to align heights with TechnologyCard shortDesc */}
             </div>
 
-            {service.certifications && (
-              <div className="pt-2.5 sm:pt-3 border-t border-slate-100/60">
-                <div className="flex items-center gap-1.5 text-[11px] text-[#64748b]">
-                  <CheckCircle className="w-3 h-3 text-[#10b981]" />
-                  <span className="font-medium text-[#334155] line-clamp-1">{service.certifications}</span>
-                </div>
-              </div>
-            )}
+            <div className="flex flex-wrap items-center gap-1 sm:gap-1.5 mb-2.5 sm:mb-3">
+              <span
+                className="inline-flex items-center px-2 py-0.5 rounded-full font-semibold truncate max-w-[160px]"
+                style={{ fontSize: 10, background: 'rgba(37,99,235,0.07)', color: '#1d4ed8', border: '1px solid rgba(37,99,235,0.12)' }}
+                title={service.category || 'General Service'}
+              >
+                {service.category || 'General Service'}
+              </span>
+
+              {service.certifications && (
+                <span
+                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-semibold truncate max-w-[160px]"
+                  style={{ fontSize: 10, background: 'rgba(16,185,129,0.07)', color: '#059669', border: '1px solid rgba(16,185,129,0.12)' }}
+                  title={service.certifications}
+                >
+                  <CheckCircle className="w-3 h-3" />
+                  {service.certifications}
+                </span>
+              )}
+            </div>
+          </div>
+
+          <div className="pt-2.5 sm:pt-3 border-t flex items-center justify-between" style={{ borderColor: 'rgba(15,23,42,0.06)' }}>
+            <span className="text-[11px] font-medium" style={{ color: '#94a3b8' }}>
+              Service Access
+            </span>
+            <span
+              className="inline-flex items-center gap-1 text-[11px] sm:text-[12px] font-bold transition-all duration-300 group-hover:gap-2"
+              style={{ color: '#1b60bb' }}
+            >
+              Explore Service
+              <ArrowRight
+                className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-1"
+              />
+            </span>
           </div>
         </div>
       </motion.div>

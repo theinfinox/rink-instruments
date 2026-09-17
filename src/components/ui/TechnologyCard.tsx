@@ -84,10 +84,12 @@ export default function TechnologyCard({ instrument, compact = false, disableAni
               <h4 className="font-heading font-bold text-gray-900 text-[14px] leading-tight group-hover:text-[#0A2164] transition-colors">
                 {vm.displayTitle}
               </h4>
-              <div className="flex items-center gap-1 mt-1.5">
-                <Building2 className="w-3 h-3 text-gray-400 flex-shrink-0" />
-                <span className="text-[10px] text-gray-500 line-clamp-1">{vm.institution}</span>
-              </div>
+              {vm.institution && (
+                <div className="flex items-center gap-1 mt-1.5">
+                  <Building2 className="w-3 h-3 text-gray-400 flex-shrink-0" />
+                  <span className="text-[10px] text-gray-500 line-clamp-1">{vm.institution}</span>
+                </div>
+              )}
             </div>
           </div>
         </motion.div>
@@ -191,12 +193,14 @@ export default function TechnologyCard({ instrument, compact = false, disableAni
         <div className="flex flex-col flex-1 px-4 py-3.5 sm:px-5 sm:py-4 gap-0">
 
           {/* Institution */}
-          <div className="flex items-center gap-1.5 mb-1.5 sm:mb-2 min-w-0">
-            <Building2 className="w-3 h-3 flex-shrink-0" style={{ color: '#94a3b8' }} />
-            <span className="text-[11px] font-medium uppercase tracking-wide truncate" style={{ color: '#64748b' }}>
-              {vm.institution}
-            </span>
-          </div>
+          {vm.institution && (
+            <div className="flex items-center gap-1.5 mb-1.5 sm:mb-2 min-w-0">
+              <Building2 className="w-3 h-3 flex-shrink-0" style={{ color: '#94a3b8' }} />
+              <span className="text-[11px] font-medium uppercase tracking-wide truncate" style={{ color: '#64748b' }}>
+                {vm.institution}
+              </span>
+            </div>
+          )}
 
           {/* Title — full name with 2-line clamp */}
           <h3
@@ -238,10 +242,12 @@ export default function TechnologyCard({ instrument, compact = false, disableAni
                   # {vm.id}
                 </span>
               )}
-              <MouBadge 
-                hasVerifiedMou={vm.hasVerifiedMou} 
-                details={vm.subsidizedPolicy?.discountOrRate || undefined} 
-              />
+              <div className="flex-shrink-0">
+                <MouBadge 
+                  hasVerifiedMou={vm.hasVerifiedMou} 
+                  details={vm.subsidizedPolicy?.discountOrRate || undefined} 
+                />
+              </div>
             </div>
           </div>
 
