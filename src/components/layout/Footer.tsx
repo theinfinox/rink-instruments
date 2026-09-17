@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { Mail, MapPin, ExternalLink } from 'lucide-react';
+import { Mail, MapPin, ExternalLink, Phone } from 'lucide-react';
 
 const EXPLORE_LINKS = [
   { label: 'Home', href: '/' },
@@ -95,6 +95,32 @@ export default function Footer() {
                 className="text-xs sm:text-sm font-semibold text-[#0A2164] hover:underline font-sans py-1"
               >
                 rink@startupmission.in
+              </a>
+            </div>
+
+            <div className="flex items-start gap-2.5 mt-3">
+              <Phone className="w-4 h-4 text-[#0A2164] mt-0.5 flex-shrink-0" />
+              <div className="text-xs sm:text-sm font-semibold text-[#0A2164] font-sans flex flex-col gap-1">
+                <a href="tel:08047180470" className="hover:underline py-0.5">08047180470</a>
+                <a href="tel:0471-2700270" className="hover:underline py-0.5">0471-2700270</a>
+              </div>
+            </div>
+
+            <div className="flex flex-row gap-4 items-center mt-5">
+              <a href="https://www.linkedin.com/company/research-innovation-network-kerala/" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-[#0A2164] transition-colors" aria-label="LinkedIn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M8 11v5"></path><path d="M8 8v.01"></path><path d="M12 16v-5"></path><path d="M16 16v-3a2 2 0 1 0 -4 0"></path><path d="M3 7a4 4 0 0 1 4 -4h10a4 4 0 0 1 4 4v10a4 4 0 0 1 -4 4h-10a4 4 0 0 1 -4 -4z"></path>
+                </svg>
+              </a>
+              <a href="https://www.facebook.com/keralastartupmission" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-[#0A2164] transition-colors" aria-label="Facebook">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M18 2h-3a4 4 0 0 0-4 4v3H8v4h3v8h4v-8h3l1-4h-4V6a1 1 0 0 1 1-1h3z"></path>
+                </svg>
+              </a>
+              <a href="https://x.com/startup_mission" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-[#0A2164] transition-colors" aria-label="X (Twitter)">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M18.244 3H21l-6.6 7.513L22 21h-6.933l-4.533-5.487L5.6 21H3l7.066-8.044L2 3h7l4.067 4.933L18.244 3zM16.6 19h1.8L7.4 5H5.6l11 14z"></path>
+                </svg>
               </a>
             </div>
           </div>
