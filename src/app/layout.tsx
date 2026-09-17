@@ -54,7 +54,7 @@ export const revalidate = 60;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${plusJakartaSans.variable} ${playfairDisplay.variable}`}>
+    <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth" className={`${plusJakartaSans.variable} ${playfairDisplay.variable}`}>
       <head>
       </head>
       <body suppressHydrationWarning className="flex flex-col min-h-screen bg-background text-text-primary relative pt-16">
