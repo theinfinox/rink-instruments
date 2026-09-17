@@ -66,16 +66,22 @@ export default async function Image() {
         >
           {/* Header */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-              {logo ? (
-                <img src={logo} width={160} style={{ objectFit: 'contain' }} alt="RINK Logo" />
-              ) : (
-                <span style={{ fontSize: 32, fontWeight: 800, color: '#F8FAFC' }}>RINK</span>
-              )}
-              <div style={{ width: '2px', height: '40px', backgroundColor: 'rgba(255,255,255,0.2)' }} />
-              <span style={{ fontSize: 30, fontWeight: 700, letterSpacing: '0.05em', color: '#F4B400' }}>
-                PORTAL
-              </span>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                backgroundColor: '#ffffff',
+                padding: '16px 28px',
+                borderRadius: '20px',
+                boxShadow: '0 10px 25px rgba(0,0,0,0.3)',
+              }}>
+                {logo ? (
+                  <img src={logo} width={200} style={{ objectFit: 'contain' }} alt="RINK Logo" />
+                ) : (
+                  <span style={{ fontSize: 40, fontWeight: 800, color: '#05112B' }}>RINK</span>
+                )}
+              </div>
             </div>
             <div style={{ fontSize: 22, fontWeight: 600, color: '#94A3B8', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
               Research Innovation Network Kerala (RINK)
