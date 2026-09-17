@@ -14,60 +14,76 @@ export default async function Image() {
           height: '100%',
           display: 'flex',
           flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: '#05112B', // RINK dark blue theme
-          backgroundImage: 'radial-gradient(circle at 50% -20%, #1a365d 0%, #05112B 60%)',
+          backgroundColor: '#05112B',
+          backgroundImage: 'radial-gradient(circle at 50% 0%, #1a365d 0%, #05112B 80%)',
           fontFamily: 'sans-serif',
           color: 'white',
-          padding: '60px',
-          textAlign: 'center',
+          padding: '48px',
         }}
       >
-        <p
+        {/* Tech grid overlay */}
+        <div
           style={{
-            fontSize: 24,
-            fontWeight: 700,
-            letterSpacing: '0.15em',
-            textTransform: 'uppercase',
-            color: '#F4B400', // Yellow brand for Services
-            marginBottom: '40px',
+            position: 'absolute',
+            top: 0, left: 0, right: 0, bottom: 0,
+            backgroundImage: `url('data:image/svg+xml;utf8,<svg width="40" height="40" xmlns="http://www.w3.org/2000/svg"><circle cx="2" cy="2" r="1.5" fill="rgba(255,255,255,0.06)"/></svg>')`,
           }}
-        >
-          Research Innovation Network Kerala . Services Portal
-        </p>
+        />
 
-        <h1
-          style={{
-            fontSize: 72,
-            fontWeight: 800,
-            lineHeight: 1.15,
-            marginBottom: '40px',
-            maxWidth: '95%',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}
-        >
-          <span style={{ marginBottom: '10px' }}>Discover Specialised R&D</span>
-          <span>Services from Kerala's Leading</span>
-          <span>Startups & Institutions.</span>
-        </h1>
-
+        {/* Content Container (Glassmorphism Card) */}
         <div
           style={{
             display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginTop: '20px',
-            background: 'rgba(255,255,255,0.1)', 
-            padding: '20px 48px',
-            borderRadius: '100px',
-            boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
-            border: '2px solid rgba(255,255,255,0.2)',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            height: '100%',
+            width: '100%',
+            backgroundColor: 'rgba(255, 255, 255, 0.03)',
+            border: '2px solid rgba(255, 255, 255, 0.1)',
+            borderRadius: '32px',
+            padding: '56px 64px',
+            boxShadow: '0 30px 60px rgba(0,0,0,0.5)',
           }}
         >
-          <span style={{ fontSize: 32, fontWeight: 700, color: '#ffffff' }}>Search Services</span>
+          {/* Header */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <div style={{ width: '56px', height: '56px', backgroundColor: '#F4B400', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(255,255,255,0.2)' }}>
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+              </div>
+              <span style={{ fontSize: 32, fontWeight: 800, letterSpacing: '0.05em', color: '#F8FAFC' }}>
+                RINK <span style={{ color: '#F4B400' }}>PORTAL</span>
+              </span>
+            </div>
+            <div style={{ fontSize: 22, fontWeight: 600, color: '#94A3B8', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+              Research Innovation Network
+            </div>
+          </div>
+
+          {/* Body */}
+          <div style={{ display: 'flex', flexDirection: 'column', marginTop: 'auto', marginBottom: 'auto' }}>
+            <p style={{ fontSize: 26, fontWeight: 700, color: '#F4B400', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '24px' }}>
+              Specialised Services
+            </p>
+            <h1 style={{ fontSize: 76, fontWeight: 800, lineHeight: 1.15, margin: 0, display: 'flex', flexDirection: 'column', letterSpacing: '-0.02em' }}>
+              <span style={{ color: '#ffffff' }}>Discover R&D Services from</span>
+              <span style={{ color: '#94A3B8' }}>Kerala's Leading Startups.</span>
+            </h1>
+          </div>
+
+          {/* Badges / Footer */}
+          <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
+            {[
+              { label: 'Startups' },
+              { label: 'Universities' },
+              { label: 'R&D Labs' }
+            ].map((badge, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '16px 32px', backgroundColor: 'rgba(244,180,0,0.15)', border: '1px solid rgba(244,180,0,0.3)', borderRadius: '100px' }}>
+                <span style={{ color: '#F4B400', fontSize: 24 }}>✦</span>
+                <span style={{ fontSize: 24, fontWeight: 700, color: '#E2E8F0', letterSpacing: '0.02em' }}>{badge.label}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     ),
