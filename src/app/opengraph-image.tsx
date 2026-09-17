@@ -1,11 +1,30 @@
 import { ImageResponse } from 'next/og';
+import fs from 'fs';
+import path from 'path';
 
-export const runtime = 'edge';
 export const alt = 'RINK Instruments Portal';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
+let logoDataUri: string | null = null;
+
+function getLogo() {
+  if (!logoDataUri) {
+    try {
+      const filePath = path.join(process.cwd(), 'public', 'images', 'rink_logo.png');
+      const buffer = fs.readFileSync(filePath);
+      logoDataUri = `data:image/png;base64,${buffer.toString('base64')}`;
+    } catch (e) {
+      console.error('Failed to load rink logo', e);
+      logoDataUri = ''; 
+    }
+  }
+  return logoDataUri;
+}
+
 export default async function Image() {
+  const logo = getLogo();
+
   return new ImageResponse(
     (
       <div
@@ -47,12 +66,15 @@ export default async function Image() {
         >
           {/* Header */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <div style={{ width: '56px', height: '56px', backgroundColor: '#3B82F6', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(255,255,255,0.2)' }}>
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
-              </div>
-              <span style={{ fontSize: 32, fontWeight: 800, letterSpacing: '0.05em', color: '#F8FAFC' }}>
-                RINK <span style={{ color: '#60A5FA' }}>PORTAL</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+              {logo ? (
+                <img src={logo} width={160} style={{ objectFit: 'contain' }} alt="RINK Logo" />
+              ) : (
+                <span style={{ fontSize: 32, fontWeight: 800, color: '#F8FAFC' }}>RINK</span>
+              )}
+              <div style={{ width: '2px', height: '40px', backgroundColor: 'rgba(255,255,255,0.2)' }} />
+              <span style={{ fontSize: 30, fontWeight: 700, letterSpacing: '0.05em', color: '#60A5FA' }}>
+                PORTAL
               </span>
             </div>
             <div style={{ fontSize: 22, fontWeight: 600, color: '#94A3B8', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
@@ -78,8 +100,10 @@ export default async function Image() {
               { label: 'R&D Labs' },
               { label: 'Startups' }
             ].map((badge, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '16px 32px', backgroundColor: 'rgba(59,130,246,0.15)', border: '1px solid rgba(59,130,246,0.3)', borderRadius: '100px' }}>
-                <span style={{ color: '#60A5FA', fontSize: 24 }}>✦</span>
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px 32px', backgroundColor: 'rgba(59,130,246,0.15)', border: '1px solid rgba(59,130,246,0.3)', borderRadius: '100px' }}>
+                <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="8" cy="8" r="6" fill="#60A5FA" />
+                </svg>
                 <span style={{ fontSize: 24, fontWeight: 700, color: '#E2E8F0', letterSpacing: '0.02em' }}>{badge.label}</span>
               </div>
             ))}

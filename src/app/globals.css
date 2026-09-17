@@ -1060,15 +1060,25 @@ input::placeholder, textarea::placeholder { color: var(--text-secondary) !import
 
 /* Make the loading bar adapt to the mobile bottom UI */
 @media (max-width: 767px) {
+  /* Hide the stranded spinner on mobile */
+  #nprogress .spinner {
+    display: none !important;
+  }
+  
+  /* Reverse the peg glow to shine upwards */
+  #nprogress .peg {
+    box-shadow: 0 -4px 10px #3B82F6, 0 -4px 5px #3B82F6 !important;
+  }
+
   /* Default: if Bottom Nav is present */
   html:has(nav[aria-label="Mobile navigation"]) #nprogress .bar {
     top: auto !important;
-    bottom: calc(64px + env(safe-area-inset-bottom, 0px)) !important;
+    bottom: 64px !important;
   }
   
   /* Override: if Sticky Detail CTA is present */
   html:has(#mobile-sticky-cta) #nprogress .bar {
     top: auto !important;
-    bottom: calc(68px + env(safe-area-inset-bottom, 16px)) !important;
+    bottom: 84px !important;
   }
 }
