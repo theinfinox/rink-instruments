@@ -67,7 +67,7 @@ export default function SearchBar({
     isUserTypingRef.current = false;
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setQuery(defaultValue);
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+     
     setOpen(false);
   }, [defaultValue]);
 

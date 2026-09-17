@@ -166,11 +166,11 @@ function InstitutionGridCard({
   hiddenOnMobile?: boolean;
   hiddenOnDesktop?: boolean;
 }) {
+  const [imageFailed, setImageFailed] = useState(false);
   if (!inst.name || !inst.slug) return null;
   const isServices = context === 'services';
   const isStartup = inst.is_startup || inst.entity_type === 'startup';
   const logo = getLogo(inst);
-  const [imageFailed, setImageFailed] = useState(false);
   const linkHref = isServices 
     ? `/services/list?startup=${encodeURIComponent(inst.slug)}` 
     : `/institutions/${encodeURIComponent(inst.slug)}`;
@@ -349,6 +349,7 @@ export default function InstitutionSearchGrid({ institutions, startups = [], con
 
   // Reset expansion when query or tab changes
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsExpanded(false);
   }, [query, filterTab]);
 
