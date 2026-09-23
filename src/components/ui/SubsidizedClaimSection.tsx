@@ -68,7 +68,7 @@ export default function SubsidizedClaimSection({
         </div>
 
         {/* Rate Tier Badge */}
-        <div className="inline-flex flex-col items-end">
+        <div className="inline-flex flex-col items-start md:items-end mt-2 md:mt-0">
           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
             Concession Tier
           </span>
@@ -77,14 +77,14 @@ export default function SubsidizedClaimSection({
               href={sourcePortalUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm tracking-wide transition-colors group"
+              className="inline-flex items-start gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm tracking-wide transition-colors group max-w-[280px] sm:max-w-sm text-left leading-snug"
               title="View Official Fee Schedule"
             >
               <span>{rateHighlight}</span>
-              <ExternalLink className="w-3.5 h-3.5 text-emerald-200 group-hover:text-white transition-colors" />
+              <ExternalLink className="w-3.5 h-3.5 text-emerald-200 group-hover:text-white transition-colors mt-0.5 flex-shrink-0" />
             </a>
           ) : (
-            <span className="inline-flex items-center px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold bg-emerald-600 text-white shadow-sm tracking-wide">
+            <span className="inline-flex items-start px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold bg-emerald-600 text-white shadow-sm tracking-wide max-w-[280px] sm:max-w-sm text-left leading-snug">
               {rateHighlight}
             </span>
           )}
