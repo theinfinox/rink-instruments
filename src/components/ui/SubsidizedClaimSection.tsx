@@ -113,9 +113,13 @@ export default function SubsidizedClaimSection({
               <span>Facility / Centre</span>
             </div>
             <div className="text-slate-800 text-xs sm:text-[13px] font-medium leading-snug">
-              {!facility.toLowerCase().includes(institutionName.toLowerCase()) && (
-                <span className="block text-[11px] text-slate-500 mb-0.5 leading-tight">{institutionName}</span>
-              )}
+              {(() => {
+                const normalize = (str: string) => str.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+                const isNameIncluded = normalize(facility).includes(normalize(institutionName));
+                return !isNameIncluded && (
+                  <span className="block text-[11px] text-slate-500 mb-0.5 leading-tight">{institutionName}</span>
+                );
+              })()}
               {facility}
             </div>
           </div>
