@@ -398,20 +398,7 @@ export default async function TechnologyDetailPage({ params }: { params: Promise
                         Connect directly with the partner institution to book this facility for your research, development, and testing needs.
                       </p>
 
-                      {/* Subsidized Rates Highlight */}
-                      {vm.subsidizedPolicy?.hasSubsidizedRates && (
-                        <div className="mb-4 flex items-start gap-2.5 p-3 rounded-lg bg-emerald-500/15 border border-emerald-400/30 text-emerald-100 text-xs font-sans">
-                          <ShieldCheck className="w-4 h-4 text-emerald-300 flex-shrink-0 mt-0.5" />
-                          <div>
-                            <span className="font-bold text-emerald-200 block text-xs">
-                              Subsidized Rates Applicable
-                            </span>
-                            <span className="text-emerald-100/90 text-[11px] leading-tight block mt-0.5">
-                              {vm.subsidizedPolicy.discountOrRate || 'Concessional rates available for KSUM startups'}
-                            </span>
-                          </div>
-                        </div>
-                      )}
+
 
                       <a
                         href={finalBookingLink}

@@ -154,9 +154,12 @@ function PartnerCard({
   const monogram = getMonogram(partner.name);
 
   return (
-    <div className={`bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-slate-200/90 shadow-sm hover:shadow-md hover:border-blue-300 hover:-translate-y-1 transition-all duration-200 flex-col justify-between group ${
-      hiddenOnMobile ? 'hidden sm:flex' : 'flex'
-    }`}>
+    <Link 
+      href={`/institutions/${partner.slug}?from=partnerships`}
+      className={`bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-slate-200/90 shadow-sm hover:shadow-md hover:border-blue-300 hover:-translate-y-1 transition-all duration-200 flex-col justify-between group ${
+        hiddenOnMobile ? 'hidden sm:flex' : 'flex'
+      }`}
+    >
       <div>
         {/* Top Bar: Logo/Avatar + Verified Badge */}
         <div className="flex items-start justify-between gap-3 mb-3 sm:mb-4">
@@ -235,15 +238,14 @@ function PartnerCard({
 
       {/* Action Link */}
       <div className="mt-4 sm:mt-5 pt-2.5 sm:pt-3 border-t border-slate-100">
-        <Link
-          href={`/institutions/${partner.slug}?from=partnerships`}
+        <span
           className="inline-flex items-center justify-between w-full text-xs font-semibold text-[#0A2164] group-hover:text-blue-700 transition-colors py-1"
         >
           <span>Explore Equipment &amp; Facilities</span>
           <ArrowRight className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" />
-        </Link>
+        </span>
       </div>
-    </div>
+    </Link>
   );
 }
 

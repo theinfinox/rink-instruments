@@ -290,8 +290,8 @@ export default function InstitutionSearchGrid({ institutions, startups = [], con
   const router = useRouter();
   const isServices = context === 'services';
 
-  // Active filter tab: 'all' | 'institutions' | 'startups' | 'partnered' (single-select mutually exclusive)
-  const [filterTab, setFilterTab] = useState<'all' | 'institutions' | 'startups' | 'partnered'>('all');
+  // Active filter tab: 'institutions' | 'startups' | 'partnered' | 'all' (single-select mutually exclusive)
+  const [filterTab, setFilterTab] = useState<'institutions' | 'startups' | 'partnered' | 'all'>('institutions');
 
   // Progressive disclosure thresholds
   const [isExpanded, setIsExpanded] = useState(false);
@@ -587,35 +587,13 @@ export default function InstitutionSearchGrid({ institutions, startups = [], con
           )}
         </div>
 
-        {/* ── 4 Filter Tabs: All, Institutions, Startups, Partnered ── */}
+        {/* ── 4 Filter Tabs: Institutions, Startups, Partnered, All ── */}
         {!isServices && (
           <div 
             className="flex items-center gap-1.5 sm:gap-2 mt-2.5 sm:mt-3.5 overflow-x-auto no-scrollbar scroll-smooth py-1 -mx-4 px-4 sm:mx-0 sm:px-0 sm:overflow-visible sm:flex-wrap [&::-webkit-scrollbar]:hidden"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
-            {/* 1. All */}
-            <button
-              type="button"
-              role="radio"
-              aria-checked={filterTab === 'all'}
-              id="filter-tab-all"
-              onClick={() => setFilterTab('all')}
-              className={`group flex items-center justify-center gap-1 sm:gap-1.5 px-2.5 sm:px-3.5 h-8 sm:h-9 rounded-lg sm:rounded-xl border text-[11px] sm:text-xs font-semibold whitespace-nowrap transition-all duration-200 select-none shadow-xs cursor-pointer flex-shrink-0 ${
-                filterTab === 'all'
-                  ? 'bg-blue-50 text-[#1B4D9B] border-[#1B4D9B]/35 shadow-[0_1px_3px_rgba(27,77,155,0.12)]'
-                  : 'bg-white text-slate-600 border-slate-200/90 hover:border-slate-300 hover:bg-slate-50'
-              }`}
-            >
-              <Building2 className={`w-3.5 h-3.5 flex-shrink-0 ${filterTab === 'all' ? 'text-[#1B4D9B]' : 'text-slate-400 group-hover:text-slate-600'}`} />
-              <span>All</span>
-              <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold leading-none flex-shrink-0 ${
-                filterTab === 'all' ? 'bg-[#1B4D9B]/15 text-[#1B4D9B]' : 'bg-slate-100 text-slate-500'
-              }`}>
-                {countTotal}
-              </span>
-            </button>
-
-            {/* 2. Institutions */}
+            {/* 1. Institutions */}
             <button
               type="button"
               role="radio"
@@ -637,7 +615,7 @@ export default function InstitutionSearchGrid({ institutions, startups = [], con
               </span>
             </button>
 
-            {/* 3. Startups */}
+            {/* 2. Startups */}
             <button
               type="button"
               role="radio"
@@ -659,7 +637,7 @@ export default function InstitutionSearchGrid({ institutions, startups = [], con
               </span>
             </button>
 
-            {/* 4. Partnered */}
+            {/* 3. Partnered */}
             <button
               type="button"
               role="radio"
@@ -682,6 +660,28 @@ export default function InstitutionSearchGrid({ institutions, startups = [], con
               </span>
               <span className="hidden lg:inline-block text-[10px] font-medium text-emerald-700 bg-emerald-100/70 px-1.5 py-0.5 rounded">
                 Subsidized Rates
+              </span>
+            </button>
+
+            {/* 4. All */}
+            <button
+              type="button"
+              role="radio"
+              aria-checked={filterTab === 'all'}
+              id="filter-tab-all"
+              onClick={() => setFilterTab('all')}
+              className={`group flex items-center justify-center gap-1 sm:gap-1.5 px-2.5 sm:px-3.5 h-8 sm:h-9 rounded-lg sm:rounded-xl border text-[11px] sm:text-xs font-semibold whitespace-nowrap transition-all duration-200 select-none shadow-xs cursor-pointer flex-shrink-0 ${
+                filterTab === 'all'
+                  ? 'bg-blue-50 text-[#1B4D9B] border-[#1B4D9B]/35 shadow-[0_1px_3px_rgba(27,77,155,0.12)]'
+                  : 'bg-white text-slate-600 border-slate-200/90 hover:border-slate-300 hover:bg-slate-50'
+              }`}
+            >
+              <Building2 className={`w-3.5 h-3.5 flex-shrink-0 ${filterTab === 'all' ? 'text-[#1B4D9B]' : 'text-slate-400 group-hover:text-slate-600'}`} />
+              <span>All</span>
+              <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold leading-none flex-shrink-0 ${
+                filterTab === 'all' ? 'bg-[#1B4D9B]/15 text-[#1B4D9B]' : 'bg-slate-100 text-slate-500'
+              }`}>
+                {countTotal}
               </span>
             </button>
           </div>

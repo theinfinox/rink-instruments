@@ -72,9 +72,22 @@ export default function SubsidizedClaimSection({
           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
             Concession Tier
           </span>
-          <span className="inline-flex items-center px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold bg-emerald-600 text-white shadow-sm tracking-wide">
-            {rateHighlight}
-          </span>
+          {sourcePortalUrl && sourcePortalUrl !== '#' ? (
+            <a
+              href={sourcePortalUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm tracking-wide transition-colors group"
+              title="View Official Fee Schedule"
+            >
+              <span>{rateHighlight}</span>
+              <ExternalLink className="w-3.5 h-3.5 text-emerald-200 group-hover:text-white transition-colors" />
+            </a>
+          ) : (
+            <span className="inline-flex items-center px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold bg-emerald-600 text-white shadow-sm tracking-wide">
+              {rateHighlight}
+            </span>
+          )}
         </div>
       </div>
 
@@ -99,9 +112,12 @@ export default function SubsidizedClaimSection({
               <Building className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
               <span>Facility / Centre</span>
             </div>
-            <p className="text-slate-800 text-xs sm:text-[13px] font-medium leading-snug">
+            <div className="text-slate-800 text-xs sm:text-[13px] font-medium leading-snug">
+              {!facility.toLowerCase().includes(institutionName.toLowerCase()) && (
+                <span className="block text-[11px] text-slate-500 mb-0.5 leading-tight">{institutionName}</span>
+              )}
               {facility}
-            </p>
+            </div>
           </div>
         )}
 
