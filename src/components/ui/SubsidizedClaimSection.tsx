@@ -140,69 +140,52 @@ export default function SubsidizedClaimSection({
       </div>
 
       {/* How to Claim Steps */}
-      <div className="relative z-10 bg-white/80 backdrop-blur-sm rounded-xl p-4 sm:p-5 border border-emerald-200/70 mb-5">
-        <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2 mb-3">
-          <Layers className="w-4 h-4 text-emerald-600" />
-          How to Claim Subsidized Rates
-        </h3>
+      {(policy.applicationMethod || policy.accessConditions || policy.notes || policy.additionalPolicyDetails) && (
+        <div className="relative z-10 bg-white/80 backdrop-blur-sm rounded-xl p-4 sm:p-5 border border-emerald-200/70 mb-5">
+          <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2 mb-3">
+            <Layers className="w-4 h-4 text-emerald-600" />
+            How to Claim Subsidized Rates
+          </h3>
 
-        <div className="space-y-3 font-sans text-xs sm:text-[13px]">
-          
-          {/* Step 1: Verification */}
-          <div className="flex items-start gap-3">
-            <span className="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 font-bold text-xs flex items-center justify-center mt-0.5">
-              1
-            </span>
-            <div>
-              <strong className="text-slate-900 block sm:inline">Possess Valid KSUM Registration:</strong>{' '}
-              <span className="text-slate-700">
-                Ensure your startup has an active Unique ID (UID) certificate issued by Kerala Startup Mission.
-              </span>
-            </div>
+          <div className="space-y-3 font-sans text-xs sm:text-[13px]">
+            {/* Step: Application method */}
+            {policy.applicationMethod && (
+              <div className="flex items-start gap-2.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 flex-shrink-0" />
+                <div>
+                  <strong className="text-slate-900 block sm:inline">Application &amp; Requisition:</strong>{' '}
+                  <span className="text-slate-700">
+                    {policy.applicationMethod}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* Step: Access Conditions / Quotas */}
+            {policy.accessConditions && (
+              <div className="flex items-start gap-2.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 flex-shrink-0" />
+                <div>
+                  <strong className="text-slate-900 block sm:inline">Access Conditions &amp; Limits:</strong>{' '}
+                  <span className="text-slate-700">
+                    {policy.accessConditions}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* Step: Notes or Details */}
+            {(policy.notes || policy.additionalPolicyDetails) && (
+              <div className="flex items-start gap-2.5 pt-2 mt-2 border-t border-slate-100">
+                <Info className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
+                <div className="text-slate-600 text-xs leading-relaxed">
+                  <strong>Policy Note:</strong> {policy.notes || policy.additionalPolicyDetails}
+                </div>
+              </div>
+            )}
           </div>
-
-          {/* Step 2: Application method */}
-          {policy.applicationMethod && (
-            <div className="flex items-start gap-3">
-              <span className="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 font-bold text-xs flex items-center justify-center mt-0.5">
-                2
-              </span>
-              <div>
-                <strong className="text-slate-900 block sm:inline">Application &amp; Requisition:</strong>{' '}
-                <span className="text-slate-700">
-                  {policy.applicationMethod}
-                </span>
-              </div>
-            </div>
-          )}
-
-          {/* Step 3: Access Conditions / Quotas */}
-          {policy.accessConditions && (
-            <div className="flex items-start gap-3">
-              <span className="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 font-bold text-xs flex items-center justify-center mt-0.5">
-                3
-              </span>
-              <div>
-                <strong className="text-slate-900 block sm:inline">Access Conditions &amp; Limits:</strong>{' '}
-                <span className="text-slate-700">
-                  {policy.accessConditions}
-                </span>
-              </div>
-            </div>
-          )}
-
-          {/* Step 4: Notes or Details */}
-          {(policy.notes || policy.additionalPolicyDetails) && (
-            <div className="flex items-start gap-3 pt-2 mt-2 border-t border-slate-100">
-              <Info className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
-              <div className="text-slate-600 text-xs leading-relaxed">
-                <strong>Policy Note:</strong> {policy.notes || policy.additionalPolicyDetails}
-              </div>
-            </div>
-          )}
-
         </div>
-      </div>
+      )}
 
       {/* Action Buttons */}
       <div className="relative z-10 flex flex-wrap items-center gap-3">
