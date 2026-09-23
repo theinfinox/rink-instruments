@@ -34,7 +34,7 @@ export default function SubsidizedClaimSection({
   const facility = policy.facilityOrCentre || policy.facilityNameReference;
 
   return (
-    <div className="relative rounded-2xl overflow-hidden border border-emerald-200/80 bg-gradient-to-br from-emerald-50/60 via-teal-50/40 to-blue-50/30 p-5 sm:p-7 shadow-sm">
+    <div className="relative rounded-2xl overflow-hidden border border-emerald-200/80 bg-gradient-to-br from-emerald-50/60 via-teal-50/40 to-blue-50/30 p-4 sm:p-7 shadow-sm">
       
       {/* Decorative background glow */}
       <div className="absolute top-0 right-0 -mr-16 -mt-16 w-56 h-56 rounded-full bg-emerald-300/10 blur-3xl pointer-events-none" />
@@ -92,10 +92,10 @@ export default function SubsidizedClaimSection({
       </div>
 
       {/* Highlights Grid */}
-      <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 my-5">
+      <div className="relative z-10 bg-white/90 sm:bg-transparent rounded-xl border border-emerald-100/90 sm:border-0 shadow-xs sm:shadow-none my-4 sm:my-5 divide-y divide-emerald-50 sm:divide-y-0 sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:gap-3.5">
         
         {/* Card 1: Eligibility */}
-        <div className="bg-white/90 backdrop-blur-sm rounded-xl p-3.5 border border-emerald-100/90 shadow-xs flex flex-col justify-between">
+        <div className="p-3.5 sm:bg-white/90 sm:backdrop-blur-sm sm:rounded-xl sm:border sm:border-emerald-100/90 sm:shadow-xs flex flex-col justify-between">
           <div className="flex items-center gap-2 text-emerald-800 text-xs font-bold uppercase tracking-wider mb-1.5">
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
             <span>Eligible Startups</span>
@@ -107,7 +107,7 @@ export default function SubsidizedClaimSection({
 
         {/* Card 2: Facility / Centre */}
         {facility && (
-          <div className="bg-white/90 backdrop-blur-sm rounded-xl p-3.5 border border-emerald-100/90 shadow-xs flex flex-col justify-between">
+          <div className="p-3.5 sm:bg-white/90 sm:backdrop-blur-sm sm:rounded-xl sm:border sm:border-emerald-100/90 sm:shadow-xs flex flex-col justify-between">
             <div className="flex items-center gap-2 text-emerald-800 text-xs font-bold uppercase tracking-wider mb-1.5">
               <Building className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
               <span>Facility / Centre</span>
@@ -127,7 +127,7 @@ export default function SubsidizedClaimSection({
 
         {/* Card 3: Validity Window (if specified) */}
         {policy.validity && (
-          <div className="bg-white/90 backdrop-blur-sm rounded-xl p-3.5 border border-emerald-100/90 shadow-xs flex flex-col justify-between">
+          <div className="p-3.5 sm:bg-white/90 sm:backdrop-blur-sm sm:rounded-xl sm:border sm:border-emerald-100/90 sm:shadow-xs flex flex-col justify-between">
             <div className="flex items-center gap-2 text-emerald-800 text-xs font-bold uppercase tracking-wider mb-1.5">
               <Clock className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
               <span>Concession Validity</span>
@@ -141,7 +141,7 @@ export default function SubsidizedClaimSection({
 
       {/* How to Claim Steps */}
       {(policy.applicationMethod || policy.accessConditions || policy.notes || policy.additionalPolicyDetails) && (
-        <div className="relative z-10 bg-white/80 backdrop-blur-sm rounded-xl p-4 sm:p-5 border border-emerald-200/70 mb-5">
+        <div className="relative z-10 bg-white/80 backdrop-blur-sm rounded-xl p-3.5 sm:p-5 border border-emerald-200/70 mb-4 sm:mb-5">
           <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2 mb-3">
             <Layers className="w-4 h-4 text-emerald-600" />
             How to Claim Subsidized Rates
@@ -188,17 +188,17 @@ export default function SubsidizedClaimSection({
       )}
 
       {/* Action Buttons */}
-      <div className="relative z-10 flex flex-wrap items-center gap-3">
+      <div className="relative z-10 flex flex-wrap items-center gap-2.5 sm:gap-3">
         {/* PDF Application Form Button */}
         {appFormUrl && appFormUrl !== '#' && (
           <a
             href={appFormUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs sm:text-sm shadow-sm transition-all duration-200 active:scale-[0.98]"
+            className="inline-flex items-center justify-center gap-1.5 sm:gap-2 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-[11px] sm:text-sm shadow-sm transition-all duration-200 active:scale-[0.98]"
           >
-            <FileDown className="w-4 h-4 flex-shrink-0" />
-            <span>Download Application Form (PDF)</span>
+            <FileDown className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
+            <span>Application Form</span>
           </a>
         )}
 
@@ -208,10 +208,10 @@ export default function SubsidizedClaimSection({
             href={sourcePortalUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-emerald-900 font-semibold text-xs sm:text-sm border border-emerald-300 shadow-xs transition-all duration-200 active:scale-[0.98]"
+            className="inline-flex items-center justify-center gap-1.5 sm:gap-2 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl bg-white hover:bg-slate-50 text-emerald-900 font-semibold text-[11px] sm:text-sm border border-emerald-300 shadow-xs transition-all duration-200 active:scale-[0.98]"
           >
-            <ExternalLink className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-            <span>Official Subsidized Portal / Fee Schedule</span>
+            <ExternalLink className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600 flex-shrink-0" />
+            <span>Official Portal / Fee Schedule</span>
           </a>
         )}
 
