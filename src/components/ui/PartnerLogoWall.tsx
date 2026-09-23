@@ -78,7 +78,7 @@ export default async function PartnerLogoWall() {
 
         {/* Logo Grid */}
         <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-4">
-          {mappedInstitutions.map((inst: any) => (
+          {mappedInstitutions.map((inst: { slug: string; name: string; logo: string | null; acronym: string }) => (
             <PartnerLogoTile key={inst.slug} inst={inst} />
           ))}
         </div>

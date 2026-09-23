@@ -54,6 +54,7 @@ export default function CommandPalette() {
   // Fetch index when opened
   useEffect(() => {
     if (open && allItems.length === 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLoading(true);
       fetch(`/api/search-index?dataset=${dataset}`)
         .then(r => r.json())

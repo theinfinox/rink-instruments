@@ -2,7 +2,7 @@ import { fetchInstrumentBundle, fetchDistrictTaxonomy } from '@/lib/dataFetcher'
 import TechListClient from './TechListClient';
 import { InstitutionRepository } from '@/repositories/InstitutionRepository';
 import { precisionSearch, buildSearchIndex } from '@/lib/searchEngine';
-import { SearchIndexItem } from '@/types';
+import { normalizeDistrict } from '@/lib/districtUtils';
 import { Instrument } from '@/types/instrument';
 import { toInstrumentViewModel } from '@/domain/instrument/mapper';
 
@@ -46,7 +46,7 @@ export async function generateMetadata({ searchParams }: SearchParamsProps): Pro
   };
 }
 
-interface Props extends SearchParamsProps {}
+type Props = SearchParamsProps;
 
 export default async function TechnologiesPage({ searchParams }: Props) {
   const params = await searchParams;
@@ -131,7 +131,6 @@ export default async function TechnologiesPage({ searchParams }: Props) {
   }
 
   if (canonicalDistrict) {
-    const { normalizeDistrict } = require('@/lib/districtUtils');
     const target = normalizeDistrict(canonicalDistrict);
     filtered = filtered.filter(i => 
       normalizeDistrict(i.standardized_district) === target || 

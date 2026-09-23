@@ -53,6 +53,7 @@ export default function TechListClient({
   const [filters, setFilters] = useState(initialFilters);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setFilters(initialFilters);
   }, [initialFilters]);
 

@@ -39,6 +39,7 @@ export default function Navbar() {
     window.addEventListener('scroll', scrollHandler, { passive: true });
     
     // Sync hash from URL initially and on changes
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setHash(window.location.hash);
     const hashChangeHandler = () => setHash(window.location.hash);
     window.addEventListener('hashchange', hashChangeHandler);

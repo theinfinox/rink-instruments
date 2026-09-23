@@ -95,7 +95,7 @@ export default async function Image() {
             </p>
             <h1 style={{ fontSize: 76, fontWeight: 800, lineHeight: 1.15, margin: 0, display: 'flex', flexDirection: 'column', letterSpacing: '-0.02em' }}>
               <span style={{ color: '#ffffff' }}>Discover Equipment from</span>
-              <span style={{ color: '#94A3B8' }}>Kerala's Leading Labs.</span>
+              <span style={{ color: '#94A3B8' }}>Kerala&apos;s Leading Labs.</span>
             </h1>
           </div>
 
