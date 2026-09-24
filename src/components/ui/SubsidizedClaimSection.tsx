@@ -62,7 +62,7 @@ export default function SubsidizedClaimSection({
               Subsidized Rates &amp; Startup Concessions
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 font-sans mt-0.5">
-              Offered under formal partnership with Kerala Startup Mission (KSUM) for eligible startups
+              Offered under formal partnership with Kerala Startup Mission (KSUM) for eligible startups.
             </p>
           </div>
         </div>
