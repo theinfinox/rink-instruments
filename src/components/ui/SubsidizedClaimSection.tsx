@@ -166,9 +166,9 @@ export default function SubsidizedClaimSection({
             {(policy.description || policy.accessConditions) && (
               <div className="flex items-start gap-2.5">
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 flex-shrink-0" />
-                <div>
-                  <strong className="text-slate-900 block sm:inline">Access Conditions &amp; Limits:</strong>{' '}
-                  <span className="text-slate-700">
+                <div className="flex-1">
+                  <strong className="text-slate-900 block mb-1 sm:mb-0 sm:inline">Access Conditions &amp; Limits:</strong>{' '}
+                  <span className="text-slate-600 leading-relaxed">
                     {policy.description || policy.accessConditions}
                   </span>
                 </div>
