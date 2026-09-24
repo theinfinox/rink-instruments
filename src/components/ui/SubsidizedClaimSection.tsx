@@ -90,9 +90,9 @@ export default function SubsidizedClaimSection({
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600 hover:text-emerald-700 transition-colors group"
-                title={feeRateUrl ? "View Official Fee Schedule" : "Know More"}
+                title={feeRateUrl ? "View Detailed Concession Details" : "Know More"}
               >
-                {feeRateUrl ? "View Official Fee Schedule" : "Know More"}
+                {feeRateUrl ? "View Detailed Concession Details" : "Know More"}
                 <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
               </a>
             </div>
