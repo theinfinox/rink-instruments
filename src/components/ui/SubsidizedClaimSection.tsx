@@ -26,8 +26,9 @@ export default function SubsidizedClaimSection({
 }: SubsidizedClaimSectionProps) {
   if (!policy || !policy.hasSubsidizedRates) return null;
 
-  const appFormUrl = policy.applicationFormUrl ? getSafeUrl(policy.applicationFormUrl) : null;
+  const feeRateUrl = policy.feeRateUrl ? getSafeUrl(policy.feeRateUrl) : null;
   const sourcePortalUrl = policy.sourceUrl ? getSafeUrl(policy.sourceUrl) : null;
+  const activeLink = feeRateUrl || sourcePortalUrl;
 
   const rateHighlight = policy.discountOrRate || policy.benefitType || 'Subsidized User Fee Rates';
   const eligibility = policy.eligibility || 'Kerala Startup Mission (KSUM) Registered Startups with valid UID';
@@ -72,13 +73,13 @@ export default function SubsidizedClaimSection({
           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
             Concession Tier
           </span>
-          {sourcePortalUrl && sourcePortalUrl !== '#' ? (
+          {activeLink && activeLink !== '#' ? (
             <a
-              href={sourcePortalUrl}
+              href={activeLink}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-start gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm tracking-wide transition-colors group max-w-[280px] sm:max-w-sm text-left leading-snug"
-              title="View Official Fee Schedule"
+              title={feeRateUrl ? "View Official Fee Schedule" : "View Official Website"}
             >
               <span>{rateHighlight}</span>
               <ExternalLink className="w-3.5 h-3.5 text-emerald-200 group-hover:text-white transition-colors mt-0.5 flex-shrink-0" />
@@ -187,41 +188,12 @@ export default function SubsidizedClaimSection({
         </div>
       )}
 
-      {/* Action Buttons */}
-      <div className="relative z-10 flex flex-wrap items-center gap-2.5 sm:gap-3">
-        {/* PDF Application Form Button */}
-        {appFormUrl && appFormUrl !== '#' && (
-          <a
-            href={appFormUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-1.5 sm:gap-2 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-[11px] sm:text-sm shadow-sm transition-all duration-200 active:scale-[0.98]"
-          >
-            <FileDown className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
-            <span>Application Form</span>
-          </a>
-        )}
-
-        {/* Official Subsidized Portal Link */}
-        {sourcePortalUrl && sourcePortalUrl !== '#' && (
-          <a
-            href={sourcePortalUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-1.5 sm:gap-2 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl bg-white hover:bg-slate-50 text-emerald-900 font-semibold text-[11px] sm:text-sm border border-emerald-300 shadow-xs transition-all duration-200 active:scale-[0.98]"
-          >
-            <ExternalLink className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600 flex-shrink-0" />
-            <span>Official Website / Fee Schedule</span>
-          </a>
-        )}
-
-        {/* Fallback note if no external links are specified */}
-        {!appFormUrl && !sourcePortalUrl && (
-          <div className="text-xs text-slate-600 italic bg-white/60 px-3 py-2 rounded-lg border border-emerald-200/50">
-            For access under this concession, please present your KSUM UID certificate directly to {institutionName}&apos;s facility coordinator or administration.
-          </div>
-        )}
-      </div>
+      {/* Fallback note if no external links are specified */}
+      {!activeLink && (
+        <div className="relative z-10 mt-3 text-xs text-slate-600 italic bg-white/60 px-3 py-2 rounded-lg border border-emerald-200/50">
+          For access under this concession, please present your KSUM UID certificate directly to {institutionName}&apos;s facility coordinator or administration.
+        </div>
+      )}
 
     </div>
   );

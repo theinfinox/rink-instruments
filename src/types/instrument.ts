@@ -46,5 +46,5 @@ export interface SubsidizedClaimPolicy {
   facilityNameReference?: string;
   additionalPolicyDetails?: string;
   sourceUrl?: string | null;
-  applicationFormUrl?: string | null;
+  feeRateUrl?: string | null;
 }

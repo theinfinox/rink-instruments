@@ -51,6 +51,40 @@ const nextConfig = {
   output: 'standalone',
   images: {
     remotePatterns: [
+      // KSUM & Startup Mission domains
+      {
+        protocol: 'https',
+        hostname: 'startupmission.kerala.gov.in',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.startupmission.kerala.gov.in',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'startupmission.in',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.startupmission.in',
+        pathname: '/**',
+      },
+      // Dev backend
+      {
+        protocol: 'https',
+        hostname: 'rink-git-cron.vercel.app',
+        pathname: '/**',
+      },
+      // Localhost
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        pathname: '/**',
+      },
+      // Original External Sources
       {
         protocol: 'https',
         hostname: 'drive.google.com',

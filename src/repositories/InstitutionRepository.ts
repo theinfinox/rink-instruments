@@ -197,7 +197,7 @@ export class InstitutionRepository {
             facilityNameReference: raw.facility_name_reference || undefined,
             additionalPolicyDetails: raw.additional_policy_details || undefined,
             sourceUrl: raw.source_url && raw.source_url.startsWith('http') ? raw.source_url.trim() : null,
-            applicationFormUrl: raw.application_form_url && raw.application_form_url.startsWith('http') ? raw.application_form_url.trim() : null,
+            feeRateUrl: raw.fee_rate_url && raw.fee_rate_url.startsWith('http') ? raw.fee_rate_url.trim() : null,
           });
         }
       });
@@ -224,7 +224,7 @@ export class InstitutionRepository {
               description: raw.ksum_mou_details,
               verificationStatus: raw.verification_status,
               sourceUrl: null,
-              applicationFormUrl: null,
+              feeRateUrl: null,
             });
           }
         }

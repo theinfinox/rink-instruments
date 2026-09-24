@@ -111,18 +111,17 @@ export default function MouBadge({
               </div>
               
               {/* Action Links */}
-              {(policy?.sourceUrl || policy?.applicationFormUrl) && (
+              {(policy?.sourceUrl || policy?.feeRateUrl) && (
                 <div className="flex flex-col gap-1.5 mt-2 pt-2 border-t border-slate-800">
-                  {policy.sourceUrl && policy.sourceUrl !== '#' && (
+                  {policy.feeRateUrl && policy.feeRateUrl !== '#' ? (
+                    <a href={policy.feeRateUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-emerald-300 hover:text-emerald-200 hover:underline transition-colors">
+                      <ExternalLink className="w-3 h-3" /> View Fee Schedule
+                    </a>
+                  ) : policy.sourceUrl && policy.sourceUrl !== '#' ? (
                     <a href={policy.sourceUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-emerald-300 hover:text-emerald-200 hover:underline transition-colors">
-                      <ExternalLink className="w-3 h-3" /> Official Website / Fee Schedule
+                      <ExternalLink className="w-3 h-3" /> Official Website
                     </a>
-                  )}
-                  {policy.applicationFormUrl && policy.applicationFormUrl !== '#' && (
-                    <a href={policy.applicationFormUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-emerald-300 hover:text-emerald-200 hover:underline transition-colors">
-                      <FileDown className="w-3 h-3" /> Application Form
-                    </a>
-                  )}
+                  ) : null}
                 </div>
               )}
               
