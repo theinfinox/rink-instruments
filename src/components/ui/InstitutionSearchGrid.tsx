@@ -160,11 +160,13 @@ function InstitutionGridCard({
   context,
   hiddenOnMobile,
   hiddenOnDesktop,
+  priority = false,
 }: { 
   inst: Institution; 
   context?: 'instruments' | 'services';
   hiddenOnMobile?: boolean;
   hiddenOnDesktop?: boolean;
+  priority?: boolean;
 }) {
   const [imageFailed, setImageFailed] = useState(false);
   if (!inst.name || !inst.slug) return null;
@@ -206,7 +208,7 @@ function InstitutionGridCard({
             src={logo}
             alt={inst.name}
             className="object-contain w-10 h-10 sm:w-16 sm:h-16 p-0.5 sm:p-1"
-            loading="lazy"
+            loading={priority ? "eager" : "lazy"}
             onError={() => setImageFailed(true)}
           />
         ) : (
@@ -717,6 +719,7 @@ export default function InstitutionSearchGrid({ institutions, startups = [], con
                 context={context} 
                 hiddenOnMobile={!isExpanded && index >= MOBILE_THRESHOLD}
                 hiddenOnDesktop={!isExpanded && index >= DESKTOP_THRESHOLD}
+                priority={index < 6}
               />
             ))}
           </div>

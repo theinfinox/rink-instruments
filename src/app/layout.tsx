@@ -56,6 +56,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth" className={`${plusJakartaSans.variable} ${playfairDisplay.variable}`}>
       <head>
+        <link rel="preconnect" href="https://lh3.googleusercontent.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://lh3.googleusercontent.com" />
       </head>
       <body suppressHydrationWarning className="flex flex-col min-h-screen bg-background text-text-primary relative pt-16">
         <NextTopLoader color="#2563eb" showSpinner={false} />

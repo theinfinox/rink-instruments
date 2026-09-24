@@ -12,8 +12,9 @@ interface Props {
   instrument: InstrumentViewModel;
   compact?: boolean;
   disableAnimation?: boolean;
+  priority?: boolean;
 }
-export default function TechnologyCard({ instrument, compact = false, disableAnimation = false }: Props) {
+export default function TechnologyCard({ instrument, compact = false, disableAnimation = false, priority = false }: Props) {
   const [imageFailed, setImageFailed]   = useState(false);
   const [imageLoaded, setImageLoaded]   = useState(false);
   const prefersReduced = useReducedMotion();
@@ -69,7 +70,7 @@ export default function TechnologyCard({ instrument, compact = false, disableAni
                   onError={() => setImageFailed(true)}
                   className="w-full h-full object-cover"
                   referrerPolicy="no-referrer"
-                  loading="lazy"
+                  loading={priority ? "eager" : "lazy"}
                 />
               ) : (
                 <div className="w-full h-full opacity-30">
@@ -153,7 +154,7 @@ export default function TechnologyCard({ instrument, compact = false, disableAni
                   willChange: 'transform, opacity',
                 }}
                 referrerPolicy="no-referrer"
-                loading="lazy"
+                loading={priority ? "eager" : "lazy"}
                 decoding="async"
               />
 

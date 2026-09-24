@@ -178,8 +178,8 @@ export default function InstitutionFilterView({ initialInstruments, institutionN
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
-          {filteredInstruments.map((instrument) => (
-            <TechnologyCard key={instrument.id} instrument={instrument} />
+          {filteredInstruments.map((instrument, index) => (
+            <TechnologyCard key={instrument.id} instrument={instrument} priority={index < 6} />
           ))}
         </div>
       )}

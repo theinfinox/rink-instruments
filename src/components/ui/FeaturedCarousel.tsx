@@ -178,10 +178,10 @@ export default function FeaturedCarousel<T>({
             >
                 {itemType === 'instrument' ? (
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  <TechnologyCard instrument={item as any} disableAnimation={true} />
+                  <TechnologyCard instrument={item as any} disableAnimation={true} priority={idx < 4} />
                 ) : (
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  <ServiceCard service={item as any} disableAnimation={true} />
+                  <ServiceCard service={item as any} disableAnimation={true} priority={idx < 4} />
                 )}
             </div>
             );

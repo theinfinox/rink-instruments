@@ -368,8 +368,8 @@ export default function TechListClient({
                 ? 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5'
                 : 'flex flex-col gap-3'
             }>
-              {technologies.map((tech: InstrumentViewModel) => (
-                <TechnologyCard key={tech.id} instrument={tech} compact={viewMode === 'list'} />
+              {technologies.map((tech: InstrumentViewModel, index) => (
+                <TechnologyCard key={tech.id} instrument={tech} compact={viewMode === 'list'} priority={index < 8} />
               ))}
             </div>
 
