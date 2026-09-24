@@ -1,13 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-import { ShieldCheck } from 'lucide-react';
+import { ShieldCheck, ExternalLink, FileDown } from 'lucide-react';
+import { SubsidizedClaimPolicy } from '@/types/instrument';
 
 interface MouBadgeProps {
   hasVerifiedMou?: boolean;
   className?: string;
   variant?: 'compact' | 'pill' | 'detailed';
   details?: string;
+  policy?: SubsidizedClaimPolicy | null;
 }
 
 /**
@@ -19,7 +21,8 @@ export default function MouBadge({
   hasVerifiedMou, 
   className = '', 
   variant = 'pill',
-  details 
+  details,
+  policy
 }: MouBadgeProps) {
   const [isTooltipOpen, setIsTooltipOpen] = useState(false);
 
@@ -62,7 +65,7 @@ export default function MouBadge({
       {isTooltipOpen && (
         <div 
           role="tooltip"
-          className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-72 p-3 bg-slate-900 text-white text-xs rounded-xl shadow-xl z-50 pointer-events-none text-left leading-normal animate-fade-in"
+          className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-72 p-3 bg-slate-900 text-white text-xs rounded-xl shadow-xl z-50 text-left leading-normal animate-fade-in"
         >
           <div className="flex items-center gap-1.5 font-semibold text-emerald-300 mb-1 border-b border-slate-800 pb-1">
             <ShieldCheck className="w-3.5 h-3.5" />
@@ -72,11 +75,28 @@ export default function MouBadge({
             <p>
               This institution has an active partnership MoU with <strong>Kerala Startup Mission (KSUM)</strong>.
             </p>
-            <p className="text-emerald-400 font-medium">
-              ✓ Eligible startups (with KSUM UID) receive Category II Government R&D subsidized user fee rates.
-            </p>
+            <div className="text-emerald-400 font-medium py-1">
+              ✓ {policy?.eligibility || 'Eligible startups (with KSUM UID)'} receive {policy?.discountOrRate || policy?.benefitType || 'subsidized user fee rates'} {policy?.facilityOrCentre ? `at ${policy.facilityOrCentre}` : ''}.
+            </div>
+            
+            {/* Action Links */}
+            {(policy?.sourceUrl || policy?.applicationFormUrl) && (
+              <div className="flex flex-col gap-1.5 mt-2 pt-2 border-t border-slate-800">
+                {policy.sourceUrl && policy.sourceUrl !== '#' && (
+                  <a href={policy.sourceUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-emerald-300 hover:text-emerald-200 hover:underline transition-colors">
+                    <ExternalLink className="w-3 h-3" /> Official Portal / Fee Schedule
+                  </a>
+                )}
+                {policy.applicationFormUrl && policy.applicationFormUrl !== '#' && (
+                  <a href={policy.applicationFormUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-emerald-300 hover:text-emerald-200 hover:underline transition-colors">
+                    <FileDown className="w-3 h-3" /> Application Form
+                  </a>
+                )}
+              </div>
+            )}
+            
             {details && (
-              <p className="text-slate-400 text-[10px] pt-1 border-t border-slate-800">
+              <p className="text-slate-400 text-[10px] pt-1 mt-1 border-t border-slate-800">
                 {details}
               </p>
             )}

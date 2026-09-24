@@ -199,6 +199,7 @@ export default async function InstitutionDetailPage({ params, searchParams }: Pr
                     hasVerifiedMou={true}
                     variant="detailed"
                     details={institution.mou_details}
+                    policy={subsidizedPolicy}
                   />
                 )}
 

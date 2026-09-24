@@ -268,7 +268,7 @@ function InstitutionGridCard({
                 Startup
               </span>
             )}
-            <MouBadge hasVerifiedMou={inst.has_verified_mou} variant="pill" details={inst.mou_details} />
+            <MouBadge hasVerifiedMou={inst.has_verified_mou} variant="pill" details={inst.mou_details} policy={inst.subsidized_policy} />
           </div>
         )}
       </div>

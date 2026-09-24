@@ -3,6 +3,8 @@
 // Aligned with the actual Google Sheet schema & institution data model
 // ============================================================
 
+import { SubsidizedClaimPolicy } from '@/types/instrument';
+
 export interface Technology {
   id: string;               // Technology ID (e.g. CPCRI-001)
   name: string;             // Technology Name
@@ -84,6 +86,7 @@ export interface Institution {
   mou_details?: string;
   ksum_uid?: string;
   district?: string;
+  subsidized_policy?: SubsidizedClaimPolicy;
 }
 
 // ── Search & Filter Types ───────────────────────────────────

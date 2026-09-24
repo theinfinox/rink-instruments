@@ -245,7 +245,7 @@ export default function TechnologyCard({ instrument, compact = false, disableAni
               <div className="flex-shrink-0">
                 <MouBadge 
                   hasVerifiedMou={vm.hasVerifiedMou} 
-                  details={vm.subsidizedPolicy?.discountOrRate || undefined} 
+                  policy={vm.subsidizedPolicy}
                 />
               </div>
             </div>

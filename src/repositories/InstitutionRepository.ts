@@ -259,6 +259,7 @@ export class InstitutionRepository {
           is_partner_institute: true,
           entity_type: 'research',
           is_startup: false,
+          subsidized_policy: subsidizedMap.get(id),
         });
       }
     });
@@ -306,6 +307,7 @@ export class InstitutionRepository {
               is_startup: isStartup,
               ksum_uid: inst.ksum_uid,
               district: inst.district,
+              subsidized_policy: subsidizedMap.get(id),
             });
           }
         }

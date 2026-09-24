@@ -200,7 +200,7 @@ export default async function TechnologyDetailPage({ params }: { params: Promise
                   <span className="bg-slate-50 border border-slate-200 text-slate-700 rounded-sm text-xs px-3 py-1 font-sans font-semibold">
                     {vm.location.district || 'General'}
                   </span>
-                  <MouBadge hasVerifiedMou={hasVerifiedMou} />
+                  <MouBadge hasVerifiedMou={hasVerifiedMou} policy={vm.subsidizedPolicy} />
                   {shortTags.map((t, i) => (
                     <span key={i} className="bg-slate-50 border border-slate-200 text-slate-700 rounded-sm text-xs px-3 py-1 font-sans">
                       {t}

@@ -20,7 +20,8 @@ export default async function HomePage() {
   const repo = InstitutionRepository.fromInstrumentData(
     instrumentBundle.main_data,
     instrumentBundle.instituitiion_list,
-    instrumentBundle.mou_list
+    instrumentBundle.mou_list,
+    instrumentBundle.subsidized_list
   );
 
   const instrumentViewModels = instrumentBundle.main_data.map(inst => toInstrumentViewModel(inst, repo));
