@@ -162,6 +162,7 @@ export function toInstrumentViewModel(
 
   const id = instrument.provider_key || instrument.id || '';
   const title = instrument.instruments;
+  const alias = instrument.instruments1 && instrument.instruments1 !== 'None' ? instrument.instruments1 : null;
   const acronym = instrument.acronym && instrument.acronym !== 'None' ? instrument.acronym : null;
   const displayTitle = acronym ? `${title} (${acronym})` : title;
   
@@ -187,6 +188,7 @@ export function toInstrumentViewModel(
   return Object.freeze({
     id,
     title,
+    alias,
     acronym,
     displayTitle,
     institution: institutionName,

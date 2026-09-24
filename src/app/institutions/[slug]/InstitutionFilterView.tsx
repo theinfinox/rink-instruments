@@ -43,6 +43,7 @@ export default function InstitutionFilterView({ initialInstruments, institutionN
       if (!q) return true;
 
       const title = (inst.title || '').toLowerCase();
+      const alias = (inst.alias || '').toLowerCase();
       const acronym = (inst.acronym || '').toLowerCase();
       const facility = (inst.facility || '').toLowerCase();
       const location = (inst.location?.district || '').toLowerCase();
@@ -50,6 +51,7 @@ export default function InstitutionFilterView({ initialInstruments, institutionN
 
       return (
         title.includes(q) ||
+        alias.includes(q) ||
         acronym.includes(q) ||
         facility.includes(q) ||
         location.includes(q) ||

@@ -3,6 +3,7 @@ import { Service } from '@/types/service';
 import { SearchIndexItem } from '@/types';
 import { fetchDataset, fetchInstrumentBundle, DatasetType } from '@/lib/dataFetcher';
 import { InstitutionRepository } from '@/repositories/InstitutionRepository';
+import { buildSearchIndex } from '@/lib/searchEngine';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,26 +23,7 @@ export async function GET(request: Request) {
         bundle.subsidized_list
       );
 
-      index = instruments.map(inst => {
-        const tags = Array.isArray(inst.tag) ? inst.tag : (inst.tag ? inst.tag.split(',') : []);
-        const sectorName = tags.length > 0 ? tags[0].trim() : 'General';
-        const instEntity = repo.getInstitution(inst);
-        
-        return {
-          id: inst.provider_key || inst.id || '',
-          name: inst.instruments || '',
-          institution: instEntity.name,
-          institution_slug: instEntity.slug,
-          institution_id: instEntity.institution_id || inst.institution_id || '',
-          category: sectorName,
-          category_slug: sectorName.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-          ip_status: inst.warnings || '',
-          trl: inst.standardized_district || '',
-          keywords: tags,
-          problem_solved: inst.name_of_facility || '',
-          description: inst.address || '',
-        };
-      });
+      index = buildSearchIndex(instruments, repo);
     } else {
       const services = await fetchDataset('services') as Service[];
       index = services.map(srv => {

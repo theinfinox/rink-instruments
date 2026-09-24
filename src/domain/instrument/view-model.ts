@@ -17,6 +17,9 @@ export interface InstrumentViewModel {
   /** The acronym, if any (and valid) */
   acronym: string | null;
   
+  /** The alias, usually from instruments1 */
+  alias: string | null;
+  
   /** A pre-formatted string combining title and acronym */
   displayTitle: string;
 
