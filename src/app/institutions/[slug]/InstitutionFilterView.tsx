@@ -113,8 +113,8 @@ export default function InstitutionFilterView({ initialInstruments, institutionN
           </div>
         </div>
 
-        {/* Dynamic Facility Filters (rendered only if institution has multiple facilities) */}
-        {facilities.length > 1 && (
+        {/* Dynamic Facility Filters (Disabled as requested) */}
+        {false && facilities.length > 1 && (
           <div className="mt-4 pt-4 border-t border-slate-100">
             <div className="flex items-center gap-2 mb-2.5">
               <SlidersHorizontal className="w-3.5 h-3.5 text-slate-400" />
