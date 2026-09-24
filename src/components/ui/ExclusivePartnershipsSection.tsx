@@ -262,7 +262,7 @@ function PartnerCard({
 
 interface ExclusivePartnershipsSectionProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  mouList?: any[];
+  subsidizedList?: any[];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   institutionList?: any[];
 }
@@ -270,14 +270,14 @@ interface ExclusivePartnershipsSectionProps {
 const ITEMS_PER_PAGE = 8;
 
 export default function ExclusivePartnershipsSection({ 
-  mouList = [], 
+  subsidizedList = [], 
   institutionList = [] 
 }: ExclusivePartnershipsSectionProps) {
   const [currentPage, setCurrentPage] = useState(1);
 
   // Dynamically build and resolve partner list from live data
   const partners = useMemo<MouPartner[]>(() => {
-    if (!Array.isArray(mouList) || mouList.length === 0) {
+    if (!Array.isArray(subsidizedList) || subsidizedList.length === 0) {
       return FALLBACK_MOU_PARTNERS;
     }
 
@@ -292,9 +292,9 @@ export default function ExclusivePartnershipsSection({
       });
     }
 
-    // 2. Filter for verified MoU partnerships
-    const verified = mouList.filter(
-      item => item.ksum_mou === 'Yes' || item.verification_status === 'Verified'
+    // 2. Filter for verified Subsidized partnerships
+    const verified = subsidizedList.filter(
+      item => item.verification_status === 'Verified' || item.ksum_mou_status === 'Yes'
     );
 
     if (verified.length === 0) {
@@ -330,19 +330,19 @@ export default function ExclusivePartnershipsSection({
         name: name,
         shortName: extractShortName(name),
         slug: slug,
-        benefitBadge: item.ksum_benefit_type || 'Subsidized User Rates',
-        facility: item.ksum_facility || 'Central Testing & Instrumentation Facilities',
-        concessionRate: item.ksum_discount_or_rate || 'Subsidized rates for registered startups',
-        summary: item.ksum_mou_details || item.ksum_conditions || 'Subsidized access for eligible startups.',
+        benefitBadge: item.benefit_type || 'Subsidized User Rates',
+        facility: item.facility_or_centre || 'Central Testing & Instrumentation Facilities',
+        concessionRate: item.discount_or_rate || 'Subsidized rates for registered startups',
+        summary: item.access_conditions || item.description || 'Subsidized access for eligible startups.',
         localLogo: LOCAL_INSTITUTION_LOGOS[slug] || inst.localLogo,
         cdnLogo: inst.logo_link,
         originalLogoLink: inst.original_logo_link || item.original_logo_link,
-        eligibility: item.ksum_eligible_for || 'Valid KSUM UID',
+        eligibility: item.eligibility || 'Valid KSUM UID',
         district: district,
         gmaps_link: inst.gmaps_link || inst.link,
       };
     });
-  }, [mouList, institutionList]);
+  }, [subsidizedList, institutionList]);
 
   // Mobile progressive disclosure (initially shows 3 on mobile)
   const [isMobileExpanded, setIsMobileExpanded] = useState(false);

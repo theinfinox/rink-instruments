@@ -31,7 +31,11 @@ export async function POST(request: NextRequest) {
 
     // Fetch bundle and initialize repository
     const bundle = await fetchInstrumentBundle();
-    const repo = InstitutionRepository.fromInstrumentData(bundle.main_data, bundle.instituitiion_list, bundle.mou_list);
+    const repo = InstitutionRepository.fromInstrumentData(
+      bundle.main_data, 
+      bundle.instituitiion_list, 
+      bundle.subsidized_list
+    );
 
     // Run AI search scoring
     const result = await runAISearch(query, bundle.main_data);
@@ -59,7 +63,11 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   const query = request.nextUrl.searchParams.get('q') || '';
   const bundle = await fetchInstrumentBundle();
-  const repo = InstitutionRepository.fromInstrumentData(bundle.main_data, bundle.instituitiion_list, bundle.mou_list);
+  const repo = InstitutionRepository.fromInstrumentData(
+    bundle.main_data, 
+    bundle.instituitiion_list, 
+    bundle.subsidized_list
+  );
   const result = await runAISearch(query, bundle.main_data);
 
   const mappedResults = {

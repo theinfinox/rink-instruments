@@ -12,7 +12,6 @@ export default async function PartnerLogoWall() {
   const repo = InstitutionRepository.fromInstrumentData(
     bundle.main_data, 
     bundle.instituitiion_list, 
-    bundle.mou_list, 
     bundle.subsidized_list
   );
   

@@ -26,7 +26,7 @@ interface PortalManagerProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   institutionList?: any[];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  mouList?: any[];
+  subsidizedList?: any[];
   researchInstitutions?: Institution[];
   startupInstitutions?: Institution[];
   services: Service[];
@@ -77,7 +77,7 @@ const SERVICE_SEARCH_CONFIG: SearchConfig = {
 export default function PortalManager({
   instruments,
   institutionList = [],
-  mouList = [],
+  subsidizedList = [],
   researchInstitutions,
   startupInstitutions,
   services,
@@ -90,7 +90,7 @@ export default function PortalManager({
 
   // Load canonical InstitutionRepository instances with official instituitiion_list dataset
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const repo = useMemo(() => InstitutionRepository.fromInstrumentData(instruments as any[], institutionList, mouList), [instruments, institutionList, mouList]);
+  const repo = useMemo(() => InstitutionRepository.fromInstrumentData(instruments as any[], institutionList, subsidizedList), [instruments, institutionList, subsidizedList]);
 
   // Keep view synchronized with initialView on props update / Back-Forward navigation
   useEffect(() => {
@@ -156,11 +156,11 @@ export default function PortalManager({
       // Build MoU details lookup map
       const mouMap = new Map<string, boolean>();
       const mouDetailMap = new Map<string, string>();
-      if (Array.isArray(mouList)) {
-        mouList.forEach((item) => {
+      if (Array.isArray(subsidizedList)) {
+        subsidizedList.forEach((item) => {
           if (item?.institution_id && item?.verification_status === 'Verified') {
             mouMap.set(item.institution_id, true);
-            const benefit = item.ksum_benefit_type || item.ksum_discount_or_rate || item.ksum_mou_details || '';
+            const benefit = item.benefit_type || item.discount_or_rate || item.description || '';
             if (benefit) mouDetailMap.set(item.institution_id, benefit);
           }
         });
@@ -369,7 +369,7 @@ export default function PortalManager({
       
       {SHOW_EXCLUSIVE_MOU_SECTION && view === 'instruments' && (
         <ExclusivePartnershipsSection 
-          mouList={mouList} 
+          subsidizedList={subsidizedList} 
           institutionList={institutionList} 
         />
       )}

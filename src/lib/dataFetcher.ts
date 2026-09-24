@@ -10,24 +10,21 @@ export interface InstrumentBundle {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   instituitiion_list: any[];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  mou_list: any[];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   subsidized_list: any[];
 }
 
 export async function fetchInstrumentBundle(): Promise<InstrumentBundle> {
   try {
     const res = await fetch(`${CDN_HOST}/instrument.json`);
-    if (!res.ok) return { main_data: [], instituitiion_list: [], mou_list: [], subsidized_list: [] };
+    if (!res.ok) return { main_data: [], instituitiion_list: [], subsidized_list: [] };
     const data = await res.json();
     const main_data: Instrument[] = data.main_data || [];
     const instituitiion_list = data.instituitiion_list || data.institution_list || [];
-    const mou_list = data.mou || [];
     const subsidized_list = data.subsidized || [];
-    return { main_data, instituitiion_list, mou_list, subsidized_list };
+    return { main_data, instituitiion_list, subsidized_list };
   } catch (error) {
     console.error("Failed to fetch instrument bundle:", error);
-    return { main_data: [], instituitiion_list: [], mou_list: [], subsidized_list: [] };
+    return { main_data: [], instituitiion_list: [], subsidized_list: [] };
   }
 }
 

@@ -20,7 +20,7 @@ export default async function ServicesHomePage() {
   const repo = InstitutionRepository.fromInstrumentData(
     instrumentBundle.main_data,
     instrumentBundle.instituitiion_list,
-    instrumentBundle.mou_list
+    instrumentBundle.subsidized_list
   );
 
   const instrumentViewModels = instrumentBundle.main_data.map(inst => toInstrumentViewModel(inst, repo));
@@ -31,7 +31,7 @@ export default async function ServicesHomePage() {
     <PortalManager 
       instruments={instrumentViewModels} 
       institutionList={instrumentBundle.instituitiion_list}
-      mouList={instrumentBundle.mou_list}
+      subsidizedList={instrumentBundle.subsidized_list}
       researchInstitutions={researchInstitutions}
       startupInstitutions={startupInstitutions}
       services={services} 

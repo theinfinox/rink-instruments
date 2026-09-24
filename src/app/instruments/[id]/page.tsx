@@ -45,7 +45,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const bundle = await fetchInstrumentBundle();
-  const repo = InstitutionRepository.fromInstrumentData(bundle.main_data, bundle.instituitiion_list, bundle.mou_list, bundle.subsidized_list);
+  const repo = InstitutionRepository.fromInstrumentData(bundle.main_data, bundle.instituitiion_list, bundle.subsidized_list);
   const rawTech = bundle.main_data.find(t => (t.provider_key || t.id) === id);
   if (!rawTech) return { title: 'Instrument Not Found — RINK' };
   
@@ -76,7 +76,7 @@ export default async function TechnologyDetailPage({ params }: { params: Promise
   
   const bundle = await fetchInstrumentBundle();
   const instruments = bundle.main_data;
-  const repo = InstitutionRepository.fromInstrumentData(instruments, bundle.instituitiion_list, bundle.mou_list, bundle.subsidized_list);
+  const repo = InstitutionRepository.fromInstrumentData(instruments, bundle.instituitiion_list, bundle.subsidized_list);
   
   const rawTech = instruments.find(t => (t.provider_key || t.id) === id);
   if (!rawTech) notFound();

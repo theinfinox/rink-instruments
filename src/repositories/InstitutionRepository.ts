@@ -158,14 +158,12 @@ export class InstitutionRepository {
 
   /**
    * Factory method to build InstitutionRepository from raw instrument.json output
-   * handles main_data, instituitiion_list, and mou tabs
+   * handles main_data, institution_list, and subsidized tabs
    */
   static fromInstrumentData(
     mainData: Instrument[] = [],
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     institutionList: any[] = [],
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    mouList: any[] = [],
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     subsidizedList: any[] = []
   ): InstitutionRepository {
@@ -203,33 +201,7 @@ export class InstitutionRepository {
       });
     }
 
-    // 0b. Fallback / merge with legacy mouList
-    if (Array.isArray(mouList)) {
-      mouList.forEach(raw => {
-        const id = raw?.institution_id;
-        if (id && (raw?.ksum_mou === 'Yes' || raw?.verification_status === 'Verified')) {
-          mouMap.set(id, true);
-          if (!subsidizedMap.has(id)) {
-            subsidizedMap.set(id, {
-              hasSubsidizedRates: true,
-              institutionId: id,
-              institutionName: (raw.institution_name || '').trim(),
-              benefitType: raw.ksum_benefit_type,
-              discountOrRate: raw.ksum_discount_or_rate,
-              eligibility: raw.ksum_eligible_for,
-              facilityOrCentre: raw.ksum_facility,
-              accessConditions: raw.ksum_conditions,
-              validity: raw.ksum_validity && raw.ksum_validity !== 'Not Specified' ? raw.ksum_validity : undefined,
-              applicationMethod: raw.ksum_application_method,
-              description: raw.ksum_mou_details,
-              verificationStatus: raw.verification_status,
-              sourceUrl: null,
-              feeRateUrl: null,
-            });
-          }
-        }
-      });
-    }
+    // Legacy mouList fallback has been removed as per requirement.
 
     const generateSlug = (rawName: string) =>
       rawName.toLowerCase().replace(/['’]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');

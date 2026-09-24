@@ -16,7 +16,11 @@ export async function GET(request: Request) {
     if (dataset === 'instruments') {
       const bundle = await fetchInstrumentBundle();
       const instruments = bundle.main_data;
-      const repo = InstitutionRepository.fromInstrumentData(instruments, bundle.instituitiion_list);
+      const repo = InstitutionRepository.fromInstrumentData(
+        instruments, 
+        bundle.instituitiion_list, 
+        bundle.subsidized_list
+      );
 
       index = instruments.map(inst => {
         const tags = Array.isArray(inst.tag) ? inst.tag : (inst.tag ? inst.tag.split(',') : []);

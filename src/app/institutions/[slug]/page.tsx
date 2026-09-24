@@ -19,7 +19,6 @@ async function getRepo() {
   const repo = InstitutionRepository.fromInstrumentData(
     bundle.main_data,
     bundle.instituitiion_list,
-    bundle.mou_list,
     bundle.subsidized_list
   );
   return { repo, instruments: bundle.main_data };
