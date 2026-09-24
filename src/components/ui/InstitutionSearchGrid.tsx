@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowRight, Building2, Search, X, Check, Rocket, ShieldCheck, ChevronDown, ChevronUp, Landmark, MapPin } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import type { Institution } from '@/types';
@@ -106,10 +107,11 @@ function SuggestionItem({
         style={{ width: 32, height: 32 }}
       >
         {logo && !imageFailed ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img 
+          <Image 
             src={logo} 
             alt={inst.name} 
+            width={24}
+            height={24}
             className="object-contain w-6 h-6" 
             loading="lazy" 
             onError={() => setImageFailed(true)}
@@ -203,12 +205,14 @@ function InstitutionGridCard({
         className="w-14 h-14 sm:w-[84px] sm:h-[84px] rounded-lg sm:rounded-[14px] bg-white border border-[#E5E7EB] shadow-[0_2px_10px_rgba(15,23,42,0.05)] flex-shrink-0 flex items-center justify-center overflow-hidden transition-all duration-250 group-hover:-translate-y-0.5 group-hover:shadow-[0_8px_24px_rgba(15,23,42,0.10)]"
       >
         {logo && !imageFailed ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <Image
             src={logo}
             alt={inst.name}
+            width={64}
+            height={64}
             className="object-contain w-10 h-10 sm:w-16 sm:h-16 p-0.5 sm:p-1"
             loading={priority ? "eager" : "lazy"}
+            priority={priority}
             onError={() => setImageFailed(true)}
           />
         ) : (

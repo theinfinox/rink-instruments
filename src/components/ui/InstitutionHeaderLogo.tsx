@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { Building2 } from 'lucide-react';
 
 interface Props {
@@ -28,13 +29,14 @@ export default function InstitutionHeaderLogo({ src, alt, acronym }: Props) {
 
   return (
     <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-white border border-slate-200 shadow-xs flex items-center justify-center overflow-hidden p-2 flex-shrink-0">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
+      <Image
         src={src}
         alt={alt}
+        width={80}
+        height={80}
         onError={() => setError(true)}
         className="w-full h-full object-contain"
-        loading="eager"
+        priority={true}
       />
     </div>
   );

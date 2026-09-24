@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react';
 import { InstrumentViewModel } from '@/domain/instrument/view-model';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Building2, ArrowRight } from 'lucide-react';
 import { SectorIllustration, SECTOR_ACCENTS } from './SectorCard';
 import { motion, useReducedMotion } from 'framer-motion';
@@ -63,14 +64,15 @@ export default function TechnologyCard({ instrument, compact = false, disableAni
           <div className="flex gap-3">
             <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-gray-50 border border-gray-100 relative">
               {hasImage ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
+                <Image
                   src={displayImage!}
                   alt={vm.title}
+                  fill
+                  sizes="80px"
                   onError={() => setImageFailed(true)}
-                  className="w-full h-full object-cover"
+                  className="object-cover"
                   referrerPolicy="no-referrer"
-                  loading={priority ? "eager" : "lazy"}
+                  priority={priority}
                 />
               ) : (
                 <div className="w-full h-full opacity-30">
@@ -141,21 +143,21 @@ export default function TechnologyCard({ instrument, compact = false, disableAni
               )}
 
               {/* Actual technology image */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src={displayImage!}
                 alt={vm.title}
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 onLoad={() => setImageLoaded(true)}
                 onError={() => { setImageFailed(true); setImageLoaded(true); }}
-                className="w-full h-full object-cover transition-all duration-500 ease-out group-hover:scale-[1.05] group-hover:brightness-[1.03]"
+                className="object-cover transition-all duration-500 ease-out group-hover:scale-[1.05] group-hover:brightness-[1.03]"
                 style={{
                   opacity: imageLoaded ? 1 : 0,
                   transition: 'opacity 0.4s ease-out, transform 0.5s ease-out, filter 0.5s ease-out',
                   willChange: 'transform, opacity',
                 }}
                 referrerPolicy="no-referrer"
-                loading={priority ? "eager" : "lazy"}
-                decoding="async"
+                priority={priority}
               />
 
               {/* Light gradient overlay for badge readability */}
