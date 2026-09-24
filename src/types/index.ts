@@ -113,6 +113,8 @@ export interface SearchResult {
 export interface SearchIndexItem {
   id: string;
   name: string;
+  alias?: string;
+  acronym?: string;
   institution: string;
   institution_slug: string;
   institution_id?: string;

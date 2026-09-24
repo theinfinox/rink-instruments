@@ -34,6 +34,8 @@ export function buildSearchIndex(instruments: Instrument[], repo: InstitutionRep
     return {
       id: inst.provider_key || inst.id || '',
       name: inst.instruments || '',
+      alias: inst.instruments1 || '',
+      acronym: inst.acronym || '',
       institution: instEntity.name,
       institution_slug: instEntity.slug,
       institution_id: instEntity.institution_id || inst.institution_id || '',
@@ -87,6 +89,8 @@ async function getOramaDb(items: SearchIndexItem[]): Promise<AnyOrama> {
     await _insert!(db, {
       id:               item.id,
       name:             item.name,
+      alias:            item.alias || '',
+      acronym:          item.acronym || '',
       institution:      item.institution,
       category:         item.category,
       keywords_str:     (item.keywords || []).join(' '),
@@ -119,6 +123,8 @@ function scoreItem(item: SearchIndexItem, q: string): ScoredItem | null {
 
   const nId          = norm(item.id);
   const nName        = norm(item.name);
+  const nAlias       = norm(item.alias || '');
+  const nAcronym     = norm(item.acronym || '');
   const nInstitution = norm(item.institution);
   const nCategory    = norm(item.category);
   const nProblem     = norm(item.problem_solved || '');
@@ -126,6 +132,8 @@ function scoreItem(item: SearchIndexItem, q: string): ScoredItem | null {
 
   const jId          = nId.replace(/\s+/g, '');
   const jName        = nName.replace(/\s+/g, '');
+  const jAlias       = nAlias.replace(/\s+/g, '');
+  const jAcronym     = nAcronym.replace(/\s+/g, '');
   const jInstitution = nInstitution.replace(/\s+/g, '');
   const jCategory    = nCategory.replace(/\s+/g, '');
   const jProblem     = nProblem.replace(/\s+/g, '');
@@ -144,13 +152,13 @@ function scoreItem(item: SearchIndexItem, q: string): ScoredItem | null {
   }
 
   // Tier 2: Exact Name or Exact Acronym Field Match (e.g. "SEM")
-  const isAcronymMatch = item.problem_solved && norm(item.problem_solved) === nq; // problem_solved or acronym
-  if (nName === nq || jName === jQ || isAcronymMatch) {
+  const isAcronymMatch = (item.problem_solved && norm(item.problem_solved) === nq) || nAcronym === nq; 
+  if (nName === nq || jName === jQ || nAlias === nq || jAlias === jQ || isAcronymMatch) {
     return { ...item, _score: 950, _matchField: 'name_or_acronym_exact' };
   }
 
   // Tier 3: Standalone Acronym / Word Boundary Token Match in Title (e.g. "(SEM)" in "Scanning Electron Microscope (SEM)")
-  if (wordBoundary.test(nName)) {
+  if (wordBoundary.test(nName) || wordBoundary.test(nAlias)) {
     return { ...item, _score: 880, _matchField: 'acronym_word_boundary' };
   }
 
@@ -160,12 +168,12 @@ function scoreItem(item: SearchIndexItem, q: string): ScoredItem | null {
   }
 
   // Tier 5: Prefix Name (e.g. "SEM Imaging System" or "Semiconductor...")
-  if (nName.startsWith(nq) || jName.startsWith(jQ)) {
+  if (nName.startsWith(nq) || jName.startsWith(jQ) || nAlias.startsWith(nq) || jAlias.startsWith(jQ) || nAcronym.startsWith(nq)) {
     return { ...item, _score: 700, _matchField: 'name_prefix' };
   }
 
   // Tier 6: Substring Name (e.g. "...semiconductor...")
-  if (nName.includes(nq) || jName.includes(jQ)) {
+  if (nName.includes(nq) || jName.includes(jQ) || nAlias.includes(nq) || jAlias.includes(jQ) || nAcronym.includes(nq)) {
     return { ...item, _score: 420, _matchField: 'name_substr' };
   }
 
