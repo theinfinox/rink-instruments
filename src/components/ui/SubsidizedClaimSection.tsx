@@ -211,7 +211,7 @@ export default function SubsidizedClaimSection({
             className="inline-flex items-center justify-center gap-1.5 sm:gap-2 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl bg-white hover:bg-slate-50 text-emerald-900 font-semibold text-[11px] sm:text-sm border border-emerald-300 shadow-xs transition-all duration-200 active:scale-[0.98]"
           >
             <ExternalLink className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600 flex-shrink-0" />
-            <span>Official Portal / Fee Schedule</span>
+            <span>Official Website / Fee Schedule</span>
           </a>
         )}
 
