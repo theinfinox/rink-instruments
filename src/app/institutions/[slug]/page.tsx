@@ -248,7 +248,7 @@ export default async function InstitutionDetailPage({ params, searchParams }: Pr
                     className="inline-flex items-center gap-1 text-[#0A2164] hover:underline font-medium"
                   >
                     <Globe className="w-3.5 h-3.5 text-slate-400" />
-                    <span>Official Portal</span>
+                    <span>Official Page</span>
                   </a>
                 )}
               </div>

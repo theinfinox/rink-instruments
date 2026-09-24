@@ -141,7 +141,7 @@ export default function SubsidizedClaimSection({
       </div>
 
       {/* How to Claim Steps */}
-      {(policy.applicationMethod || policy.accessConditions || policy.notes || policy.additionalPolicyDetails) && (
+      {(policy.applicationMethod || policy.accessConditions || policy.description || policy.notes || policy.additionalPolicyDetails) && (
         <div className="relative z-10 bg-white/80 backdrop-blur-sm rounded-xl p-3.5 sm:p-5 border border-emerald-200/70 mb-4 sm:mb-5">
           <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2 mb-3">
             <Layers className="w-4 h-4 text-emerald-600" />
@@ -163,13 +163,13 @@ export default function SubsidizedClaimSection({
             )}
 
             {/* Step: Access Conditions / Quotas */}
-            {policy.accessConditions && (
+            {(policy.description || policy.accessConditions) && (
               <div className="flex items-start gap-2.5">
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 flex-shrink-0" />
                 <div>
                   <strong className="text-slate-900 block sm:inline">Access Conditions &amp; Limits:</strong>{' '}
                   <span className="text-slate-700">
-                    {policy.accessConditions}
+                    {policy.description || policy.accessConditions}
                   </span>
                 </div>
               </div>
