@@ -468,6 +468,8 @@ export function runLocalSearchWithAnalysis(
     let needsMatched = 0;
     for (const need of needs) {
       const nameLower = (inst.instruments || '').toLowerCase();
+      const aliasLower = (inst.instruments1 || '').toLowerCase();
+      const acronymLower = (inst.acronym || '').toLowerCase();
       const keywordsLower = tags.map(k => k.toLowerCase()).join(' ');
       const problemLower = (inst.name_of_facility || '').toLowerCase();
       const appsLower = '';
@@ -476,7 +478,7 @@ export function runLocalSearchWithAnalysis(
       const sectorLower = tags.join(' ').toLowerCase();
       const instLower = (inst.institution_name || '').toLowerCase();
 
-      const text = `${nameLower} ${keywordsLower} ${problemLower} ${appsLower} ${descLower} ${typeLower} ${sectorLower} ${instLower}`;
+      const text = `${nameLower} ${aliasLower} ${acronymLower} ${keywordsLower} ${problemLower} ${appsLower} ${descLower} ${typeLower} ${sectorLower} ${instLower}`;
       const escaped = need.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const regex = new RegExp(`\\b${escaped}`, 'i');
 
@@ -487,6 +489,9 @@ export function runLocalSearchWithAnalysis(
         if (new RegExp(`\\b${escaped}`, 'i').test(nameLower)) {
           score += 40;
           matchedOn.push('name');
+        } else if (new RegExp(`\\b${escaped}`, 'i').test(aliasLower) || new RegExp(`\\b${escaped}`, 'i').test(acronymLower)) {
+          score += 35;
+          matchedOn.push('alias');
         } else if (keywordsLower.includes(need)) {
           score += 25;
           matchedOn.push('keywords');

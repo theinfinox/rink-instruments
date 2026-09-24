@@ -13,6 +13,7 @@ import { fetchDataset, DatasetType } from '@/lib/dataFetcher';
 const SCHEMA = {
   id: 'string' as const,
   name: 'string' as const,
+  alias: 'string' as const,
   institution: 'string' as const,
   institutionId: 'string' as const,
   institutionName: 'string' as const,
@@ -69,6 +70,7 @@ async function getIndex(dataset: DatasetType) {
       await insert(db, {
         id: tech.id || '',
         name: normalizeText(tech.instruments || ''),
+        alias: normalizeText(tech.instruments1 || ''),
         institution: normalizeText(`${tech.institution_name || ''} ${tech.matched_institution || ''}`),
         institutionId: tech.institution_id || '',
         institutionName: normalizeText(tech.institution_name || ''),
@@ -88,6 +90,7 @@ async function getIndex(dataset: DatasetType) {
       await insert(db, {
         id,
         name: normalizeText(srv.serviceName || ''),
+        alias: '',
         institution: normalizeText(srv.startupName || ''),
         institutionId: srv.ksumUid || '',
         institutionName: normalizeText(srv.startupName || ''),
@@ -187,6 +190,7 @@ export async function oramaSearch<T = Instrument | Service>(
     boost: {
       id: 100,
       name: 90,
+      alias: 85,
       keywords: 80,
       problem_solved: 70,
       description: 60,

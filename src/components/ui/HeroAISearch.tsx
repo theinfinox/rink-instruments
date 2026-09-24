@@ -29,16 +29,36 @@ function Bold({ text }: { text: string }) {
 function ResultCard({ r }: { r: AISearchResult }) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const vm = (r as any).viewModel;
-  if (!vm) return null;
-  const tags = vm.tags || [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const raw = (r as any).instrument;
+
+  if (!vm && !raw) return null;
+
+  const id = vm?.id || raw?.id || raw?.serviceName || '';
+  const displayTitle = vm?.displayTitle || raw?.instruments || raw?.serviceName || '';
+  const institution = vm?.institution || raw?.matched_institution || raw?.institution_name || raw?.startupName || '';
+  
+  let tags: string[] = [];
+  if (vm?.tags) {
+    tags = vm.tags;
+  } else if (raw?.tag) {
+    tags = Array.isArray(raw.tag) ? raw.tag : raw.tag.split(',').map((t: string) => t.trim()).filter(Boolean);
+  } else if (raw?.category) {
+    tags = [raw.category];
+  }
+
+  // Use /services prefix if it's a service (assumed if serviceName exists and instruments doesn't)
+  const isService = !vm && raw && !raw.instruments && raw.serviceName;
+  const href = isService ? `/services/${encodeURIComponent(id)}` : `/instruments/${encodeURIComponent(id)}`;
+
   return (
     <Link
-      href={`/instruments/${vm.id}`}
+      href={href}
       className="block bg-white/5 border border-white/10 backdrop-blur-sm rounded-md p-4 hover:border-[#F5B400]/40 hover:bg-white/[0.08] transition-all"
     >
-      <div className="font-semibold text-white text-sm leading-snug mb-2 line-clamp-2">{vm.displayTitle}</div>
+      <div className="font-semibold text-white text-sm leading-snug mb-2 line-clamp-2">{displayTitle}</div>
       <div className="flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-slate-300">
-        <span className="inline-flex items-center gap-1"><Building2 className="w-3 h-3 opacity-70" /> {vm.institution}</span>
+        <span className="inline-flex items-center gap-1"><Building2 className="w-3 h-3 opacity-70" /> {institution}</span>
         {tags.length > 0 && <span className="inline-flex items-center gap-1"><Layers className="w-3 h-3 opacity-70" /> {tags[0]}</span>}
       </div>
     </Link>
