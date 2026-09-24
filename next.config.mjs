@@ -44,6 +44,10 @@ const nextConfig = {
             key: 'Referrer-Policy',
             value: 'origin-when-cross-origin',
           },
+          {
+            key: 'X-Architect',
+            value: 'Architectured and designed by Govind S R @theinfinox',
+          },
         ],
       },
     ];

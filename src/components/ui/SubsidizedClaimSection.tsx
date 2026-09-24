@@ -67,35 +67,39 @@ export default function SubsidizedClaimSection({
             </p>
           </div>
         </div>
-
-        {/* Rate Tier Badge */}
-        <div className="w-full md:w-auto flex flex-col items-start md:items-end mt-1 md:mt-0">
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 md:mb-1">
-            Concession Tier
-          </span>
-          {activeLink && activeLink !== '#' ? (
-            <a
-              href={activeLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex w-full md:w-auto justify-between md:justify-start items-center gap-2 px-4 py-2.5 md:px-3.5 md:py-1.5 rounded-xl text-sm font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm tracking-wide transition-colors group text-left leading-snug"
-              title={feeRateUrl ? "View Official Fee Schedule" : "View Official Website"}
-            >
-              <span className="flex-1 md:flex-none">{rateHighlight}</span>
-              <ExternalLink className="w-4 h-4 md:w-3.5 md:h-3.5 text-emerald-200 group-hover:text-white transition-colors flex-shrink-0" />
-            </a>
-          ) : (
-            <span className="inline-flex w-full md:w-auto items-center px-4 py-2.5 md:px-3.5 md:py-1.5 rounded-xl text-sm font-bold bg-emerald-600 text-white shadow-sm tracking-wide text-left leading-snug">
-              {rateHighlight}
-            </span>
-          )}
-        </div>
       </div>
 
       {/* Highlights Grid */}
       <div className="relative z-10 bg-white/90 sm:bg-transparent rounded-xl border border-emerald-100/90 sm:border-0 shadow-xs sm:shadow-none my-4 sm:my-5 divide-y divide-emerald-50 sm:divide-y-0 sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:gap-3.5">
         
-        {/* Card 1: Eligibility */}
+        {/* Card 1: Concession Tier */}
+        <div className="p-3.5 sm:bg-white/90 sm:backdrop-blur-sm sm:rounded-xl sm:border sm:border-emerald-100/90 sm:shadow-xs flex flex-col justify-between">
+          <div>
+            <div className="flex items-center gap-2 text-emerald-800 text-xs font-bold uppercase tracking-wider mb-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
+              <span>Concession Tier</span>
+            </div>
+            <p className="text-emerald-900 text-sm sm:text-[15px] font-bold leading-snug">
+              {rateHighlight}
+            </p>
+          </div>
+          {activeLink && activeLink !== '#' && (
+            <div className="mt-3 pt-3 border-t border-emerald-100/80">
+              <a
+                href={activeLink || undefined}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600 hover:text-emerald-700 transition-colors group"
+                title={feeRateUrl ? "View Official Fee Schedule" : "View Official Website"}
+              >
+                {feeRateUrl ? "View Official Fee Schedule" : "View Official Website"}
+                <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+              </a>
+            </div>
+          )}
+        </div>
+
+        {/* Card 2: Eligibility */}
         <div className="p-3.5 sm:bg-white/90 sm:backdrop-blur-sm sm:rounded-xl sm:border sm:border-emerald-100/90 sm:shadow-xs flex flex-col justify-between">
           <div className="flex items-center gap-2 text-emerald-800 text-xs font-bold uppercase tracking-wider mb-1.5">
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
@@ -116,7 +120,7 @@ export default function SubsidizedClaimSection({
             <div className="text-slate-800 text-xs sm:text-[13px] font-medium leading-snug">
               {(() => {
                 const normalize = (str: string) => str.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-                const isNameIncluded = normalize(facility).includes(normalize(institutionName));
+                const isNameIncluded = normalize(facility || '').includes(normalize(institutionName));
                 return !isNameIncluded && (
                   <span className="block text-[11px] text-slate-500 mb-0.5 leading-tight">{institutionName}</span>
                 );
