@@ -42,7 +42,7 @@ export default function SubsidizedClaimSection({
       <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-56 h-56 rounded-full bg-teal-300/10 blur-3xl pointer-events-none" />
 
       {/* Header */}
-      <div className="relative z-10 flex flex-wrap items-start justify-between gap-4 pb-5 border-b border-emerald-200/60">
+      <div className="relative z-10 flex flex-col md:flex-row md:items-start justify-between gap-5 md:gap-4 pb-5 border-b border-emerald-200/60">
         <div className="flex items-start gap-3.5">
           <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-md shadow-emerald-600/20 flex-shrink-0 mt-0.5">
             <ShieldCheck className="w-5 h-5" />
@@ -69,8 +69,8 @@ export default function SubsidizedClaimSection({
         </div>
 
         {/* Rate Tier Badge */}
-        <div className="inline-flex flex-col items-start md:items-end mt-2 md:mt-0">
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+        <div className="w-full md:w-auto flex flex-col items-start md:items-end mt-1 md:mt-0">
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 md:mb-1">
             Concession Tier
           </span>
           {activeLink && activeLink !== '#' ? (
@@ -78,14 +78,14 @@ export default function SubsidizedClaimSection({
               href={activeLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-start gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm tracking-wide transition-colors group max-w-[280px] sm:max-w-sm text-left leading-snug"
+              className="inline-flex w-full md:w-auto justify-between md:justify-start items-center gap-2 px-4 py-2.5 md:px-3.5 md:py-1.5 rounded-xl text-sm font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm tracking-wide transition-colors group text-left leading-snug"
               title={feeRateUrl ? "View Official Fee Schedule" : "View Official Website"}
             >
-              <span>{rateHighlight}</span>
-              <ExternalLink className="w-3.5 h-3.5 text-emerald-200 group-hover:text-white transition-colors mt-0.5 flex-shrink-0" />
+              <span className="flex-1 md:flex-none">{rateHighlight}</span>
+              <ExternalLink className="w-4 h-4 md:w-3.5 md:h-3.5 text-emerald-200 group-hover:text-white transition-colors flex-shrink-0" />
             </a>
           ) : (
-            <span className="inline-flex items-start px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold bg-emerald-600 text-white shadow-sm tracking-wide max-w-[280px] sm:max-w-sm text-left leading-snug">
+            <span className="inline-flex w-full md:w-auto items-center px-4 py-2.5 md:px-3.5 md:py-1.5 rounded-xl text-sm font-bold bg-emerald-600 text-white shadow-sm tracking-wide text-left leading-snug">
               {rateHighlight}
             </span>
           )}
@@ -167,7 +167,7 @@ export default function SubsidizedClaimSection({
               <div className="flex items-start gap-2.5">
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 flex-shrink-0" />
                 <div className="flex-1">
-                  <strong className="text-slate-900 block mb-1 sm:mb-0 sm:inline">Access Conditions &amp; Limits:</strong>{' '}
+                  <strong className="text-slate-900 block mb-1 sm:mb-0 sm:inline">NB:</strong>{' '}
                   <span className="text-slate-600 leading-relaxed">
                     {policy.description || policy.accessConditions}
                   </span>
