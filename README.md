@@ -262,7 +262,7 @@ Potential enhancements include:
 
 ## Developed By
 
-**Muhammed Ashik S**
+**Govind S R, Muhammed Ashik S & Akash**
 
 Academic Intern
 
