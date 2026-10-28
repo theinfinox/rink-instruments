@@ -17,7 +17,7 @@ export default function ClientStartupLogo({ logo, name }: Props) {
       <img
         src={logo}
         alt={name}
-        className="w-5 h-5 object-contain rounded-sm flex-shrink-0 border border-slate-100 bg-white shadow-2xs"
+        className="w-5 h-5 object-contain rounded-sm shrink-0 border border-slate-100 bg-white shadow-2xs"
         loading="lazy"
         onError={() => setImageFailed(true)}
       />
@@ -25,7 +25,7 @@ export default function ClientStartupLogo({ logo, name }: Props) {
   }
 
   return (
-    <Building2 className="w-4 h-4 text-slate-400 group-hover:text-[#0A2164] transition-colors flex-shrink-0" />
+    <Building2 className="w-4 h-4 text-slate-400 group-hover:text-[#0A2164] transition-colors shrink-0" />
   );
 }
 
