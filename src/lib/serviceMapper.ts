@@ -1,4 +1,5 @@
 import { Service } from '@/types/service';
+import { getImageUrl } from '@/lib/utils';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function mapService(raw: any): Service {
@@ -18,7 +19,9 @@ export function mapService(raw: any): Service {
     equipmentUsed: equipment,
     certifications: raw.column_15 || '',
     infrastructure: raw.column_16 || '',
-    thumbnail: raw.upload_the_startup_logo_png_format || '/images/default-service.png',
+    thumbnail: raw.upload_the_startup_logo_png_format && raw.upload_the_startup_logo_png_format !== 'None'
+      ? getImageUrl(raw.upload_the_startup_logo_png_format.trim())
+      : '',
     originalLogoUrl: raw.original_upload_the_startup_logo_png_format || '',
     district: raw.district || '',
     address: raw.address || '',
