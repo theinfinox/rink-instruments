@@ -160,14 +160,23 @@ export function toInstrumentViewModel(
 ): Readonly<InstrumentViewModel> {
   const instEntity = repo.getInstitution(instrument);
 
+  // Fallback: If repo entity has no logo, but this instrument carries a direct logo (e.g. from intake form)
+  const resolvedInstEntity = (!instEntity.logo_link && instrument.logo_link)
+    ? {
+        ...instEntity,
+        logo_link: instrument.logo_link,
+        original_logo_link: instrument.original_logo_link || instEntity.original_logo_link,
+      }
+    : instEntity;
+
   const id = instrument.provider_key || instrument.id || '';
   const title = instrument.instruments;
   const alias = instrument.instruments1 && instrument.instruments1 !== 'None' ? instrument.instruments1 : null;
   const acronym = instrument.acronym && instrument.acronym !== 'None' ? instrument.acronym : null;
   const displayTitle = acronym ? `${title} (${acronym})` : title;
   
-  const institutionName = instEntity.name || repo.resolveDisplayName(instrument);
-  const hasVerifiedMou = instEntity?.has_verified_mou === true;
+  const institutionName = resolvedInstEntity.name || repo.resolveDisplayName(instrument);
+  const hasVerifiedMou = resolvedInstEntity?.has_verified_mou === true;
   const subsidizedPolicy = repo.getSubsidizedPolicy(instrument);
     
   const facility = instrument.name_of_facility && instrument.name_of_facility !== 'None' ? instrument.name_of_facility : null;
@@ -192,15 +201,15 @@ export function toInstrumentViewModel(
     acronym,
     displayTitle,
     institution: institutionName,
-    institution_id: instrument.institution_id || instEntity?.institution_id,
-    institution_name: instrument.institution_name || instEntity?.name,
+    institution_id: instrument.institution_id || resolvedInstEntity?.institution_id,
+    institution_name: instrument.institution_name || resolvedInstEntity?.name,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    institution_type: instrument.institution_type || (instEntity?.is_startup ? 'Startup' : (instrument as any).are_you_an_institution_startup),
+    institution_type: instrument.institution_type || (resolvedInstEntity?.is_startup ? 'Startup' : (instrument as any).are_you_an_institution_startup),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     source_type: (instrument as any).source_type,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ksum_uid: instrument.ksum_uid || (instrument as any).ksum_uid || instEntity?.ksum_uid,
-    institution_entity: instEntity || undefined,
+    ksum_uid: instrument.ksum_uid || (instrument as any).ksum_uid || resolvedInstEntity?.ksum_uid,
+    institution_entity: resolvedInstEntity || undefined,
     hasVerifiedMou,
     subsidizedPolicy: subsidizedPolicy || undefined,
     facility,

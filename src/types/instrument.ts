@@ -26,6 +26,8 @@ export interface Instrument {
   ksum_uid?: string;
   source_type?: string;
   specifications?: string;
+  logo_link?: string;
+  original_logo_link?: string;
 }
 
 export interface SubsidizedClaimPolicy {

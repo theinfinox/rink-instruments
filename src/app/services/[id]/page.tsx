@@ -7,6 +7,8 @@ import { Service } from '@/types/service';
 import SmartBack from '@/components/ui/SmartBack';
 import NativeShareButton from '@/components/ui/NativeShareButton';
 import QRCodeLabel from '@/components/ui/QRCodeLabel';
+import ServiceDetailMedia from './ServiceDetailMedia';
+import ClientStartupLogo from './ClientStartupLogo';
 
 export const dynamicParams = true;
 
@@ -127,6 +129,13 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
               </span>
             )}
           </div>
+
+          <ServiceDetailMedia
+            src={service.thumbnail}
+            alt={service.serviceName}
+            category={service.category}
+            sector={service.sector}
+          />
           
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-4">
             <h1 className="text-2xl md:text-3xl font-heading font-bold text-slate-900 leading-tight">
@@ -141,8 +150,8 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
           </div>
           
           <div className="flex flex-wrap items-center gap-2 text-slate-600 mb-8 text-sm">
-            <Link href={`/services/list?q=${encodeURIComponent(service.startupName || '')}`} className="flex items-center gap-1.5 font-medium text-slate-900 hover:text-[#0A2164] hover:underline">
-              <Building2 className="w-4 h-4 text-slate-400" />
+            <Link href={`/services/list?q=${encodeURIComponent(service.startupName || '')}`} className="flex items-center gap-2 font-medium text-slate-900 hover:text-[#0A2164] hover:underline">
+              <ClientStartupLogo logo={service.logo} name={service.startupName || 'Startup'} />
               {service.startupName}
             </Link>
             {service.district && (
