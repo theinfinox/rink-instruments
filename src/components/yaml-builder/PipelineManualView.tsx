@@ -137,6 +137,10 @@ export default function PipelineManualView({ config }: { config: RinkConfig }) {
           md += `#### ${sIdx + 1}.${tIdx + 1}. Tab: \`${tab.name}\` (GID: \`${tab.gid}\`)\n`;
           if (tab.skipFirstRows) md += `- ⏭️ **Row Offset**: Skips top \`${tab.skipFirstRows}\` data row(s) below header.\n`;
           if (tab.hierarchical_rows) md += `- 🌳 **Hierarchical Rows**: Enabled (blank leading cells inherit parent metadata).\n`;
+          if (tab.columnMapping && Object.keys(tab.columnMapping).length > 0) {
+            md += `- 🔄 **Column Mappings**:\n`;
+            Object.entries(tab.columnMapping).forEach(([s, t]) => md += `  - \`${s}\` ➔ \`${t}\`\n`);
+          }
           if (tab.excludeColumns?.length) md += `- 🚫 **Excluded Columns**: \`${tab.excludeColumns.join(', ')}\`\n`;
           if (tab.excludeRowsWhere?.length) {
             md += `- ✂️ **Row Drop Rules**:\n`;
@@ -398,6 +402,12 @@ export default function PipelineManualView({ config }: { config: RinkConfig }) {
 
                       {/* Rules Summary Pills */}
                       <div className="flex flex-wrap gap-1.5 text-[11px]">
+                        {tab.columnMapping && Object.keys(tab.columnMapping).length > 0 ? (
+                          <div className="bg-indigo-50 text-indigo-800 px-2 py-0.5 rounded border border-indigo-200 font-mono">
+                            <strong>Column Mappings:</strong> {Object.keys(tab.columnMapping).length} mapped
+                          </div>
+                        ) : null}
+
                         {tab.excludeColumns?.length ? (
                           <div className="bg-rose-50 text-rose-800 px-2 py-0.5 rounded border border-rose-200 font-mono">
                             <strong>Excluded Columns:</strong> {tab.excludeColumns.join(', ')}

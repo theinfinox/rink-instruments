@@ -19,7 +19,9 @@ export interface Service {
   
   // Media
   thumbnail: string;
+  logo?: string;
   originalLogoUrl?: string;
+  originalThumbnailUrl?: string;
   
   // Contact & Location
   district: string;

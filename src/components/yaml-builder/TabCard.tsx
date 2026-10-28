@@ -1,8 +1,33 @@
 import React, { useState } from 'react';
 import Tooltip from './Tooltip';
 import { TabConfig } from './types';
-import { Loader2, Plus, Sparkles } from 'lucide-react';
+import { Loader2, Plus, Sparkles, ArrowRight } from 'lucide-react';
 import MergeSourceCard from './MergeSourceCard';
+
+const COMMON_TARGET_COLUMNS = [
+  'instruments',
+  'service_name',
+  'description',
+  'institution_name',
+  'startup_name',
+  'district',
+  'category',
+  'sector',
+  'tag',
+  'image_link',
+  'logo_link',
+  'specifications',
+  'equipment_used',
+  'infrastructure',
+  'certifications',
+  'address',
+  'name_of_facility',
+  'enquiry_mail',
+  'enquiry_contact_number',
+  'website_booking_link',
+  'acronym',
+  'provider_key'
+];
 
 export default function TabCard({ 
   tab, 
@@ -146,6 +171,36 @@ export default function TabCard({
     );
   };
 
+  const mappingEntries = Object.entries(tab.columnMapping || {});
+
+  const updateMappingKey = (oldKey: string, newKey: string, targetVal: string) => {
+    const newMap = { ...(tab.columnMapping || {}) };
+    delete newMap[oldKey];
+    if (newKey.trim()) {
+      newMap[newKey.trim()] = targetVal;
+    }
+    onChange({ ...tab, columnMapping: Object.keys(newMap).length > 0 ? newMap : undefined });
+  };
+
+  const updateMappingVal = (srcKey: string, targetVal: string) => {
+    const newMap = { ...(tab.columnMapping || {}) };
+    newMap[srcKey] = targetVal;
+    onChange({ ...tab, columnMapping: newMap });
+  };
+
+  const removeMapping = (srcKey: string) => {
+    const newMap = { ...(tab.columnMapping || {}) };
+    delete newMap[srcKey];
+    onChange({ ...tab, columnMapping: Object.keys(newMap).length > 0 ? newMap : undefined });
+  };
+
+  const addMappingRow = () => {
+    const newMap = { ...(tab.columnMapping || {}) };
+    const unused = tabColumns.find(c => !newMap[c]) || '';
+    newMap[unused] = '';
+    onChange({ ...tab, columnMapping: newMap });
+  };
+
   return (
     <div className="bg-gray-50 p-4 rounded-md border border-gray-200 mt-4 relative transition-all">
       <button 
@@ -259,11 +314,119 @@ export default function TabCard({
           </div>
         </div>
 
+        {/* 🔄 Column Mapping (Spreadsheet Header ➔ Canonical Key) */}
+        <div className="bg-white p-3 rounded-md border border-indigo-100 mb-3 shadow-2xs">
+          <div className="flex items-center justify-between mb-2">
+            <label className="flex items-center text-xs font-bold text-indigo-950">
+              Column Mapping (Spreadsheet Header ➔ Canonical Key)
+              <Tooltip text="Map raw or misnamed spreadsheet headers (e.g. column_12 -> service_name, upload_the_startup_logo_png_format -> logo_link) into clean API keys." />
+            </label>
+            <button
+              type="button"
+              onClick={addMappingRow}
+              className="flex items-center gap-1 text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-2.5 py-1 rounded font-medium transition-colors cursor-pointer"
+            >
+              <Plus size={13} /> Add Mapping
+            </button>
+          </div>
+
+          {mappingEntries.length === 0 ? (
+            <p className="text-xs text-gray-500 italic">No column mappings added. Raw headers will be sanitized to snake_case automatically.</p>
+          ) : (
+            <div className="space-y-2 mt-2">
+              {mappingEntries.map(([srcKey, targetVal], idx) => (
+                <div key={idx} className="flex items-center gap-2">
+                  {/* Source Column Smart Combobox */}
+                  <div className="w-1/2 flex items-center gap-1">
+                    <div className="relative flex-1">
+                      <input
+                        type="text"
+                        list={`src-cols-${tab.gid}-${idx}`}
+                        className="w-full border border-gray-300 rounded p-1.5 text-xs font-mono bg-white"
+                        placeholder="Source header (e.g. column_12)"
+                        value={srcKey}
+                        onChange={(e) => updateMappingKey(srcKey, e.target.value, targetVal)}
+                      />
+                      <datalist id={`src-cols-${tab.gid}-${idx}`}>
+                        {tabColumns.map(col => (
+                          <option key={col} value={col} />
+                        ))}
+                      </datalist>
+                    </div>
+
+                    {tabColumns.length > 0 && (
+                      <select
+                        className="border border-gray-200 rounded p-1.5 text-xs bg-gray-50 text-gray-600 max-w-[100px] truncate"
+                        value=""
+                        onChange={(e) => {
+                          if (e.target.value) {
+                            updateMappingKey(srcKey, e.target.value, targetVal);
+                          }
+                        }}
+                      >
+                        <option value="" disabled>Pick...</option>
+                        {tabColumns.map(col => (
+                          <option key={col} value={col}>{col}</option>
+                        ))}
+                      </select>
+                    )}
+                  </div>
+
+                  <ArrowRight size={14} className="text-indigo-400 shrink-0" />
+
+                  {/* Target Canonical Key Smart Combobox */}
+                  <div className="w-1/2 flex items-center gap-1">
+                    <div className="relative flex-1">
+                      <input
+                        type="text"
+                        list={`target-cols-${tab.gid}-${idx}`}
+                        className="w-full border border-gray-300 rounded p-1.5 text-xs font-mono bg-white"
+                        placeholder="Target key (e.g. service_name)"
+                        value={targetVal}
+                        onChange={(e) => updateMappingVal(srcKey, e.target.value)}
+                      />
+                      <datalist id={`target-cols-${tab.gid}-${idx}`}>
+                        {COMMON_TARGET_COLUMNS.map(col => (
+                          <option key={col} value={col} />
+                        ))}
+                      </datalist>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => removeMapping(srcKey)}
+                      className="text-gray-400 hover:text-red-500 p-1 cursor-pointer"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
         {/* Exclude Columns */}
         {renderMultiSelect('Exclude Columns', 'Column headers to completely hide from the public API (e.g. internal_notes, pricing)', tab.excludeColumns, (v) => onChange({...tab, excludeColumns: v}), 'exclude-cols')}
 
-        {/* Image Columns */}
-        {renderMultiSelect('Image Columns', 'Column headers containing Google Drive image links to auto-convert to WebP.', Array.isArray(tab.imageColumns) ? tab.imageColumns : (tab.imageColumns ? [tab.imageColumns as string] : undefined), (v) => onChange({...tab, imageColumns: v}), 'img-cols')}
+        {/* Image Columns (With Explicit Safeguard Notice) */}
+        <div className="p-3 bg-blue-50/30 rounded-md border border-blue-100/70 mb-2">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-[11px] font-semibold text-blue-700 bg-blue-100/60 px-2 py-0.5 rounded">
+              🛡️ URL Protection Active
+            </span>
+            <span className="text-[10px] text-gray-400">
+              Only selected columns are converted to WebP
+            </span>
+          </div>
+          {renderMultiSelect(
+            'Image Columns', 
+            'Explicitly select columns containing Google Drive image links to download and optimize into WebP (e.g. logo_link for Provider Logos, image_link for Offering Photos). Website URLs and booking links outside this list are 100% preserved as raw external links.', 
+            Array.isArray(tab.imageColumns) ? tab.imageColumns : (tab.imageColumns ? [tab.imageColumns as string] : undefined), 
+            (v) => onChange({...tab, imageColumns: v}), 
+            'img-cols'
+          )}
+        </div>
 
         {/* Exclude Rows Where (Smart Combobox) */}
         <div className="border border-orange-100 bg-orange-50/30 p-3 rounded-md mt-2 transition-all">

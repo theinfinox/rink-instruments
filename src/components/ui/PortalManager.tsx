@@ -224,8 +224,31 @@ export default function PortalManager({
         if (svc.startupName) {
           const name = svc.startupName;
           const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-          if (!startupMap.has(slug)) startupMap.set(slug, { slug, name, tech_count: 0 });
-          startupMap.get(slug)!.tech_count++;
+          if (!startupMap.has(slug)) {
+            startupMap.set(slug, {
+              slug,
+              name,
+              tech_count: 0,
+              logo_link: svc.logo || svc.thumbnail || undefined,
+              original_logo_link: svc.originalLogoUrl || undefined,
+              district: svc.district || undefined,
+              address: svc.address || undefined,
+              entity_type: 'startup' as const,
+              is_startup: true,
+            });
+          }
+          const existing = startupMap.get(slug)!;
+          existing.tech_count++;
+          if (!existing.logo_link && (svc.logo || svc.thumbnail)) {
+            existing.logo_link = svc.logo || svc.thumbnail;
+            existing.original_logo_link = svc.originalLogoUrl;
+          }
+          if (!existing.district && svc.district) {
+            existing.district = svc.district;
+          }
+          if (!existing.address && svc.address) {
+            existing.address = svc.address;
+          }
         }
         if (svc.category) sectorMap.set(svc.category.trim(), true);
         if (svc.district) {

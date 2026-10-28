@@ -36,9 +36,11 @@ export interface TabConfig {
   gid: number;
   hierarchical_rows?: boolean;
   skipFirstRows?: number;
+  onlyIncludeMapped?: boolean;
   excludeColumns?: string[];
   excludeRowsWhere?: ExcludeRowCondition[];
   splitColumns?: SplitColumnConfig[];
+  columnMapping?: Record<string, string>;
   imageColumns?: string | string[];
   aiSearch?: {
     enabled: boolean;
